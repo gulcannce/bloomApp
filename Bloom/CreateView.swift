@@ -10,6 +10,7 @@ struct CreateView: View {
     @State private var selectedItem: PhotosPickerItem? = nil
     @State private var processedImage: Image? = nil
     @State private var savedSuccessfully = false
+    @State private var selectedMoodEmoji: String = "🌸"
 
     var body: some View {
         ZStack {
@@ -95,6 +96,34 @@ struct CreateView: View {
                                 .focused($isTextFocused)
                         }
                         .padding(.vertical, 16)
+
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text(localization.currentLanguage == .turkish ? "Bugünün Hali" : "Today's Mood")
+                                .font(.system(size: 14, weight: .light, design: .serif))
+                                .foregroundColor(.black.opacity(0.5))
+                                .padding(.horizontal, 16)
+
+                            HStack(spacing: 12) {
+                                ForEach(["🌸", "✨", "☁️", "🌱", "🤍"], id: \.self) { emoji in
+                                    Button(action: {
+                                        selectedMoodEmoji = emoji
+                                        triggerEmojiHaptic()
+                                        print("QA_LOG: Mood Emoji Selected -> \(emoji)")
+                                    }) {
+                                        Text(emoji)
+                                            .font(.system(size: 24))
+                                            .scaleEffect(selectedMoodEmoji == emoji ? 1.2 : 1.0)
+                                            .animation(.spring(response: 0.3, dampingFraction: 0.6), value: selectedMoodEmoji)
+                                    }
+                                    .frame(maxWidth: .infinity)
+                                    .padding(.vertical, 8)
+                                    .background(selectedMoodEmoji == emoji ? Color.white.opacity(0.8) : Color.white.opacity(0.5))
+                                    .cornerRadius(8)
+                                }
+                            }
+                            .padding(.horizontal, 16)
+                        }
+                        .padding(.vertical, 16)
                     }
                     .padding(.bottom, 80)
                 }
@@ -103,7 +132,6 @@ struct CreateView: View {
 
                 HStack(spacing: 16) {
                     ToolbarButton(icon: "textformat.size", label: "Aa")
-                    ToolbarButton(icon: "smiley", label: "😊")
 
                     PhotosPicker(selection: $selectedItem, matching: .images) {
                         ToolbarButton(icon: "photo.stack", label: "📷")
@@ -150,12 +178,17 @@ struct CreateView: View {
         return formatter.string(from: Date())
     }
 
+    private func triggerEmojiHaptic() {
+        let lightHaptic = UIImpactFeedbackGenerator(style: .light)
+        lightHaptic.impactOccurred()
+    }
+
     private func saveMemory() {
         guard !diaryText.trimmingCharacters(in: .whitespaces).isEmpty else {
             print("QA_LOG: Memory save cancelled - empty note")
             return
         }
-        let newMemory = Memory(image: processedImage, note: diaryText, emoji: "🌸")
+        let newMemory = Memory(image: processedImage, note: diaryText, emoji: selectedMoodEmoji)
         memoryStore.addMemory(newMemory)
         print("QA_LOG: Memory saved - \(newMemory.id)")
 

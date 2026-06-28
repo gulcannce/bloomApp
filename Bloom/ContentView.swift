@@ -342,14 +342,55 @@ struct HomeView: View {
 // MARK: - Stats View (Mood Analytics)
 struct StatsView: View {
     @EnvironmentObject var localization: LocalizationManager
+    @StateObject private var memoryStore = MemoryStore.shared
 
-    let moodData = [
-        ("😄", "Harika", 35),
-        ("🙂", "İyi", 28),
-        ("😐", "Orta", 22),
-        ("😕", "Kötü", 10),
-        ("😢", "Berbat", 5),
-    ]
+    var moodData: [(emoji: String, label: String, value: Int)] {
+        let emojis = [("🌸", "Çiçek"), ("✨", "Parlak"), ("☁️", "Sakin"), ("🌱", "Büyüme"), ("🤍", "Aşk")]
+        let totalMemories = memoryStore.memories.count
+        guard totalMemories > 0 else {
+            return emojis.map { ($0.0, $0.1, 0) }
+        }
+
+        var counts: [String: Int] = [:]
+        for memory in memoryStore.memories {
+            counts[memory.emoji, default: 0] += 1
+        }
+
+        return emojis.map { emoji, label in
+            let count = counts[emoji] ?? 0
+            return (emoji, label, count)
+        }
+    }
+
+    var longestStreak: Int {
+        guard !memoryStore.memories.isEmpty else { return 0 }
+        let calendar = Calendar.current
+        let dates = Set(memoryStore.memories.map { calendar.startOfDay(for: $0.date) })
+        let sortedDates = dates.sorted(by: >)
+
+        var streak = 1
+        var maxStreak = 1
+        for i in 0..<(sortedDates.count - 1) {
+            let current = sortedDates[i]
+            let next = sortedDates[i + 1]
+            let daysDifference = calendar.dateComponents([.day], from: next, to: current).day ?? 0
+            if daysDifference == 1 {
+                streak += 1
+                maxStreak = max(maxStreak, streak)
+            } else {
+                streak = 1
+            }
+        }
+        return maxStreak
+    }
+
+    var averageMoodEmoji: String {
+        var counts: [String: Int] = [:]
+        for memory in memoryStore.memories {
+            counts[memory.emoji, default: 0] += 1
+        }
+        return counts.max(by: { $0.value < $1.value })?.key ?? "🌸"
+    }
 
     var body: some View {
         ZStack {
@@ -371,7 +412,9 @@ struct StatsView: View {
 
                     // Mood Metrics List
                     VStack(alignment: .leading, spacing: 12) {
-                        ForEach(moodData, id: \.1) { emoji, label, percentage in
+                        ForEach(moodData, id: \.1) { emoji, label, value in
+                            let totalCount = moodData.reduce(0) { $0 + $1.value }
+                            let percentage = totalCount > 0 ? Int((Double(value) / Double(totalCount)) * 100) : 0
                             HStack(spacing: 12) {
                                 Text(emoji)
                                     .font(.system(size: 20))
@@ -411,8 +454,8 @@ struct StatsView: View {
 
                     // Streak Counters
                     HStack(spacing: 16) {
-                        StreakBadge(label: "Longest Streak", value: "12 Days 🔥")
-                        StreakBadge(label: "Average Mood", value: "😄 3.78")
+                        StreakBadge(label: localization.currentLanguage == .turkish ? "Longest Streak" : "Longest Streak", value: "\(longestStreak) Days 🔥")
+                        StreakBadge(label: localization.currentLanguage == .turkish ? "Average Mood" : "Average Mood", value: "\(averageMoodEmoji)")
                     }
                     .padding(.horizontal, 16)
 

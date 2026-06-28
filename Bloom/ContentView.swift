@@ -769,7 +769,12 @@ struct ToolbarButton: View {
 // MARK: - Calendar View (Memory Archive)
 struct CalendarView: View {
     @EnvironmentObject var localization: LocalizationManager
+    @StateObject private var memoryStore = MemoryStore.shared
     let currentDate = Date()
+
+    var sortedMemories: [Memory] {
+        memoryStore.memories.sorted { $0.date > $1.date }
+    }
 
     var body: some View {
         ZStack {
@@ -785,29 +790,39 @@ struct CalendarView: View {
                         .padding(.top, 20)
 
                     // Monthly Calendar Grid
-                    MonthlyCalendarGrid()
+                    MonthlyCalendarGrid(memories: memoryStore.memories)
                         .padding(.horizontal, 16)
 
                     Divider()
                         .padding(.horizontal, 16)
 
                     // Memory Timeline
-                    VStack(alignment: .leading, spacing: 16) {
-                        Text("Anılar")
-                            .font(.system(size: 16, weight: .light, design: .serif))
-                            .foregroundColor(.black.opacity(0.6))
-                            .padding(.horizontal, 16)
-
-                        ForEach(0..<3, id: \.self) { index in
-                            MemoryTimelineItem(
-                                date: "28 Mayıs 2024",
-                                snippet: "Bugün harika bir gün geçirdim. Doğanın içinde vakit geçirmek bana çok iyi geldi.",
-                                emoji: ["🌸", "🌿", "☁️"][index % 3]
-                            )
-                            .padding(.horizontal, 16)
+                    if memoryStore.memories.isEmpty {
+                        VStack(spacing: 12) {
+                            Text(localization.currentLanguage == .turkish ? "Henüz anı yok" : "No memories yet")
+                                .font(.system(size: 14, weight: .light))
+                                .foregroundColor(.black.opacity(0.4))
                         }
+                        .frame(maxWidth: .infinity, alignment: .center)
+                        .padding(.vertical, 40)
+                    } else {
+                        VStack(alignment: .leading, spacing: 16) {
+                            Text(localization.currentLanguage == .turkish ? "Anılar" : "Memories")
+                                .font(.system(size: 16, weight: .light, design: .serif))
+                                .foregroundColor(.black.opacity(0.6))
+                                .padding(.horizontal, 16)
+
+                            ForEach(sortedMemories, id: \.id) { memory in
+                                MemoryTimelineItem(
+                                    date: formatDateForTimeline(memory.date),
+                                    snippet: memory.note.prefix(60) + (memory.note.count > 60 ? "..." : ""),
+                                    emoji: memory.emoji
+                                )
+                                .padding(.horizontal, 16)
+                            }
+                        }
+                        .padding(.vertical, 16)
                     }
-                    .padding(.vertical, 16)
 
                     Spacer(minLength: 40)
                 }
@@ -815,12 +830,37 @@ struct CalendarView: View {
             }
         }
     }
+
+    private func formatDateForTimeline(_ date: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = localization.currentLanguage == .turkish ? "dd MMMM yyyy" : "MMMM dd, yyyy"
+        formatter.locale = localization.currentLanguage == .turkish ? Locale(identifier: "tr_TR") : Locale(identifier: "en_US")
+        return formatter.string(from: date)
+    }
 }
 
 // MARK: - Monthly Calendar Grid
 struct MonthlyCalendarGrid: View {
     let columns = Array(repeating: GridItem(.flexible(), spacing: 8), count: 7)
-    let daysWithMemories = [3, 8, 15, 22, 28] // Sample days with memories
+    let memories: [Memory]
+    let calendar = Calendar.current
+
+    var daysWithMemories: [Int] {
+        let today = Date()
+        let currentMonth = calendar.component(.month, from: today)
+        let currentYear = calendar.component(.year, from: today)
+
+        var days: [Int] = []
+        for memory in memories {
+            let memoryMonth = calendar.component(.month, from: memory.date)
+            let memoryYear = calendar.component(.year, from: memory.date)
+            if memoryMonth == currentMonth && memoryYear == currentYear {
+                let day = calendar.component(.day, from: memory.date)
+                days.append(day)
+            }
+        }
+        return Array(Set(days)).sorted()
+    }
 
     var body: some View {
         VStack(spacing: 12) {
@@ -849,7 +889,7 @@ struct MonthlyCalendarGrid: View {
                                 .foregroundColor(.black.opacity(0.7))
 
                             if daysWithMemories.contains(day) {
-                                Text("📷")
+                                Text(emojiForDay(day))
                                     .font(.system(size: 10))
                             }
                         }
@@ -861,6 +901,23 @@ struct MonthlyCalendarGrid: View {
         .padding(16)
         .background(Color.white.opacity(0.8))
         .cornerRadius(12)
+    }
+
+    private func emojiForDay(_ day: Int) -> String {
+        let today = Date()
+        let currentMonth = calendar.component(.month, from: today)
+        let currentYear = calendar.component(.year, from: today)
+
+        for memory in memories {
+            let memoryMonth = calendar.component(.month, from: memory.date)
+            let memoryYear = calendar.component(.year, from: memory.date)
+            let memoryDay = calendar.component(.day, from: memory.date)
+
+            if memoryMonth == currentMonth && memoryYear == currentYear && memoryDay == day {
+                return memory.emoji
+            }
+        }
+        return "📷"
     }
 }
 

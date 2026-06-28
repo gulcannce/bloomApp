@@ -11,6 +11,7 @@ struct ContentView: View {
     @State private var photoScale: CGFloat = 1.0
     @State private var photoOffset: CGSize = .zero
     @State private var photoRotation: Angle = .zero
+    @State private var selectedEmoji: String? = nil
 
     var body: some View {
         ZStack {
@@ -24,6 +25,8 @@ struct ContentView: View {
                     .foregroundColor(.black.opacity(0.7))
 
                 PolaroidCard(photoScale: $photoScale, photoOffset: $photoOffset, photoRotation: $photoRotation)
+
+                EmojiPicker(selectedEmoji: $selectedEmoji)
 
                 Spacer()
             }
@@ -112,6 +115,36 @@ struct PhotoWindow: View {
                 )
             )
         )
+    }
+}
+
+struct EmojiPicker: View {
+    @Binding var selectedEmoji: String?
+    private let emojis = ["🌸", "✨", "☁️", "🌱", "🤍"]
+
+    var body: some View {
+        HStack(spacing: 12) {
+            ForEach(emojis, id: \.self) { emoji in
+                Button(action: {
+                    selectedEmoji = emoji
+                    print("QA_LOG: Emoji Selected -> \(emoji)")
+                }) {
+                    Text(emoji)
+                        .font(.system(size: 32))
+                        .padding(12)
+                        .background(
+                            selectedEmoji == emoji
+                                ? Color.black.opacity(0.08)
+                                : Color.clear
+                        )
+                        .cornerRadius(8)
+                        .scaleEffect(selectedEmoji == emoji ? 1.1 : 1.0)
+                        .animation(.easeInOut(duration: 0.2), value: selectedEmoji)
+                }
+            }
+            Spacer()
+        }
+        .padding(.horizontal, 24)
     }
 }
 

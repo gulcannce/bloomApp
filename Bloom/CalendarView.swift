@@ -110,6 +110,7 @@ struct MonthlyCalendarGrid: View {
                         if daysWithMemories.contains(day) {
                             RoundedRectangle(cornerRadius: 8)
                                 .fill(Color.black.opacity(0.08))
+                                .transition(.scale.combined(with: .opacity))
                         }
 
                         VStack(spacing: 2) {
@@ -120,10 +121,12 @@ struct MonthlyCalendarGrid: View {
                             if daysWithMemories.contains(day) {
                                 Text(emojiForDay(day))
                                     .font(.system(size: 10))
+                                    .transition(.scale.combined(with: .opacity))
                             }
                         }
                     }
                     .frame(height: 50)
+                    .animation(.spring(response: 0.45, dampingFraction: 0.82, blendDuration: 0), value: daysWithMemories)
                 }
             }
         }

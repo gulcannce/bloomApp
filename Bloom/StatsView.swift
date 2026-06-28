@@ -98,6 +98,7 @@ struct StatsView: View {
                                         RoundedRectangle(cornerRadius: 4)
                                             .fill(Color.black.opacity(0.15))
                                             .frame(width: geo.size.width * CGFloat(percentage) / 100)
+                                            .animation(.spring(response: 0.45, dampingFraction: 0.82, blendDuration: 0), value: percentage)
                                     }
                                 }
                                 .frame(height: 6)

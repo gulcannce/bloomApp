@@ -158,6 +158,10 @@ struct CreateView: View {
         let newMemory = Memory(image: processedImage, note: diaryText, emoji: "🌸")
         memoryStore.addMemory(newMemory)
         print("QA_LOG: Memory saved - \(newMemory.id)")
+
+        let successHaptic = UINotificationFeedbackGenerator()
+        successHaptic.notificationOccurred(.success)
+
         diaryText = ""
         processedImage = nil
         savedSuccessfully = true

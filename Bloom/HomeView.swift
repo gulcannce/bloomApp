@@ -98,8 +98,11 @@ struct HomeView: View {
                                             }
                                         }
                                         .scaleEffect(currentIndex == index ? photoScale : 1.0)
+                                        .animation(.spring(response: 0.45, dampingFraction: 0.82, blendDuration: 0), value: photoScale)
                                         .offset(currentIndex == index ? photoOffset : .zero)
+                                        .animation(.spring(response: 0.45, dampingFraction: 0.82, blendDuration: 0), value: photoOffset)
                                         .rotationEffect(currentIndex == index ? photoRotation : .zero)
+                                        .animation(.spring(response: 0.45, dampingFraction: 0.82, blendDuration: 0), value: photoRotation)
                                         .highPriorityGesture(
                                             DragGesture()
                                                 .onChanged { value in

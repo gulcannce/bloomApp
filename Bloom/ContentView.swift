@@ -1,6 +1,7 @@
 import SwiftUI
 import Combine
 import PhotosUI
+import UIKit
 
 // MARK: - Localization
 enum Language: String, CaseIterable {

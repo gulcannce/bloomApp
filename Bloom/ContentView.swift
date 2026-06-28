@@ -47,10 +47,12 @@ struct PolaroidCard: View {
                 .frame(width: 320, height: 420)
                 .shadow(color: .black.opacity(0.08), radius: 12, x: 0, y: 8)
 
-            VStack(spacing: 16) {
+            VStack(spacing: 0) {
                 PhotoWindow(scale: $photoScale, offset: $photoOffset, rotation: $photoRotation)
                     .frame(width: 280, height: 280)
                     .clipped()
+
+                Spacer()
 
                 VStack(spacing: 8) {
                     Text("Anı")
@@ -63,9 +65,7 @@ struct PolaroidCard: View {
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.horizontal, 20)
-                .padding(.bottom, 12)
-
-                Spacer()
+                .padding(.bottom, 24)
             }
             .frame(width: 320, height: 420)
             .padding(.top, 20)

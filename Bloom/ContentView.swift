@@ -8,10 +8,22 @@
 import SwiftUI
 
 struct ContentView: View {
-    @State private var photoScale: CGFloat = 1.0
-    @State private var photoOffset: CGSize = .zero
-    @State private var photoRotation: Angle = .zero
     @State private var selectedEmoji: String? = nil
+    @State private var carouselIndex: Int = 0
+
+    private let photoItems = ["🌸", "✨", "☁️", "🌱", "🤍"]
+    @State private var gestures: [Int: PhotoGestureState] = [:]
+
+    private func getGestureState(_ index: Int) -> PhotoGestureState {
+        if gestures[index] == nil {
+            gestures[index] = PhotoGestureState()
+        }
+        return gestures[index]!
+    }
+
+    private var currentGestureState: PhotoGestureState {
+        getGestureState(carouselIndex)
+    }
 
     var body: some View {
         ZStack {
@@ -24,7 +36,11 @@ struct ContentView: View {
                     .tracking(0.8)
                     .foregroundColor(.black.opacity(0.7))
 
-                PolaroidCard(photoScale: $photoScale, photoOffset: $photoOffset, photoRotation: $photoRotation)
+                PolaroidCard(
+                    carouselIndex: $carouselIndex,
+                    photoItems: photoItems,
+                    currentGestureState: currentGestureState
+                )
 
                 EmojiPicker(selectedEmoji: $selectedEmoji)
 
@@ -36,9 +52,9 @@ struct ContentView: View {
 }
 
 struct PolaroidCard: View {
-    @Binding var photoScale: CGFloat
-    @Binding var photoOffset: CGSize
-    @Binding var photoRotation: Angle
+    @Binding var carouselIndex: Int
+    let photoItems: [String]
+    let currentGestureState: PhotoGestureState
 
     var body: some View {
         ZStack {
@@ -48,12 +64,18 @@ struct PolaroidCard: View {
                 .shadow(color: .black.opacity(0.08), radius: 12, x: 0, y: 8)
 
             VStack(spacing: 0) {
-                PhotoWindow(scale: $photoScale, offset: $photoOffset, rotation: $photoRotation)
-                    .frame(width: 280, height: 280)
-                    .clipped()
-                    .zIndex(1)
-
-                Spacer()
+                TabView(selection: $carouselIndex) {
+                    ForEach(photoItems.indices, id: \.self) { index in
+                        PhotoWindow(
+                            item: photoItems[index],
+                            gestureState: currentGestureState
+                        )
+                        .tag(index)
+                    }
+                }
+                .frame(width: 280, height: 320)
+                .clipped()
+                .zIndex(1)
 
                 VStack(spacing: 8) {
                     Text("Anı")
@@ -78,21 +100,19 @@ struct PolaroidCard: View {
 }
 
 struct PhotoWindow: View {
-    @Binding var scale: CGFloat
-    @Binding var offset: CGSize
-    @Binding var rotation: Angle
+    let item: String
+    let gestureState: PhotoGestureState
 
     var body: some View {
         ZStack {
             Color.gray.opacity(0.12)
 
-            Image(systemName: "photo.artframe")
-                .font(.system(size: 48, weight: .light))
-                .foregroundColor(.black.opacity(0.3))
+            Text(item)
+                .font(.system(size: 64))
         }
-        .scaleEffect(scale)
-        .offset(offset)
-        .rotationEffect(rotation)
+        .scaleEffect(gestureState.scale)
+        .offset(gestureState.offset)
+        .rotationEffect(gestureState.rotation)
         .cornerRadius(8)
         .clipped()
         .highPriorityGesture(
@@ -103,19 +123,18 @@ struct PhotoWindow: View {
                             width: value.translation.width,
                             height: value.translation.height
                         )
-                        offset = newOffset
+                        gestureState.offset = newOffset
                         print("QA_LOG: Photo Offset Updated -> \(newOffset)")
                     },
                 SimultaneousGesture(
                     MagnificationGesture()
                         .onChanged { value in
-                            let newScale = value
-                            scale = newScale
-                            print("QA_LOG: Photo Scale Updated -> \(newScale)")
+                            gestureState.scale = value
+                            print("QA_LOG: Photo Scale Updated -> \(value)")
                         },
                     RotationGesture()
                         .onChanged { value in
-                            rotation = value
+                            gestureState.rotation = value
                             print("QA_LOG: Rotation Angle Updated -> \(value.degrees)")
                         }
                 )
@@ -154,6 +173,12 @@ struct EmojiPicker: View {
         }
         .padding(.horizontal, 24)
     }
+}
+
+class PhotoGestureState: ObservableObject {
+    @Published var scale: CGFloat = 1.0
+    @Published var offset: CGSize = .zero
+    @Published var rotation: Angle = .zero
 }
 
 #Preview {

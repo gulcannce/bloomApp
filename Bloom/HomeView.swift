@@ -4,20 +4,20 @@ import Combine
 struct HomeView: View {
     @EnvironmentObject var localization: LocalizationManager
     @StateObject private var memoryStore = MemoryStore.shared
-    @State private var currentIndex = 0
-    @State private var photoScale: CGFloat = 1.0
-    @State private var photoOffset: CGSize = .zero
-    @State private var photoRotation: Angle = .zero
-    @State private var selectedEmoji: String? = nil
     @State private var expandedMemoryId: UUID? = nil
     @Namespace private var animationNamespace
+
+    let columns = [
+        GridItem(.flexible(), spacing: 12),
+        GridItem(.flexible(), spacing: 12)
+    ]
 
     var body: some View {
         ZStack {
             BloomTheme.background
                 .ignoresSafeArea()
 
-            VStack(spacing: 30) {
+            VStack(spacing: 0) {
                 HStack {
                     Text(localization.string("bloom_title"))
                         .font(.system(size: 28, weight: .light, design: .serif))
@@ -46,141 +46,44 @@ struct HomeView: View {
                     }
                 }
                 .padding(.horizontal, 20)
+                .padding(.vertical, 20)
 
-                HStack(spacing: 24) {
-                    ForEach(["🌸", "✨", "☁️", "🌱", "🤍"], id: \.self) { emoji in
-                        Button(action: {
-                            selectedEmoji = emoji
-                        }) {
-                            Text(emoji)
-                                .font(.system(size: 26))
-                                .scaleEffect(selectedEmoji == emoji ? 1.2 : 1.0)
-                                .animation(.spring(response: 0.3, dampingFraction: 0.6), value: selectedEmoji)
-                        }
-                    }
-                }
-                .padding(.vertical, 10)
-                .padding(.horizontal, 20)
-                .background(Color.white.opacity(0.5))
-                .clipShape(Capsule())
-
-                VStack(spacing: 0) {
-                    if memoryStore.memories.isEmpty {
-                        VStack(spacing: 16) {
-                            Image(systemName: "photo.artframe")
-                                .font(.system(size: 48, weight: .light))
-                                .foregroundColor(.black.opacity(0.2))
+                if memoryStore.memories.isEmpty {
+                    VStack(spacing: 20) {
+                        Spacer()
+                        Image(systemName: "photo.artframe")
+                            .font(.system(size: 48, weight: .light))
+                            .foregroundColor(BloomTheme.textTertiary)
+                        VStack(spacing: 8) {
                             Text(localization.currentLanguage == .turkish ? "Henüz anı yok" : "No memories yet")
-                                .font(.system(size: 14, weight: .light))
-                                .foregroundColor(.black.opacity(0.4))
-                        }
-                        .frame(height: 310)
-                    } else {
-                        ZStack(alignment: .top) {
-                            RoundedRectangle(cornerRadius: 4)
-                                .fill(BloomTheme.agedParchment)
-                                .frame(width: 290, height: 310)
-                                .offset(x: 4, y: 6)
-                                .rotationEffect(.degrees(-2.5), anchor: .center)
-
-                            VStack(spacing: 0) {
-                                TabView(selection: $currentIndex) {
-                                    ForEach(memoryStore.memories.indices, id: \.self) { index in
-                                        let memory = memoryStore.memories[index]
-                                        ZStack {
-                                            LinearGradient(gradient: Gradient(colors: [BloomTheme.agedParchment, BloomTheme.agedParchment.opacity(0.8)]), startPoint: .topLeading, endPoint: .bottomTrailing)
-                            if let image = memory.image {
-                                                image.resizable().scaledToFill()
-                                            } else {
-                                                Image(systemName: "photo.artframe")
-                                                    .font(.system(size: 40))
-                                                    .foregroundColor(BloomTheme.textTertiary)
-                                            }
-                                        }
-                                        .scaleEffect(currentIndex == index ? photoScale : 1.0)
-                                        .animation(.spring(response: 0.45, dampingFraction: 0.82, blendDuration: 0), value: photoScale)
-                                        .offset(currentIndex == index ? photoOffset : .zero)
-                                        .animation(.spring(response: 0.45, dampingFraction: 0.82, blendDuration: 0), value: photoOffset)
-                                        .rotationEffect(currentIndex == index ? photoRotation : .zero)
-                                        .animation(.spring(response: 0.45, dampingFraction: 0.82, blendDuration: 0), value: photoRotation)
-                                        .highPriorityGesture(
-                                            DragGesture()
-                                                .onChanged { value in
-                                                    photoOffset = value.translation
-                                                }
-                                                .onEnded { _ in }
-                                        )
-                                        .tag(index)
-                                    }
-                                }
-                                .tabViewStyle(.page)
-                                .frame(width: 290, height: 310)
-                                .cornerRadius(4)
-                                .clipped()
-                            }
-                            .background(BloomTheme.cardBackground)
-                            .cornerRadius(4)
-                            .shadow(color: Color.black.opacity(0.08), radius: 12, x: 0, y: 8)
-
-                            RoundedRectangle(cornerRadius: 1.5)
-                                .fill(Color.white.opacity(0.6))
-                                .frame(width: 60, height: 18)
-                                .overlay(
-                                    RoundedRectangle(cornerRadius: 1.5)
-                                        .stroke(Color.white.opacity(0.3), lineWidth: 0.5)
-                                )
-                                .shadow(color: Color.black.opacity(0.08), radius: 2, x: 0, y: 1)
-                                .offset(y: 8)
-                                .rotationEffect(.degrees(2.0), anchor: .center)
-                        }
-                        .frame(width: 320, height: 420)
-                        .padding(.top, 15)
-                    }
-
-                    Spacer()
-
-                    if memoryStore.memories.isEmpty {
-                        VStack(alignment: .leading, spacing: 6) {
-                            Text(localization.currentLanguage == .turkish ? "İlk anını oluştur" : "Create your first memory")
                                 .font(.system(size: 16, weight: .regular, design: .serif))
-                                .foregroundColor(BloomTheme.driedRose)
-                            Text(localization.currentLanguage == .turkish ? "Create sekmesine git" : "Go to Create tab")
-                                .font(.system(size: 12, weight: .light))
-                                .foregroundColor(BloomTheme.textSecondary)
-                        }
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding(.horizontal, 20)
-                        .padding(.bottom, 24)
-                    } else {
-                        let current = memoryStore.memories[currentIndex]
-                        VStack(alignment: .leading, spacing: 6) {
-                            Text(current.note.prefix(50) + (current.note.count > 50 ? "..." : ""))
-                                .font(.system(size: 14, weight: .light))
                                 .foregroundColor(BloomTheme.textPrimary)
-                            Text(formattedDate(current.date))
-                                .font(.system(size: 12, weight: .light))
+                            Text(localization.currentLanguage == .turkish ? "Create sekmesine git" : "Go to Create tab")
+                                .font(.system(size: 14, weight: .light))
                                 .foregroundColor(BloomTheme.textSecondary)
                         }
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding(.horizontal, 20)
-                        .padding(.bottom, 24)
+                        Spacer()
                     }
-                }
-                .frame(width: 320, height: 420)
-                .background(BloomTheme.cardBackground)
-                .cornerRadius(12)
-                .shadow(color: Color.black.opacity(0.08), radius: 12, x: 0, y: 8)
-                .onTapGesture {
-                    if !memoryStore.memories.isEmpty {
-                        withAnimation(.spring(response: 0.52, dampingFraction: 0.78)) {
-                            expandedMemoryId = memoryStore.memories[currentIndex].id
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                } else {
+                    ScrollView(showsIndicators: false) {
+                        LazyVGrid(columns: columns, spacing: 12) {
+                            ForEach(memoryStore.memories, id: \.id) { memory in
+                                PinterestMemoryCard(
+                                    memory: memory,
+                                    onTap: {
+                                        withAnimation(.spring(response: 0.52, dampingFraction: 0.78)) {
+                                            expandedMemoryId = memory.id
+                                        }
+                                    },
+                                    animationNamespace: animationNamespace
+                                )
+                            }
                         }
+                        .padding(12)
                     }
                 }
-
-                Spacer()
             }
-            .padding(.top, 40)
 
             if let expandedId = expandedMemoryId,
                let expandedMemory = memoryStore.memories.first(where: { $0.id == expandedId }) {
@@ -288,5 +191,87 @@ struct HomeView: View {
         let formatter = DateFormatter()
         formatter.dateFormat = localization.currentLanguage == .turkish ? "dd.MM.yyyy" : "MM/dd/yyyy"
         return formatter.string(from: date)
+    }
+}
+
+struct PinterestMemoryCard: View {
+    @EnvironmentObject var localization: LocalizationManager
+    let memory: Memory
+    let onTap: () -> Void
+    let animationNamespace: Namespace.ID
+
+    var cardHeight: CGFloat {
+        let baseHeight: CGFloat = 200
+        let noteLength = CGFloat(memory.note.count)
+        let additionalHeight = min(noteLength / 50, 2) * 40
+        return baseHeight + additionalHeight
+    }
+
+    var body: some View {
+        VStack(spacing: 0) {
+            ZStack {
+                LinearGradient(gradient: Gradient(colors: [BloomTheme.agedParchment, BloomTheme.agedParchment.opacity(0.9)]), startPoint: .topLeading, endPoint: .bottomTrailing)
+
+                if let image = memory.image {
+                    image.resizable().scaledToFill()
+                } else {
+                    Image(systemName: "photo.artframe")
+                        .font(.system(size: 32, weight: .light))
+                        .foregroundColor(BloomTheme.textTertiary)
+                }
+            }
+            .frame(height: 180)
+            .cornerRadius(16)
+            .clipped()
+            .matchedGeometryEffect(id: memory.id, in: animationNamespace)
+
+            VStack(alignment: .leading, spacing: 8) {
+                HStack(spacing: 8) {
+                    Text(memory.emoji)
+                        .font(.system(size: 20))
+
+                    Text(relativeDate(memory.date))
+                        .font(.system(size: 11, weight: .light, design: .serif))
+                        .foregroundColor(BloomTheme.textSecondary)
+
+                    Spacer()
+                }
+
+                Text(memory.note.prefix(60) + (memory.note.count > 60 ? "..." : ""))
+                    .font(.system(size: 12, weight: .light))
+                    .lineSpacing(2)
+                    .foregroundColor(BloomTheme.textPrimary)
+                    .lineLimit(3)
+            }
+            .padding(12)
+            .frame(maxWidth: .infinity, alignment: .leading)
+        }
+        .background(BloomTheme.cardBackground)
+        .cornerRadius(16)
+        .shadow(color: Color.black.opacity(0.06), radius: 8, x: 0, y: 4)
+        .onTapGesture(perform: onTap)
+    }
+
+    private func relativeDate(_ date: Date) -> String {
+        let now = Date()
+        let calendar = Calendar.current
+        let components = calendar.dateComponents([.day, .month, .year], from: date, to: now)
+
+        if components.day == 0 {
+            return localization.currentLanguage == .turkish ? "Bugün" : "Today"
+        } else if components.day == 1 {
+            return localization.currentLanguage == .turkish ? "Dün" : "Yesterday"
+        } else if let days = components.day, days < 7 {
+            return localization.currentLanguage == .turkish ? "\(days) gün önce" : "\(days)d ago"
+        } else if let weeks = components.day, weeks < 30 {
+            let weekCount = weeks / 7
+            return localization.currentLanguage == .turkish ? "\(weekCount) hafta önce" : "\(weekCount)w ago"
+        } else if let months = components.month, months < 12 {
+            return localization.currentLanguage == .turkish ? "\(months) ay önce" : "\(months)mo ago"
+        } else {
+            let formatter = DateFormatter()
+            formatter.dateFormat = localization.currentLanguage == .turkish ? "dd.MM.yy" : "MM/dd/yy"
+            return formatter.string(from: date)
+        }
     }
 }

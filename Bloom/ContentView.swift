@@ -340,44 +340,28 @@ struct MoodWheelChart: View {
             Circle()
                 .stroke(Color.black.opacity(0.08), lineWidth: 1)
 
-            // Mood segments
-            Canvas { context in
-                let total = data.reduce(0) { $0 + $1.value }
-                var startAngle: Double = -90
-
-                for (emoji, _, value) in data {
+            // Mood segments - Simplified circle visualization
+            ZStack {
+                ForEach(0..<data.count, id: \.self) { index in
+                    let total = data.reduce(0) { $0 + $1.value }
+                    let value = data[index].value
                     let percentage = Double(value) / Double(total)
-                    let angle = percentage * 360
+                    let rotation = data[0..<index].reduce(0.0) { $0 + Double($1.value) / Double(total) * 360 }
 
-                    var path = Path()
-                    path.move(to: CGPoint(x: 150, y: 150))
-                    path.addArc(
-                        center: CGPoint(x: 150, y: 150),
-                        radius: 100,
-                        startAngle: .degrees(startAngle),
-                        endAngle: .degrees(startAngle + angle),
-                        clockwise: false
-                    )
-                    path.closeSubpath()
+                    ZStack {
+                        Circle()
+                            .trim(from: 0, to: percentage)
+                            .stroke(Color.black.opacity(0.1), lineWidth: 20)
+                            .rotationEffect(.degrees(rotation - 90))
 
-                    context.fill(path, with: .color(.black.opacity(0.1)))
-
-                    // Emoji placement
-                    let midAngle = startAngle + angle / 2
-                    let radians = midAngle * .pi / 180
-                    let x = 150 + 65 * cos(radians)
-                    let y = 150 + 65 * sin(radians)
-
-                    context.draw(
-                        Text(emoji).font(.system(size: 28)),
-                        at: CGPoint(x: x, y: y),
-                        anchor: .center
-                    )
-
-                    startAngle += angle
+                        Text(data[index].0)
+                            .font(.system(size: 20))
+                            .offset(y: -80)
+                            .rotationEffect(.degrees(rotation + percentage * 180))
+                    }
                 }
             }
-            .frame(width: 300, height: 300)
+            .frame(width: 280, height: 280)
 
             // Center circle
             Circle()

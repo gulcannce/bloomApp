@@ -1,37 +1,117 @@
 import SwiftUI
 
+// MARK: - Localization
+enum Language: String, CaseIterable {
+    case turkish = "tr"
+    case english = "en"
+
+    var displayName: String {
+        switch self {
+        case .turkish:
+            return "Türkçe"
+        case .english:
+            return "English"
+        }
+    }
+}
+
+class LocalizationManager: ObservableObject {
+    @Published var currentLanguage: Language = .turkish
+
+    func string(_ key: String) -> String {
+        switch currentLanguage {
+        case .turkish:
+            return turkishStrings[key] ?? key
+        case .english:
+            return englishStrings[key] ?? key
+        }
+    }
+
+    private let turkishStrings: [String: String] = [
+        "bloom_title": "Bloom",
+        "anasayfa": "Anasayfa",
+        "istatistikler": "İstatistikler",
+        "yeni_ani": "Yeni Anı",
+        "takvim": "Takvim",
+        "profil": "Profil",
+        "ani": "Anı",
+        "date": "28 Haziran 2026",
+        "stats_title": "İstatistikler",
+        "mood_tracking": "Ruh Hali Takibi",
+        "mood_desc": "Ruh hali istatistikleri ve analitiği için yer tutucu.",
+        "create_title": "Yeni Anı",
+        "create_desc": "Yeni anı oluştur",
+        "calendar_title": "Takvim",
+        "memory_timeline": "Anı Zaman Çizelgesi",
+        "calendar_desc": "Anı takvimi ve zaman çizelgesi görünümü için yer tutucu.",
+        "profile_title": "Profil",
+        "user_settings": "Kullanıcı Ayarları",
+        "profile_desc": "Kullanıcı profili ve ayarları için yer tutucu.",
+        "language": "Dil",
+    ]
+
+    private let englishStrings: [String: String] = [
+        "bloom_title": "Bloom",
+        "anasayfa": "Home",
+        "istatistikler": "Stats",
+        "yeni_ani": "Create",
+        "takvim": "Calendar",
+        "profil": "Profile",
+        "ani": "Memory",
+        "date": "June 28, 2026",
+        "stats_title": "Statistics",
+        "mood_tracking": "Mood Tracking",
+        "mood_desc": "Placeholder for mood statistics and analytics.",
+        "create_title": "Create Memory",
+        "create_desc": "Create a new memory",
+        "calendar_title": "Calendar",
+        "memory_timeline": "Memory Timeline",
+        "calendar_desc": "Placeholder for memory calendar and timeline view.",
+        "profile_title": "Profile",
+        "user_settings": "User Settings",
+        "profile_desc": "Placeholder for user profile and settings.",
+        "language": "Language",
+    ]
+}
+
 struct ContentView: View {
     @State private var selectedTab: Int = 0
+    @StateObject private var localization = LocalizationManager()
 
     var body: some View {
         TabView(selection: $selectedTab) {
             HomeView()
+                .environmentObject(localization)
                 .tabItem {
-                    Label("Anasayfa", systemImage: "house.fill")
+                    Label(localization.string("anasayfa"), systemImage: "house.fill")
                 }
                 .tag(0)
 
             StatsView()
+                .environmentObject(localization)
                 .tabItem {
-                    Label("İstatistikler", systemImage: "chart.bar.fill")
+                    Label(localization.string("istatistikler"), systemImage: "chart.bar.fill")
                 }
                 .tag(1)
 
             CreateView()
+                .environmentObject(localization)
                 .tabItem {
-                    Label("Yeni Anı", systemImage: "plus.circle.fill")
+                    Label(localization.string("yeni_ani"), systemImage: "plus.circle.fill")
                 }
                 .tag(2)
 
             CalendarView()
+                .environmentObject(localization)
                 .tabItem {
-                    Label("Takvim", systemImage: "calendar")
+                    Label(localization.string("takvim"), systemImage: "calendar")
                 }
                 .tag(3)
 
             ProfileView()
+                .environmentObject(localization)
                 .tabItem {
-                    Label("Profil", systemImage: "person.fill")
+                    Label(localization.string("profil"), systemImage: "person.fill")
                 }
                 .tag(4)
         }
@@ -39,8 +119,9 @@ struct ContentView: View {
     }
 }
 
-// MARK: - Home View (Existing Polaroid/Carousel)
+// MARK: - Home View
 struct HomeView: View {
+    @EnvironmentObject var localization: LocalizationManager
     let images = ["flower_placeholder", "leaf_placeholder", "heart_placeholder"]
     @State private var currentIndex = 0
     @State private var photoScale: CGFloat = 1.0
@@ -54,10 +135,35 @@ struct HomeView: View {
                 .ignoresSafeArea()
 
             VStack(spacing: 30) {
-                Text("Bloom")
-                    .font(.system(size: 28, weight: .light, design: .serif))
-                    .tracking(1.0)
-                    .foregroundColor(.black.opacity(0.8))
+                HStack {
+                    Text(localization.string("bloom_title"))
+                        .font(.system(size: 28, weight: .light, design: .serif))
+                        .tracking(1.0)
+                        .foregroundColor(.black.opacity(0.8))
+
+                    Spacer()
+
+                    Menu {
+                        ForEach(Language.allCases, id: \.self) { language in
+                            Button(action: {
+                                localization.currentLanguage = language
+                                print("QA_LOG: Language Changed -> \(language.displayName)")
+                            }) {
+                                HStack {
+                                    Text(language.displayName)
+                                    if localization.currentLanguage == language {
+                                        Image(systemName: "checkmark")
+                                    }
+                                }
+                            }
+                        }
+                    } label: {
+                        Image(systemName: "globe")
+                            .font(.system(size: 18))
+                            .foregroundColor(.black.opacity(0.5))
+                    }
+                }
+                .padding(.horizontal, 20)
 
                 HStack(spacing: 24) {
                     ForEach(["🌸", "✨", "☁️", "🌱", "🤍"], id: \.self) { emoji in
@@ -109,10 +215,10 @@ struct HomeView: View {
                     Spacer()
 
                     VStack(alignment: .leading, spacing: 6) {
-                        Text("Anı")
+                        Text(localization.string("ani"))
                             .font(.system(size: 16, weight: .regular, design: .serif))
                             .foregroundColor(.black.opacity(0.7))
-                        Text("28 Haziran 2026")
+                        Text(localization.string("date"))
                             .font(.system(size: 12, weight: .light))
                             .foregroundColor(.black.opacity(0.4))
                     }
@@ -134,23 +240,25 @@ struct HomeView: View {
 
 // MARK: - Stats View
 struct StatsView: View {
+    @EnvironmentObject var localization: LocalizationManager
+
     var body: some View {
         ZStack {
             Color(red: 0.98, green: 0.97, blue: 0.95)
                 .ignoresSafeArea()
 
             VStack(spacing: 20) {
-                Text("İstatistikler")
+                Text(localization.string("stats_title"))
                     .font(.system(size: 28, weight: .light, design: .serif))
                     .tracking(1.0)
                     .foregroundColor(.black.opacity(0.8))
 
                 VStack(alignment: .leading, spacing: 12) {
-                    Text("Mood Tracking")
+                    Text(localization.string("mood_tracking"))
                         .font(.system(size: 16, weight: .regular))
                         .foregroundColor(.black.opacity(0.7))
 
-                    Text("Placeholder for mood statistics and analytics.")
+                    Text(localization.string("mood_desc"))
                         .font(.system(size: 14, weight: .light))
                         .foregroundColor(.black.opacity(0.5))
                 }
@@ -168,13 +276,15 @@ struct StatsView: View {
 
 // MARK: - Create View
 struct CreateView: View {
+    @EnvironmentObject var localization: LocalizationManager
+
     var body: some View {
         ZStack {
             Color(red: 0.98, green: 0.97, blue: 0.95)
                 .ignoresSafeArea()
 
             VStack(spacing: 40) {
-                Text("Yeni Anı")
+                Text(localization.string("create_title"))
                     .font(.system(size: 28, weight: .light, design: .serif))
                     .tracking(1.0)
                     .foregroundColor(.black.opacity(0.8))
@@ -194,23 +304,25 @@ struct CreateView: View {
 
 // MARK: - Calendar View
 struct CalendarView: View {
+    @EnvironmentObject var localization: LocalizationManager
+
     var body: some View {
         ZStack {
             Color(red: 0.98, green: 0.97, blue: 0.95)
                 .ignoresSafeArea()
 
             VStack(spacing: 20) {
-                Text("Takvim")
+                Text(localization.string("calendar_title"))
                     .font(.system(size: 28, weight: .light, design: .serif))
                     .tracking(1.0)
                     .foregroundColor(.black.opacity(0.8))
 
                 VStack(alignment: .leading, spacing: 12) {
-                    Text("Memory Timeline")
+                    Text(localization.string("memory_timeline"))
                         .font(.system(size: 16, weight: .regular))
                         .foregroundColor(.black.opacity(0.7))
 
-                    Text("Placeholder for memory calendar and timeline view.")
+                    Text(localization.string("calendar_desc"))
                         .font(.system(size: 14, weight: .light))
                         .foregroundColor(.black.opacity(0.5))
                 }
@@ -228,23 +340,25 @@ struct CalendarView: View {
 
 // MARK: - Profile View
 struct ProfileView: View {
+    @EnvironmentObject var localization: LocalizationManager
+
     var body: some View {
         ZStack {
             Color(red: 0.98, green: 0.97, blue: 0.95)
                 .ignoresSafeArea()
 
             VStack(spacing: 20) {
-                Text("Profil")
+                Text(localization.string("profile_title"))
                     .font(.system(size: 28, weight: .light, design: .serif))
                     .tracking(1.0)
                     .foregroundColor(.black.opacity(0.8))
 
                 VStack(alignment: .leading, spacing: 12) {
-                    Text("User Settings")
+                    Text(localization.string("user_settings"))
                         .font(.system(size: 16, weight: .regular))
                         .foregroundColor(.black.opacity(0.7))
 
-                    Text("Placeholder for user profile and settings.")
+                    Text(localization.string("profile_desc"))
                         .font(.system(size: 14, weight: .light))
                         .foregroundColor(.black.opacity(0.5))
                 }

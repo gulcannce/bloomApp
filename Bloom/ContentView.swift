@@ -20,10 +20,10 @@ struct ContentView: View {
                 }
                 .tag(1)
 
-            CreateView()
+            AchievementsView()
                 .environmentObject(localization)
                 .tabItem {
-                    Label(localization.string("yeni_ani"), systemImage: "plus.circle.fill")
+                    Label(localization.currentLanguage == .turkish ? "Başarımlar" : "Achievements", systemImage: "star.fill")
                 }
                 .tag(2)
 

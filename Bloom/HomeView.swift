@@ -254,6 +254,17 @@ struct HomeView: View {
                                             .font(.system(size: 13, weight: .light))
                                             .lineSpacing(3)
                                             .foregroundColor(.black.opacity(0.7))
+
+                                        if !expandedMemory.stickers.isEmpty {
+                                            HStack(spacing: 8) {
+                                                ForEach(expandedMemory.stickers, id: \.self) { sticker in
+                                                    Text(sticker)
+                                                        .font(.system(size: 20))
+                                                        .opacity(0.7)
+                                                }
+                                            }
+                                            .padding(.top, 4)
+                                        }
                                     }
                                     .frame(maxWidth: .infinity, alignment: .leading)
                                 }

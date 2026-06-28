@@ -7,25 +7,28 @@ struct Memory: Identifiable {
     let note: String
     let date: Date
     let emoji: String
+    var stickers: [String] = []
 
-    init(image: Image? = nil, note: String, emoji: String = "🌸") {
+    init(image: Image? = nil, note: String, emoji: String = "🌸", stickers: [String] = []) {
         self.id = UUID()
         self.image = image
         self.note = note
         self.date = Date()
         self.emoji = emoji
+        self.stickers = stickers
     }
 
-    init(image: Image? = nil, note: String, emoji: String = "🌸", date: Date) {
+    init(image: Image? = nil, note: String, emoji: String = "🌸", date: Date, stickers: [String] = []) {
         self.id = UUID()
         self.image = image
         self.note = note
         self.date = date
         self.emoji = emoji
+        self.stickers = stickers
     }
 
     func toCodable() -> CodableMemory {
-        CodableMemory(id: id, note: note, date: date, emoji: emoji, hasImage: image != nil)
+        CodableMemory(id: id, note: note, date: date, emoji: emoji, hasImage: image != nil, stickers: stickers)
     }
 }
 
@@ -35,9 +38,10 @@ struct CodableMemory: Codable {
     let date: Date
     let emoji: String
     let hasImage: Bool
+    let stickers: [String]
 
     func toMemory() -> Memory {
-        Memory(image: nil, note: note, emoji: emoji)
+        Memory(image: nil, note: note, emoji: emoji, stickers: stickers)
     }
 }
 

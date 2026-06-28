@@ -11,6 +11,9 @@ struct CreateView: View {
     @State private var processedImage: Image? = nil
     @State private var savedSuccessfully = false
     @State private var selectedMoodEmoji: String = "🌸"
+    @State private var selectedStickers: Set<String> = []
+
+    let availableStickers = ["🌸", "🎀", "🩹", "🤍", "✨", "🌹", "🍄", "🦋"]
 
     var body: some View {
         ZStack {
@@ -124,6 +127,37 @@ struct CreateView: View {
                             .padding(.horizontal, 16)
                         }
                         .padding(.vertical, 16)
+
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text(localization.currentLanguage == .turkish ? "Dekorasyon Stickerleri" : "Decoration Stickers")
+                                .font(.system(size: 14, weight: .light, design: .serif))
+                                .foregroundColor(.black.opacity(0.5))
+                                .padding(.horizontal, 16)
+
+                            ScrollView(.horizontal, showsIndicators: false) {
+                                HStack(spacing: 10) {
+                                    ForEach(availableStickers, id: \.self) { sticker in
+                                        Button(action: {
+                                            if selectedStickers.contains(sticker) {
+                                                selectedStickers.remove(sticker)
+                                            } else {
+                                                selectedStickers.insert(sticker)
+                                            }
+                                        }) {
+                                            Text(sticker)
+                                                .font(.system(size: 28))
+                                                .scaleEffect(selectedStickers.contains(sticker) ? 1.15 : 1.0)
+                                                .animation(.spring(response: 0.3, dampingFraction: 0.6), value: selectedStickers)
+                                        }
+                                        .frame(width: 48, height: 48)
+                                        .background(selectedStickers.contains(sticker) ? Color.white.opacity(0.8) : Color.white.opacity(0.5))
+                                        .cornerRadius(8)
+                                    }
+                                }
+                                .padding(.horizontal, 16)
+                            }
+                        }
+                        .padding(.vertical, 16)
                     }
                     .padding(.bottom, 80)
                 }
@@ -188,7 +222,7 @@ struct CreateView: View {
             print("QA_LOG: Memory save cancelled - empty note")
             return
         }
-        let newMemory = Memory(image: processedImage, note: diaryText, emoji: selectedMoodEmoji)
+        let newMemory = Memory(image: processedImage, note: diaryText, emoji: selectedMoodEmoji, stickers: Array(selectedStickers))
         memoryStore.addMemory(newMemory)
         print("QA_LOG: Memory saved - \(newMemory.id)")
 

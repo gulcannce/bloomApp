@@ -90,11 +90,11 @@ struct PhotoWindow: View {
                 .font(.system(size: 48, weight: .light))
                 .foregroundColor(.black.opacity(0.3))
         }
-        .cornerRadius(8)
-        .clipped()
         .scaleEffect(scale)
         .offset(offset)
         .rotationEffect(rotation)
+        .cornerRadius(8)
+        .clipped()
         .highPriorityGesture(
             SimultaneousGesture(
                 DragGesture()

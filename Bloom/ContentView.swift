@@ -521,35 +521,53 @@ struct CreateView: View {
                         .padding(.top, 24)
 
                         // Scrapbook Card with Polaroid
-                        VStack(spacing: 16) {
-                            // Decorative tape corners (visual placeholders)
-                            CreatePhotoView(image: processedImage)
-                                .frame(height: 260)
-                                .overlay(alignment: .topLeading) {
-                                    Text("📌")
-                                        .font(.system(size: 20))
-                                        .offset(x: -12, y: -12)
-                                }
-                                .overlay(alignment: .topTrailing) {
-                                    Text("📌")
-                                        .font(.system(size: 20))
-                                        .offset(x: 12, y: -12)
-                                }
+                        ZStack(alignment: .top) {
+                            RoundedRectangle(cornerRadius: 12)
+                                .fill(Color(red: 0.98, green: 0.97, blue: 0.96))
+                                .offset(x: 4, y: 6)
+                                .rotationEffect(.degrees(-2.5), anchor: .center)
 
-                            // Decorative flowers
-                            HStack(spacing: 200) {
-                                Text("🌸")
-                                    .font(.system(size: 16))
-                                Text("🌼")
-                                    .font(.system(size: 16))
+                            VStack(spacing: 16) {
+                                // Decorative tape corners (visual placeholders)
+                                CreatePhotoView(image: processedImage)
+                                    .frame(height: 260)
+                                    .overlay(alignment: .topLeading) {
+                                        Text("📌")
+                                            .font(.system(size: 20))
+                                            .offset(x: -12, y: -12)
+                                    }
+                                    .overlay(alignment: .topTrailing) {
+                                        Text("📌")
+                                            .font(.system(size: 20))
+                                            .offset(x: 12, y: -12)
+                                    }
+
+                                // Decorative flowers
+                                HStack(spacing: 200) {
+                                    Text("🌸")
+                                        .font(.system(size: 16))
+                                    Text("🌼")
+                                        .font(.system(size: 16))
+                                }
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 4)
                             }
-                            .frame(maxWidth: .infinity)
-                            .padding(.vertical, 4)
+                            .padding(20)
+                            .background(Color.white.opacity(0.9))
+                            .cornerRadius(12)
+                            .shadow(color: Color.black.opacity(0.04), radius: 8, x: 0, y: 4)
+
+                            RoundedRectangle(cornerRadius: 1.5)
+                                .fill(Color.white.opacity(0.55))
+                                .frame(width: 60, height: 18)
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 1.5)
+                                        .stroke(Color.white.opacity(0.3), lineWidth: 0.5)
+                                )
+                                .shadow(color: Color.black.opacity(0.08), radius: 2, x: 0, y: 1)
+                                .offset(y: 8)
+                                .rotationEffect(.degrees(2.0), anchor: .center)
                         }
-                        .padding(20)
-                        .background(Color.white.opacity(0.9))
-                        .cornerRadius(12)
-                        .shadow(color: Color.black.opacity(0.04), radius: 8, x: 0, y: 4)
                         .padding(.horizontal, 16)
 
                         // Diary Text Editor

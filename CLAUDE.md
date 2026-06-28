@@ -20,8 +20,8 @@ Apply drag and magnification gestures STRICTLY to the inner image layer using si
 Embed explicit "QA_LOG:" print statements inside all interactions for instant Xcode console verification. Every user action, gesture response, and state change must be logged for rapid debugging and QA validation.
 
 ## Development Commands
-- Build: `xcodebuild -project Folio.xcodeproj -scheme Bloom build`
-- Test: `xcodebuild -project Folio.xcodeproj -scheme BloomTests test`
+- Build: `xcodebuild -project Bloom.xcodeproj -scheme Bloom build`
+- Test: `xcodebuild -project Bloom.xcodeproj -scheme Bloom test`
 
 ## Language
 - Code language: Swift

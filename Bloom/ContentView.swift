@@ -6,56 +6,104 @@
 //
 
 import SwiftUI
-import SwiftData
 
 struct ContentView: View {
-    @Environment(\.modelContext) private var modelContext
-    @Query private var items: [Item]
+    @State private var photoScale: CGFloat = 1.0
+    @State private var photoOffset: CGSize = .zero
 
     var body: some View {
-        NavigationSplitView {
-            List {
-                ForEach(items) { item in
-                    NavigationLink {
-                        Text("Item at \(item.timestamp, format: Date.FormatStyle(date: .numeric, time: .standard))")
-                    } label: {
-                        Text(item.timestamp, format: Date.FormatStyle(date: .numeric, time: .standard))
-                    }
-                }
-                .onDelete(perform: deleteItems)
+        ZStack {
+            Color(red: 0.98, green: 0.96, blue: 0.93)
+                .ignoresSafeArea()
+
+            VStack(spacing: 24) {
+                Text("Bloom")
+                    .font(.system(size: 28, weight: .light, design: .default))
+                    .tracking(0.8)
+                    .foregroundColor(.black.opacity(0.7))
+
+                PolaroidCard(photoScale: $photoScale, photoOffset: $photoOffset)
+
+                Spacer()
             }
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    EditButton()
-                }
-                ToolbarItem {
-                    Button(action: addItem) {
-                        Label("Add Item", systemImage: "plus")
-                    }
-                }
-            }
-        } detail: {
-            Text("Select an item")
+            .padding(.top, 40)
         }
     }
+}
 
-    private func addItem() {
-        withAnimation {
-            let newItem = Item(timestamp: Date())
-            modelContext.insert(newItem)
+struct PolaroidCard: View {
+    @Binding var photoScale: CGFloat
+    @Binding var photoOffset: CGSize
+
+    var body: some View {
+        ZStack {
+            RoundedRectangle(cornerRadius: 12)
+                .fill(Color(red: 0.995, green: 0.992, blue: 0.988))
+                .frame(width: 320, height: 420)
+                .shadow(color: .black.opacity(0.08), radius: 12, x: 0, y: 8)
+
+            VStack(spacing: 16) {
+                PhotoWindow(scale: $photoScale, offset: $photoOffset)
+                    .frame(width: 280, height: 280)
+
+                VStack(spacing: 8) {
+                    Text("Anı")
+                        .font(.system(size: 14, weight: .light, design: .default))
+                        .foregroundColor(.black.opacity(0.6))
+
+                    Text("28 Haziran 2026")
+                        .font(.system(size: 11, weight: .light, design: .default))
+                        .foregroundColor(.black.opacity(0.4))
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.horizontal, 20)
+                .padding(.bottom, 12)
+
+                Spacer()
+            }
+            .padding(.top, 20)
         }
     }
+}
 
-    private func deleteItems(offsets: IndexSet) {
-        withAnimation {
-            for index in offsets {
-                modelContext.delete(items[index])
-            }
+struct PhotoWindow: View {
+    @Binding var scale: CGFloat
+    @Binding var offset: CGSize
+
+    var body: some View {
+        ZStack {
+            Color.gray.opacity(0.12)
+
+            Image(systemName: "photo.artframe")
+                .font(.system(size: 48, weight: .light))
+                .foregroundColor(.black.opacity(0.3))
         }
+        .cornerRadius(8)
+        .clipped()
+        .scaleEffect(scale)
+        .offset(offset)
+        .highPriorityGesture(
+            SimultaneousGesture(
+                DragGesture()
+                    .onChanged { value in
+                        let newOffset = CGSize(
+                            width: value.translation.width,
+                            height: value.translation.height
+                        )
+                        offset = newOffset
+                        print("QA_LOG: Photo Offset Updated -> \(newOffset)")
+                    },
+                MagnificationGesture()
+                    .onChanged { value in
+                        let newScale = value
+                        scale = newScale
+                        print("QA_LOG: Photo Scale Updated -> \(newScale)")
+                    }
+            )
+        )
     }
 }
 
 #Preview {
     ContentView()
-        .modelContainer(for: Item.self, inMemory: true)
 }

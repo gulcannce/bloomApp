@@ -14,7 +14,7 @@ struct HomeView: View {
 
     var body: some View {
         ZStack {
-            Color(red: 0.98, green: 0.97, blue: 0.95)
+            BloomTheme.background
                 .ignoresSafeArea()
 
             VStack(spacing: 30) {
@@ -22,7 +22,7 @@ struct HomeView: View {
                     Text(localization.string("bloom_title"))
                         .font(.system(size: 28, weight: .light, design: .serif))
                         .tracking(1.0)
-                        .foregroundColor(.black.opacity(0.8))
+                        .foregroundColor(BloomTheme.textPrimary)
 
                     Spacer()
 
@@ -42,7 +42,7 @@ struct HomeView: View {
                     } label: {
                         Image(systemName: "globe")
                             .font(.system(size: 18))
-                            .foregroundColor(.black.opacity(0.5))
+                            .foregroundColor(BloomTheme.textSecondary)
                     }
                 }
                 .padding(.horizontal, 20)
@@ -61,7 +61,7 @@ struct HomeView: View {
                 }
                 .padding(.vertical, 10)
                 .padding(.horizontal, 20)
-                .background(Color.white.opacity(0.6))
+                .background(Color.white.opacity(0.5))
                 .clipShape(Capsule())
 
                 VStack(spacing: 0) {
@@ -78,7 +78,7 @@ struct HomeView: View {
                     } else {
                         ZStack(alignment: .top) {
                             RoundedRectangle(cornerRadius: 4)
-                                .fill(Color(red: 0.98, green: 0.97, blue: 0.96))
+                                .fill(BloomTheme.agedParchment)
                                 .frame(width: 290, height: 310)
                                 .offset(x: 4, y: 6)
                                 .rotationEffect(.degrees(-2.5), anchor: .center)
@@ -88,13 +88,13 @@ struct HomeView: View {
                                     ForEach(memoryStore.memories.indices, id: \.self) { index in
                                         let memory = memoryStore.memories[index]
                                         ZStack {
-                                            Color(red: 0.92, green: 0.92, blue: 0.92)
-                                            if let image = memory.image {
+                                            LinearGradient(gradient: Gradient(colors: [BloomTheme.agedParchment, BloomTheme.agedParchment.opacity(0.8)]), startPoint: .topLeading, endPoint: .bottomTrailing)
+                            if let image = memory.image {
                                                 image.resizable().scaledToFill()
                                             } else {
                                                 Image(systemName: "photo.artframe")
                                                     .font(.system(size: 40))
-                                                    .foregroundColor(.black.opacity(0.2))
+                                                    .foregroundColor(BloomTheme.textTertiary)
                                             }
                                         }
                                         .scaleEffect(currentIndex == index ? photoScale : 1.0)
@@ -118,12 +118,12 @@ struct HomeView: View {
                                 .cornerRadius(4)
                                 .clipped()
                             }
-                            .background(Color.white)
+                            .background(BloomTheme.cardBackground)
                             .cornerRadius(4)
-                            .shadow(color: Color.black.opacity(0.06), radius: 12, x: 0, y: 8)
+                            .shadow(color: Color.black.opacity(0.08), radius: 12, x: 0, y: 8)
 
                             RoundedRectangle(cornerRadius: 1.5)
-                                .fill(Color.white.opacity(0.55))
+                                .fill(Color.white.opacity(0.6))
                                 .frame(width: 60, height: 18)
                                 .overlay(
                                     RoundedRectangle(cornerRadius: 1.5)
@@ -143,10 +143,10 @@ struct HomeView: View {
                         VStack(alignment: .leading, spacing: 6) {
                             Text(localization.currentLanguage == .turkish ? "İlk anını oluştur" : "Create your first memory")
                                 .font(.system(size: 16, weight: .regular, design: .serif))
-                                .foregroundColor(.black.opacity(0.7))
+                                .foregroundColor(BloomTheme.driedRose)
                             Text(localization.currentLanguage == .turkish ? "Create sekmesine git" : "Go to Create tab")
                                 .font(.system(size: 12, weight: .light))
-                                .foregroundColor(.black.opacity(0.4))
+                                .foregroundColor(BloomTheme.textSecondary)
                         }
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .padding(.horizontal, 20)
@@ -156,10 +156,10 @@ struct HomeView: View {
                         VStack(alignment: .leading, spacing: 6) {
                             Text(current.note.prefix(50) + (current.note.count > 50 ? "..." : ""))
                                 .font(.system(size: 14, weight: .light))
-                                .foregroundColor(.black.opacity(0.7))
+                                .foregroundColor(BloomTheme.textPrimary)
                             Text(formattedDate(current.date))
                                 .font(.system(size: 12, weight: .light))
-                                .foregroundColor(.black.opacity(0.4))
+                                .foregroundColor(BloomTheme.textSecondary)
                         }
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .padding(.horizontal, 20)
@@ -167,9 +167,9 @@ struct HomeView: View {
                     }
                 }
                 .frame(width: 320, height: 420)
-                .background(Color.white)
+                .background(BloomTheme.cardBackground)
                 .cornerRadius(12)
-                .shadow(color: Color.black.opacity(0.06), radius: 12, x: 0, y: 8)
+                .shadow(color: Color.black.opacity(0.08), radius: 12, x: 0, y: 8)
                 .onTapGesture {
                     if !memoryStore.memories.isEmpty {
                         withAnimation(.spring(response: 0.52, dampingFraction: 0.78)) {
@@ -203,7 +203,7 @@ struct HomeView: View {
                             }) {
                                 Image(systemName: "xmark.circle.fill")
                                     .font(.system(size: 24, weight: .light))
-                                    .foregroundColor(.black.opacity(0.5))
+                                    .foregroundColor(BloomTheme.driedRose)
                             }
                             .padding(20)
                         }
@@ -214,7 +214,7 @@ struct HomeView: View {
                                     VStack(spacing: 16) {
                                         ZStack(alignment: .top) {
                                             RoundedRectangle(cornerRadius: 4)
-                                                .fill(Color(red: 0.98, green: 0.97, blue: 0.96))
+                                                .fill(BloomTheme.agedParchment)
                                                 .frame(maxWidth: 140, maxHeight: 180)
                                                 .offset(x: 3, y: 4)
 
@@ -223,7 +223,7 @@ struct HomeView: View {
                                             } else {
                                                 Image(systemName: "photo.artframe")
                                                     .font(.system(size: 32, weight: .light))
-                                                    .foregroundColor(.black.opacity(0.2))
+                                                    .foregroundColor(BloomTheme.textTertiary)
                                             }
 
                                             RoundedRectangle(cornerRadius: 1.5)
@@ -243,14 +243,14 @@ struct HomeView: View {
 
                                         Text(formattedDate(expandedMemory.date))
                                             .font(.system(size: 11, weight: .light, design: .serif))
-                                            .foregroundColor(.black.opacity(0.5))
+                                            .foregroundColor(BloomTheme.textSecondary)
 
                                         Divider()
 
                                         Text(expandedMemory.note)
                                             .font(.system(size: 13, weight: .light))
                                             .lineSpacing(3)
-                                            .foregroundColor(.black.opacity(0.7))
+                                            .foregroundColor(BloomTheme.textPrimary)
 
                                         if !expandedMemory.stickers.isEmpty {
                                             HStack(spacing: 8) {
@@ -268,14 +268,14 @@ struct HomeView: View {
                                 .padding(24)
                                 .background(
                                     RoundedRectangle(cornerRadius: 12)
-                                        .fill(Color(red: 0.995, green: 0.99, blue: 0.985))
-                                        .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.black.opacity(0.08), lineWidth: 1))
+                                        .fill(LinearGradient(gradient: Gradient(colors: [BloomTheme.agedParchment, BloomTheme.agedParchment.opacity(0.9)]), startPoint: .topLeading, endPoint: .bottomTrailing))
+                                        .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.black.opacity(0.05), lineWidth: 1))
                                 )
                             }
                             .padding(16)
                         }
                     }
-                    .background(Color.white)
+                    .background(BloomTheme.cardBackground)
                     .cornerRadius(20)
                     .padding(16)
                     .frame(maxHeight: 600)

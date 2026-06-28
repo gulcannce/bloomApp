@@ -6,10 +6,10 @@ struct StatsView: View {
     @StateObject private var memoryStore = MemoryStore.shared
 
     var moodData: [(emoji: String, label: String, value: Int)] {
-        let emojis = [("🌸", "Çiçek"), ("✨", "Parlak"), ("☁️", "Sakin"), ("🌱", "Büyüme"), ("🤍", "Aşk")]
+        let botanicalEmojis = [("🥀", "Reflective"), ("🌿", "Calm"), ("🌾", "Peaceful"), ("🌸", "Joyful"), ("🍂", "Introspective")]
         let totalMemories = memoryStore.memories.count
         guard totalMemories > 0 else {
-            return emojis.map { ($0.0, $0.1, 0) }
+            return botanicalEmojis.map { ($0.0, $0.1, 0) }
         }
 
         var counts: [String: Int] = [:]
@@ -17,7 +17,7 @@ struct StatsView: View {
             counts[memory.emoji, default: 0] += 1
         }
 
-        return emojis.map { emoji, label in
+        return botanicalEmojis.map { emoji, label in
             let count = counts[emoji] ?? 0
             return (emoji, label, count)
         }
@@ -55,7 +55,7 @@ struct StatsView: View {
 
     var body: some View {
         ZStack {
-            Color(red: 0.98, green: 0.97, blue: 0.95)
+            BloomTheme.background
                 .ignoresSafeArea()
 
             ScrollView {
@@ -63,7 +63,7 @@ struct StatsView: View {
                     Text(localization.string("stats_title"))
                         .font(.system(size: 28, weight: .light, design: .serif))
                         .tracking(1.0)
-                        .foregroundColor(.black.opacity(0.8))
+                        .foregroundColor(BloomTheme.textPrimary)
                         .padding(.top, 20)
 
                     MoodWheelChart(data: moodData)
@@ -81,11 +81,11 @@ struct StatsView: View {
                                 VStack(alignment: .leading, spacing: 4) {
                                     Text(label)
                                         .font(.system(size: 14, weight: .regular))
-                                        .foregroundColor(.black.opacity(0.7))
+                                        .foregroundColor(BloomTheme.textPrimary)
 
                                     Text("\(percentage)%")
                                         .font(.system(size: 12, weight: .light))
-                                        .foregroundColor(.black.opacity(0.4))
+                                        .foregroundColor(BloomTheme.textSecondary)
                                 }
 
                                 Spacer()

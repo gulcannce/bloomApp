@@ -13,11 +13,12 @@ struct CreateView: View {
     @State private var selectedMoodEmoji: String = "🌸"
     @State private var selectedStickers: Set<String> = []
 
+    let moodSymbols = ["🥀", "🌿", "🌾", "🌸", "🍂"]
     let availableStickers = ["🌸", "🎀", "🩹", "🤍", "✨", "🌹", "🍄", "🦋"]
 
     var body: some View {
         ZStack {
-            Color(red: 0.98, green: 0.97, blue: 0.95)
+            BloomTheme.background
                 .ignoresSafeArea()
 
             VStack(spacing: 0) {
@@ -27,13 +28,13 @@ struct CreateView: View {
                             Text(formattedDate())
                                 .font(.system(size: 18, weight: .light, design: .serif))
                                 .tracking(0.5)
-                                .foregroundColor(.black.opacity(0.6))
+                                .foregroundColor(BloomTheme.textPrimary)
                         }
                         .padding(.top, 24)
 
                         ZStack(alignment: .top) {
                             RoundedRectangle(cornerRadius: 12)
-                                .fill(Color(red: 0.98, green: 0.97, blue: 0.96))
+                                .fill(BloomTheme.agedParchment)
                                 .offset(x: 4, y: 6)
                                 .rotationEffect(.degrees(-2.5), anchor: .center)
 
@@ -61,9 +62,9 @@ struct CreateView: View {
                                 .padding(.vertical, 4)
                             }
                             .padding(20)
-                            .background(Color.white.opacity(0.9))
+                            .background(BloomTheme.cardBackground)
                             .cornerRadius(12)
-                            .shadow(color: Color.black.opacity(0.04), radius: 8, x: 0, y: 4)
+                            .shadow(color: Color.black.opacity(0.06), radius: 8, x: 0, y: 4)
 
                             RoundedRectangle(cornerRadius: 1.5)
                                 .fill(Color.white.opacity(0.55))
@@ -81,7 +82,7 @@ struct CreateView: View {
                         VStack(alignment: .leading, spacing: 8) {
                             Text("Bugün'ün Öyküsü")
                                 .font(.system(size: 14, weight: .light, design: .serif))
-                                .foregroundColor(.black.opacity(0.5))
+                                .foregroundColor(BloomTheme.textSecondary)
                                 .padding(.horizontal, 16)
 
                             TextEditor(text: $diaryText)
@@ -89,11 +90,11 @@ struct CreateView: View {
                                 .lineSpacing(4)
                                 .padding(12)
                                 .frame(minHeight: 140)
-                                .background(Color.white.opacity(0.7))
+                                .background(BloomTheme.cardBackground)
                                 .cornerRadius(8)
                                 .overlay(
                                     RoundedRectangle(cornerRadius: 8)
-                                        .stroke(Color.black.opacity(0.1), lineWidth: 1)
+                                        .stroke(Color.black.opacity(0.05), lineWidth: 1)
                                 )
                                 .padding(.horizontal, 16)
                                 .focused($isTextFocused)
@@ -103,11 +104,11 @@ struct CreateView: View {
                         VStack(alignment: .leading, spacing: 8) {
                             Text(localization.currentLanguage == .turkish ? "Bugünün Hali" : "Today's Mood")
                                 .font(.system(size: 14, weight: .light, design: .serif))
-                                .foregroundColor(.black.opacity(0.5))
+                                .foregroundColor(BloomTheme.textSecondary)
                                 .padding(.horizontal, 16)
 
                             HStack(spacing: 12) {
-                                ForEach(["🌸", "✨", "☁️", "🌱", "🤍"], id: \.self) { emoji in
+                                ForEach(moodSymbols, id: \.self) { emoji in
                                     Button(action: {
                                         selectedMoodEmoji = emoji
                                         triggerEmojiHaptic()
@@ -119,7 +120,7 @@ struct CreateView: View {
                                     }
                                     .frame(maxWidth: .infinity)
                                     .padding(.vertical, 8)
-                                    .background(selectedMoodEmoji == emoji ? Color.white.opacity(0.8) : Color.white.opacity(0.5))
+                                    .background(selectedMoodEmoji == emoji ? BloomTheme.driedRose.opacity(0.2) : Color.white.opacity(0.5))
                                     .cornerRadius(8)
                                 }
                             }
@@ -130,7 +131,7 @@ struct CreateView: View {
                         VStack(alignment: .leading, spacing: 8) {
                             Text(localization.currentLanguage == .turkish ? "Dekorasyon Stickerleri" : "Decoration Stickers")
                                 .font(.system(size: 14, weight: .light, design: .serif))
-                                .foregroundColor(.black.opacity(0.5))
+                                .foregroundColor(BloomTheme.textSecondary)
                                 .padding(.horizontal, 16)
 
                             ScrollView(.horizontal, showsIndicators: false) {
@@ -196,7 +197,7 @@ struct CreateView: View {
                     }
                 }
                 .padding(12)
-                .background(Color.white.opacity(0.8))
+                .background(BloomTheme.cardBackground)
                 .cornerRadius(12)
                 .padding(8)
             }
@@ -239,7 +240,7 @@ struct CreatePhotoView: View {
 
     var body: some View {
         ZStack {
-            Color(red: 0.92, green: 0.92, blue: 0.92)
+            LinearGradient(gradient: Gradient(colors: [BloomTheme.agedParchment, BloomTheme.agedParchment.opacity(0.9)]), startPoint: .topLeading, endPoint: .bottomTrailing)
 
             if let image = image {
                 image
@@ -250,18 +251,18 @@ struct CreatePhotoView: View {
                 VStack(spacing: 12) {
                     Image(systemName: "photo.artframe")
                         .font(.system(size: 48, weight: .light))
-                        .foregroundColor(.black.opacity(0.2))
+                        .foregroundColor(BloomTheme.textTertiary)
 
                     Text("Fotoğraf Ekle")
                         .font(.system(size: 14, weight: .light))
-                        .foregroundColor(.black.opacity(0.3))
+                        .foregroundColor(BloomTheme.textSecondary)
                 }
             }
         }
         .cornerRadius(8)
         .overlay(
             RoundedRectangle(cornerRadius: 8)
-                .stroke(Color.black.opacity(0.1), lineWidth: 1)
+                .stroke(Color.black.opacity(0.05), lineWidth: 1)
         )
     }
 }
@@ -275,11 +276,11 @@ struct ToolbarButton: View {
             VStack(spacing: 4) {
                 Image(systemName: icon)
                     .font(.system(size: 16, weight: .light))
-                    .foregroundColor(.black.opacity(0.6))
+                    .foregroundColor(BloomTheme.textPrimary)
 
                 Text(label)
                     .font(.system(size: 10, weight: .light))
-                    .foregroundColor(.black.opacity(0.5))
+                    .foregroundColor(BloomTheme.textSecondary)
             }
             .frame(maxWidth: .infinity)
             .padding(.vertical, 8)

@@ -12,7 +12,7 @@ struct CalendarView: View {
 
     var body: some View {
         ZStack {
-            Color(red: 0.98, green: 0.97, blue: 0.95)
+            BloomTheme.background
                 .ignoresSafeArea()
 
             ScrollView {

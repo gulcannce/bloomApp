@@ -6,7 +6,7 @@ struct ProfileView: View {
 
     var body: some View {
         ZStack {
-            Color(red: 0.98, green: 0.97, blue: 0.95)
+            BloomTheme.background
                 .ignoresSafeArea()
 
             ScrollView {
@@ -113,9 +113,9 @@ struct ProfileView: View {
                             .foregroundColor(.white)
                             .frame(maxWidth: .infinity)
                             .padding(16)
-                            .background(Color(red: 0.8, green: 0.3, blue: 0.3))
+                            .background(BloomTheme.driedRose)
                             .cornerRadius(8)
-                            .shadow(color: Color(red: 0.8, green: 0.3, blue: 0.3).opacity(0.2), radius: 8, x: 0, y: 4)
+                            .shadow(color: BloomTheme.driedRose.opacity(0.3), radius: 8, x: 0, y: 4)
                     }
                     .padding(20)
                     .padding(.bottom, 20)

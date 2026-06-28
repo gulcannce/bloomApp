@@ -111,7 +111,6 @@ struct CreateView: View {
                                     Button(action: {
                                         selectedMoodEmoji = emoji
                                         triggerEmojiHaptic()
-                                        print("QA_LOG: Mood Emoji Selected -> \(emoji)")
                                     }) {
                                         Text(emoji)
                                             .font(.system(size: 24))
@@ -175,7 +174,6 @@ struct CreateView: View {
                             if let data = try? await selectedItem?.loadTransferable(type: Data.self),
                                let uiImage = UIImage(data: data) {
                                 processedImage = Image(uiImage: uiImage)
-                                print("QA_LOG: Photo Selected and Loaded")
                             }
                         }
                     }
@@ -219,12 +217,10 @@ struct CreateView: View {
 
     private func saveMemory() {
         guard !diaryText.trimmingCharacters(in: .whitespaces).isEmpty else {
-            print("QA_LOG: Memory save cancelled - empty note")
             return
         }
         let newMemory = Memory(image: processedImage, note: diaryText, emoji: selectedMoodEmoji, stickers: Array(selectedStickers))
         memoryStore.addMemory(newMemory)
-        print("QA_LOG: Memory saved - \(newMemory.id)")
 
         let successHaptic = UINotificationFeedbackGenerator()
         successHaptic.notificationOccurred(.success)
@@ -275,9 +271,7 @@ struct ToolbarButton: View {
     let label: String
 
     var body: some View {
-        Button(action: {
-            print("QA_LOG: Toolbar Action Triggered -> \(label)")
-        }) {
+        Button(action: {}) {
             VStack(spacing: 4) {
                 Image(systemName: icon)
                     .font(.system(size: 16, weight: .light))

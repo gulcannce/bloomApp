@@ -94,7 +94,6 @@ struct ProfileView: View {
 
                     Button(action: {
                         MemoryStore.injectMockData()
-                        print("QA_LOG: Mock data loaded for testing")
                     }) {
                         Text(localization.currentLanguage == .turkish ? "Test Verisi Yükle" : "Load Mock Data")
                             .font(.system(size: 14, weight: .light, design: .serif))
@@ -108,9 +107,7 @@ struct ProfileView: View {
 
                     Spacer(minLength: 20)
 
-                    Button(action: {
-                        print("QA_LOG: Logout triggered")
-                    }) {
+                    Button(action: {}) {
                         Text(localization.currentLanguage == .turkish ? "Çıkış Yap" : "Log Out")
                             .font(.system(size: 16, weight: .light, design: .serif))
                             .foregroundColor(.white)

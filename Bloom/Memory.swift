@@ -57,7 +57,6 @@ class MemoryStore: ObservableObject {
 
     func addMemory(_ memory: Memory) {
         memories.insert(memory, at: 0)
-        print("QA_LOG: Memory Added -> \(memory.note)")
         saveMemories()
     }
 
@@ -65,7 +64,6 @@ class MemoryStore: ObservableObject {
         let codableMemories = memories.map { $0.toCodable() }
         if let encoded = try? JSONEncoder().encode(codableMemories) {
             UserDefaults.standard.set(encoded, forKey: memoriesKey)
-            print("QA_LOG: Memories persisted to UserDefaults")
         }
     }
 
@@ -73,7 +71,6 @@ class MemoryStore: ObservableObject {
         if let data = UserDefaults.standard.data(forKey: memoriesKey),
            let decoded = try? JSONDecoder().decode([CodableMemory].self, from: data) {
             memories = decoded.map { $0.toMemory() }
-            print("QA_LOG: \(memories.count) memories loaded from UserDefaults")
         }
     }
 
@@ -101,6 +98,5 @@ class MemoryStore: ObservableObject {
         }
 
         shared.saveMemories()
-        print("QA_LOG: Mock data injected - \(shared.memories.count) memories added")
     }
 }

@@ -30,7 +30,6 @@ struct HomeView: View {
                         ForEach(Language.allCases, id: \.self) { language in
                             Button(action: {
                                 localization.currentLanguage = language
-                                print("QA_LOG: Language Changed -> \(language.displayName)")
                             }) {
                                 HStack {
                                     Text(language.displayName)
@@ -52,7 +51,6 @@ struct HomeView: View {
                     ForEach(["🌸", "✨", "☁️", "🌱", "🤍"], id: \.self) { emoji in
                         Button(action: {
                             selectedEmoji = emoji
-                            print("QA_LOG: Native Emoji Selected -> \(emoji)")
                         }) {
                             Text(emoji)
                                 .font(.system(size: 26))
@@ -109,7 +107,6 @@ struct HomeView: View {
                                             DragGesture()
                                                 .onChanged { value in
                                                     photoOffset = value.translation
-                                                    print("QA_LOG: Photo Offset -> \(photoOffset)")
                                                 }
                                                 .onEnded { _ in }
                                         )

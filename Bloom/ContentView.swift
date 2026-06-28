@@ -13,18 +13,13 @@ struct ContentView: View {
     @State private var carouselIndex: Int = 0
 
     private let photoItems = ["🌸", "✨", "☁️", "🌱", "🤍"]
-    @State private var gestures: [Int: PhotoGestureState] = [:]
-
-    private func getGestureState(_ index: Int) -> PhotoGestureState {
-        if gestures[index] == nil {
-            gestures[index] = PhotoGestureState()
+    @State private var gestures: [Int: PhotoGestureState] = {
+        var initial: [Int: PhotoGestureState] = [:]
+        for i in 0..<5 {
+            initial[i] = PhotoGestureState()
         }
-        return gestures[index]!
-    }
-
-    private var currentGestureState: PhotoGestureState {
-        getGestureState(carouselIndex)
-    }
+        return initial
+    }()
 
     var body: some View {
         ZStack {
@@ -40,7 +35,7 @@ struct ContentView: View {
                 PolaroidCard(
                     carouselIndex: $carouselIndex,
                     photoItems: photoItems,
-                    currentGestureState: currentGestureState
+                    gestures: $gestures
                 )
 
                 EmojiPicker(selectedEmoji: $selectedEmoji)
@@ -55,7 +50,7 @@ struct ContentView: View {
 struct PolaroidCard: View {
     @Binding var carouselIndex: Int
     let photoItems: [String]
-    let currentGestureState: PhotoGestureState
+    @Binding var gestures: [Int: PhotoGestureState]
 
     var body: some View {
         ZStack {
@@ -69,7 +64,7 @@ struct PolaroidCard: View {
                     ForEach(photoItems.indices, id: \.self) { index in
                         PhotoWindow(
                             item: photoItems[index],
-                            gestureState: currentGestureState
+                            gestureState: gestures[index] ?? PhotoGestureState()
                         )
                         .tag(index)
                     }

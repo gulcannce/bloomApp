@@ -3,6 +3,35 @@ import Combine
 import PhotosUI
 import UIKit
 
+// MARK: - Memory Model
+struct Memory: Identifiable {
+    let id: UUID
+    let image: Image?
+    let note: String
+    let date: Date
+    let emoji: String
+
+    init(image: Image? = nil, note: String, emoji: String = "🌸") {
+        self.id = UUID()
+        self.image = image
+        self.note = note
+        self.date = Date()
+        self.emoji = emoji
+    }
+}
+
+// MARK: - Shared Memory Store
+class MemoryStore: ObservableObject {
+    @Published var memories: [Memory] = []
+
+    static let shared = MemoryStore()
+
+    func addMemory(_ memory: Memory) {
+        memories.insert(memory, at: 0)
+        print("QA_LOG: Memory Added -> \(memory.note)")
+    }
+}
+
 // MARK: - Localization
 enum Language: String, CaseIterable {
     case turkish = "tr"
@@ -131,7 +160,7 @@ struct ContentView: View {
 // MARK: - Home View
 struct HomeView: View {
     @EnvironmentObject var localization: LocalizationManager
-    let images = ["flower_placeholder", "leaf_placeholder", "heart_placeholder"]
+    @StateObject private var memoryStore = MemoryStore.shared
     @State private var currentIndex = 0
     @State private var photoScale: CGFloat = 1.0
     @State private var photoOffset: CGSize = .zero
@@ -193,47 +222,79 @@ struct HomeView: View {
                 .clipShape(Capsule())
 
                 VStack(spacing: 0) {
-                    TabView(selection: $currentIndex) {
-                        ForEach(0..<images.count, id: \.self) { index in
-                            ZStack {
-                                Color(red: 0.92, green: 0.92, blue: 0.92)
-                                Image(systemName: "photo.artframe")
-                                    .font(.system(size: 40))
-                                    .foregroundColor(.black.opacity(0.2))
-                            }
-                            .scaleEffect(currentIndex == index ? photoScale : 1.0)
-                            .offset(currentIndex == index ? photoOffset : .zero)
-                            .rotationEffect(currentIndex == index ? photoRotation : .zero)
-                            .highPriorityGesture(
-                                DragGesture()
-                                    .onChanged { value in
-                                        photoOffset = value.translation
-                                        print("QA_LOG: Photo Offset -> \(photoOffset)")
-                                    }
-                                    .onEnded { _ in }
-                            )
-                            .tag(index)
+                    if memoryStore.memories.isEmpty {
+                        VStack(spacing: 16) {
+                            Image(systemName: "photo.artframe")
+                                .font(.system(size: 48, weight: .light))
+                                .foregroundColor(.black.opacity(0.2))
+                            Text(localization.currentLanguage == .turkish ? "Henüz anı yok" : "No memories yet")
+                                .font(.system(size: 14, weight: .light))
+                                .foregroundColor(.black.opacity(0.4))
                         }
+                        .frame(height: 310)
+                    } else {
+                        TabView(selection: $currentIndex) {
+                            ForEach(memoryStore.memories.indices, id: \.self) { index in
+                                let memory = memoryStore.memories[index]
+                                ZStack {
+                                    Color(red: 0.92, green: 0.92, blue: 0.92)
+                                    if let image = memory.image {
+                                        image.resizable().scaledToFill()
+                                    } else {
+                                        Image(systemName: "photo.artframe")
+                                            .font(.system(size: 40))
+                                            .foregroundColor(.black.opacity(0.2))
+                                    }
+                                }
+                                .scaleEffect(currentIndex == index ? photoScale : 1.0)
+                                .offset(currentIndex == index ? photoOffset : .zero)
+                                .rotationEffect(currentIndex == index ? photoRotation : .zero)
+                                .highPriorityGesture(
+                                    DragGesture()
+                                        .onChanged { value in
+                                            photoOffset = value.translation
+                                            print("QA_LOG: Photo Offset -> \(photoOffset)")
+                                        }
+                                        .onEnded { _ in }
+                                )
+                                .tag(index)
+                            }
+                        }
+                        .tabViewStyle(.page)
+                        .frame(width: 290, height: 310)
+                        .cornerRadius(4)
+                        .clipped()
+                        .padding(.top, 15)
                     }
-                    .tabViewStyle(.page)
-                    .frame(width: 290, height: 310)
-                    .cornerRadius(4)
-                    .clipped()
-                    .padding(.top, 15)
 
                     Spacer()
 
-                    VStack(alignment: .leading, spacing: 6) {
-                        Text(localization.string("ani"))
-                            .font(.system(size: 16, weight: .regular, design: .serif))
-                            .foregroundColor(.black.opacity(0.7))
-                        Text(localization.string("date"))
-                            .font(.system(size: 12, weight: .light))
-                            .foregroundColor(.black.opacity(0.4))
+                    if memoryStore.memories.isEmpty {
+                        VStack(alignment: .leading, spacing: 6) {
+                            Text(localization.currentLanguage == .turkish ? "İlk anını oluştur" : "Create your first memory")
+                                .font(.system(size: 16, weight: .regular, design: .serif))
+                                .foregroundColor(.black.opacity(0.7))
+                            Text(localization.currentLanguage == .turkish ? "Create sekmesine git" : "Go to Create tab")
+                                .font(.system(size: 12, weight: .light))
+                                .foregroundColor(.black.opacity(0.4))
+                        }
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(.horizontal, 20)
+                        .padding(.bottom, 24)
+                    } else {
+                        let current = memoryStore.memories[currentIndex]
+                        VStack(alignment: .leading, spacing: 6) {
+                            Text(current.note.prefix(50) + (current.note.count > 50 ? "..." : ""))
+                                .font(.system(size: 14, weight: .light))
+                                .foregroundColor(.black.opacity(0.7))
+                            Text(formattedDate(current.date))
+                                .font(.system(size: 12, weight: .light))
+                                .foregroundColor(.black.opacity(0.4))
+                        }
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(.horizontal, 20)
+                        .padding(.bottom, 24)
                     }
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(.horizontal, 20)
-                    .padding(.bottom, 24)
                 }
                 .frame(width: 320, height: 420)
                 .background(Color.white)
@@ -244,6 +305,12 @@ struct HomeView: View {
             }
             .padding(.top, 40)
         }
+    }
+
+    private func formattedDate(_ date: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = localization.currentLanguage == .turkish ? "dd.MM.yyyy" : "MM/dd/yyyy"
+        return formatter.string(from: date)
     }
 }
 
@@ -404,10 +471,12 @@ struct StreakBadge: View {
 // MARK: - Create View (Scrapbook Diary)
 struct CreateView: View {
     @EnvironmentObject var localization: LocalizationManager
+    @StateObject private var memoryStore = MemoryStore.shared
     @State private var diaryText: String = ""
     @FocusState private var isTextFocused: Bool
     @State private var selectedItem: PhotosPickerItem? = nil
     @State private var processedImage: Image? = nil
+    @State private var savedSuccessfully = false
 
     var body: some View {
         ZStack {
@@ -495,9 +564,9 @@ struct CreateView: View {
                     PhotosPicker(selection: $selectedItem, matching: .images) {
                         ToolbarButton(icon: "photo.stack", label: "📷")
                     }
-                    .onChange(of: selectedItem) { newItem in
+                    .onChange(of: selectedItem) {
                         Task {
-                            if let data = try? await newItem?.loadTransferable(type: Data.self),
+                            if let data = try? await selectedItem?.loadTransferable(type: Data.self),
                                let uiImage = UIImage(data: data) {
                                 processedImage = Image(uiImage: uiImage)
                                 print("QA_LOG: Photo Selected and Loaded")
@@ -506,9 +575,21 @@ struct CreateView: View {
                     }
 
                     ToolbarButton(icon: "scribble", label: "✏️")
-                    ToolbarButton(icon: "square.grid.2x2", label: "■■")
 
                     Spacer()
+
+                    Button(action: saveMemory) {
+                        HStack(spacing: 4) {
+                            Image(systemName: "checkmark")
+                                .font(.system(size: 16, weight: .semibold))
+                            Text(localization.currentLanguage == .turkish ? "Kaydet" : "Save")
+                                .font(.system(size: 12, weight: .light))
+                        }
+                        .padding(8)
+                        .padding(.horizontal, 4)
+                        .background(Color.black.opacity(0.05))
+                        .cornerRadius(6)
+                    }
                 }
                 .padding(12)
                 .background(Color.white.opacity(0.8))
@@ -523,6 +604,22 @@ struct CreateView: View {
         formatter.dateFormat = "dd MMMM yyyy"
         formatter.locale = localization.currentLanguage == .turkish ? Locale(identifier: "tr_TR") : Locale(identifier: "en_US")
         return formatter.string(from: Date())
+    }
+
+    private func saveMemory() {
+        guard !diaryText.trimmingCharacters(in: .whitespaces).isEmpty else {
+            print("QA_LOG: Memory save cancelled - empty note")
+            return
+        }
+        let newMemory = Memory(image: processedImage, note: diaryText, emoji: "🌸")
+        memoryStore.addMemory(newMemory)
+        print("QA_LOG: Memory saved - \(newMemory.id)")
+        diaryText = ""
+        processedImage = nil
+        savedSuccessfully = true
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+            savedSuccessfully = false
+        }
     }
 }
 

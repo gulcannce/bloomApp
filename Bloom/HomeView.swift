@@ -9,6 +9,8 @@ struct HomeView: View {
     @State private var photoOffset: CGSize = .zero
     @State private var photoRotation: Angle = .zero
     @State private var selectedEmoji: String? = nil
+    @State private var expandedMemoryId: UUID? = nil
+    @Namespace private var animationNamespace
 
     var body: some View {
         ZStack {
@@ -171,10 +173,106 @@ struct HomeView: View {
                 .background(Color.white)
                 .cornerRadius(12)
                 .shadow(color: Color.black.opacity(0.06), radius: 12, x: 0, y: 8)
+                .onTapGesture {
+                    if !memoryStore.memories.isEmpty {
+                        withAnimation(.spring(response: 0.52, dampingFraction: 0.78)) {
+                            expandedMemoryId = memoryStore.memories[currentIndex].id
+                        }
+                    }
+                }
 
                 Spacer()
             }
             .padding(.top, 40)
+
+            if let expandedId = expandedMemoryId,
+               let expandedMemory = memoryStore.memories.first(where: { $0.id == expandedId }) {
+                ZStack {
+                    Color.black.opacity(0.4)
+                        .ignoresSafeArea()
+                        .onTapGesture {
+                            withAnimation(.spring(response: 0.52, dampingFraction: 0.78)) {
+                                expandedMemoryId = nil
+                            }
+                        }
+
+                    VStack(spacing: 0) {
+                        HStack {
+                            Spacer()
+                            Button(action: {
+                                withAnimation(.spring(response: 0.52, dampingFraction: 0.78)) {
+                                    expandedMemoryId = nil
+                                }
+                            }) {
+                                Image(systemName: "xmark.circle.fill")
+                                    .font(.system(size: 24, weight: .light))
+                                    .foregroundColor(.black.opacity(0.5))
+                            }
+                            .padding(20)
+                        }
+
+                        ScrollView {
+                            VStack(spacing: 24) {
+                                HStack(spacing: 20) {
+                                    VStack(spacing: 16) {
+                                        ZStack(alignment: .top) {
+                                            RoundedRectangle(cornerRadius: 4)
+                                                .fill(Color(red: 0.98, green: 0.97, blue: 0.96))
+                                                .frame(maxWidth: 140, maxHeight: 180)
+                                                .offset(x: 3, y: 4)
+
+                                            if let image = expandedMemory.image {
+                                                image.resizable().scaledToFill()
+                                            } else {
+                                                Image(systemName: "photo.artframe")
+                                                    .font(.system(size: 32, weight: .light))
+                                                    .foregroundColor(.black.opacity(0.2))
+                                            }
+
+                                            RoundedRectangle(cornerRadius: 1.5)
+                                                .fill(Color.white.opacity(0.55))
+                                                .frame(width: 40, height: 12)
+                                                .overlay(RoundedRectangle(cornerRadius: 1.5).stroke(Color.white.opacity(0.3), lineWidth: 0.5))
+                                                .shadow(color: Color.black.opacity(0.08), radius: 2, x: 0, y: 1)
+                                                .offset(y: 6)
+                                        }
+                                        .frame(width: 140, height: 180)
+                                        .matchedGeometryEffect(id: expandedMemory.id, in: animationNamespace)
+                                    }
+
+                                    VStack(alignment: .leading, spacing: 12) {
+                                        Text(expandedMemory.emoji)
+                                            .font(.system(size: 32))
+
+                                        Text(formattedDate(expandedMemory.date))
+                                            .font(.system(size: 11, weight: .light, design: .serif))
+                                            .foregroundColor(.black.opacity(0.5))
+
+                                        Divider()
+
+                                        Text(expandedMemory.note)
+                                            .font(.system(size: 13, weight: .light))
+                                            .lineSpacing(3)
+                                            .foregroundColor(.black.opacity(0.7))
+                                    }
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                                }
+                                .padding(24)
+                                .background(
+                                    RoundedRectangle(cornerRadius: 12)
+                                        .fill(Color(red: 0.995, green: 0.99, blue: 0.985))
+                                        .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.black.opacity(0.08), lineWidth: 1))
+                                )
+                            }
+                            .padding(16)
+                        }
+                    }
+                    .background(Color.white)
+                    .cornerRadius(20)
+                    .padding(16)
+                    .frame(maxHeight: 600)
+                }
+            }
         }
     }
 

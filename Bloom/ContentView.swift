@@ -233,37 +233,62 @@ struct HomeView: View {
                         }
                         .frame(height: 310)
                     } else {
-                        TabView(selection: $currentIndex) {
-                            ForEach(memoryStore.memories.indices, id: \.self) { index in
-                                let memory = memoryStore.memories[index]
-                                ZStack {
-                                    Color(red: 0.92, green: 0.92, blue: 0.92)
-                                    if let image = memory.image {
-                                        image.resizable().scaledToFill()
-                                    } else {
-                                        Image(systemName: "photo.artframe")
-                                            .font(.system(size: 40))
-                                            .foregroundColor(.black.opacity(0.2))
+                        ZStack(alignment: .top) {
+                            RoundedRectangle(cornerRadius: 4)
+                                .fill(Color(red: 0.98, green: 0.97, blue: 0.96))
+                                .frame(width: 290, height: 310)
+                                .offset(x: 4, y: 6)
+                                .rotationEffect(.degrees(-2.5), anchor: .center)
+
+                            VStack(spacing: 0) {
+                                TabView(selection: $currentIndex) {
+                                    ForEach(memoryStore.memories.indices, id: \.self) { index in
+                                        let memory = memoryStore.memories[index]
+                                        ZStack {
+                                            Color(red: 0.92, green: 0.92, blue: 0.92)
+                                            if let image = memory.image {
+                                                image.resizable().scaledToFill()
+                                            } else {
+                                                Image(systemName: "photo.artframe")
+                                                    .font(.system(size: 40))
+                                                    .foregroundColor(.black.opacity(0.2))
+                                            }
+                                        }
+                                        .scaleEffect(currentIndex == index ? photoScale : 1.0)
+                                        .offset(currentIndex == index ? photoOffset : .zero)
+                                        .rotationEffect(currentIndex == index ? photoRotation : .zero)
+                                        .highPriorityGesture(
+                                            DragGesture()
+                                                .onChanged { value in
+                                                    photoOffset = value.translation
+                                                    print("QA_LOG: Photo Offset -> \(photoOffset)")
+                                                }
+                                                .onEnded { _ in }
+                                        )
+                                        .tag(index)
                                     }
                                 }
-                                .scaleEffect(currentIndex == index ? photoScale : 1.0)
-                                .offset(currentIndex == index ? photoOffset : .zero)
-                                .rotationEffect(currentIndex == index ? photoRotation : .zero)
-                                .highPriorityGesture(
-                                    DragGesture()
-                                        .onChanged { value in
-                                            photoOffset = value.translation
-                                            print("QA_LOG: Photo Offset -> \(photoOffset)")
-                                        }
-                                        .onEnded { _ in }
-                                )
-                                .tag(index)
+                                .tabViewStyle(.page)
+                                .frame(width: 290, height: 310)
+                                .cornerRadius(4)
+                                .clipped()
                             }
+                            .background(Color.white)
+                            .cornerRadius(4)
+                            .shadow(color: Color.black.opacity(0.06), radius: 12, x: 0, y: 8)
+
+                            RoundedRectangle(cornerRadius: 1.5)
+                                .fill(Color.white.opacity(0.55))
+                                .frame(width: 60, height: 18)
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 1.5)
+                                        .stroke(Color.white.opacity(0.3), lineWidth: 0.5)
+                                )
+                                .shadow(color: Color.black.opacity(0.08), radius: 2, x: 0, y: 1)
+                                .offset(y: 8)
+                                .rotationEffect(.degrees(2.0), anchor: .center)
                         }
-                        .tabViewStyle(.page)
-                        .frame(width: 290, height: 310)
-                        .cornerRadius(4)
-                        .clipped()
+                        .frame(width: 320, height: 420)
                         .padding(.top, 15)
                     }
 

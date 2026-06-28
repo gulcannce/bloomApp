@@ -51,6 +51,7 @@ struct PolaroidCard: View {
                 PhotoWindow(scale: $photoScale, offset: $photoOffset, rotation: $photoRotation)
                     .frame(width: 280, height: 280)
                     .clipped()
+                    .zIndex(1)
 
                 Spacer()
 
@@ -66,6 +67,7 @@ struct PolaroidCard: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.horizontal, 20)
                 .padding(.bottom, 24)
+                .zIndex(0)
             }
             .frame(width: 320, height: 420)
             .padding(.top, 20)

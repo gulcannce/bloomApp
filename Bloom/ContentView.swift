@@ -123,23 +123,25 @@ struct EmojiPicker: View {
     private let emojis = ["🌸", "✨", "☁️", "🌱", "🤍"]
 
     var body: some View {
-        HStack(spacing: 12) {
+        HStack(spacing: 10) {
             ForEach(emojis, id: \.self) { emoji in
                 Button(action: {
                     selectedEmoji = emoji
-                    print("QA_LOG: Emoji Selected -> \(emoji)")
+                    print("QA_LOG: Native Emoji Selected -> \(emoji)")
                 }) {
                     Text(emoji)
-                        .font(.system(size: 32))
-                        .padding(12)
+                        .font(.system(size: 28))
+                        .frame(width: 48, height: 48)
                         .background(
-                            selectedEmoji == emoji
-                                ? Color.black.opacity(0.08)
-                                : Color.clear
+                            Capsule()
+                                .fill(
+                                    selectedEmoji == emoji
+                                        ? Color(red: 0.95, green: 0.93, blue: 0.90)
+                                        : Color.clear
+                                )
                         )
-                        .cornerRadius(8)
-                        .scaleEffect(selectedEmoji == emoji ? 1.1 : 1.0)
-                        .animation(.easeInOut(duration: 0.2), value: selectedEmoji)
+                        .scaleEffect(selectedEmoji == emoji ? 1.08 : 1.0)
+                        .animation(.easeInOut(duration: 0.15), value: selectedEmoji)
                 }
             }
             Spacer()

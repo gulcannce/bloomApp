@@ -245,39 +245,173 @@ struct HomeView: View {
     }
 }
 
-// MARK: - Stats View
+// MARK: - Stats View (Mood Analytics)
 struct StatsView: View {
     @EnvironmentObject var localization: LocalizationManager
+
+    let moodData = [
+        ("😄", "Harika", 35),
+        ("🙂", "İyi", 28),
+        ("😐", "Orta", 22),
+        ("😕", "Kötü", 10),
+        ("😢", "Berbat", 5),
+    ]
 
     var body: some View {
         ZStack {
             Color(red: 0.98, green: 0.97, blue: 0.95)
                 .ignoresSafeArea()
 
-            VStack(spacing: 20) {
-                Text(localization.string("stats_title"))
-                    .font(.system(size: 28, weight: .light, design: .serif))
-                    .tracking(1.0)
-                    .foregroundColor(.black.opacity(0.8))
+            ScrollView {
+                VStack(spacing: 32) {
+                    Text(localization.string("stats_title"))
+                        .font(.system(size: 28, weight: .light, design: .serif))
+                        .tracking(1.0)
+                        .foregroundColor(.black.opacity(0.8))
+                        .padding(.top, 20)
 
-                VStack(alignment: .leading, spacing: 12) {
-                    Text(localization.string("mood_tracking"))
-                        .font(.system(size: 16, weight: .regular))
-                        .foregroundColor(.black.opacity(0.7))
+                    // Mood Wheel Chart
+                    MoodWheelChart(data: moodData)
+                        .frame(height: 280)
+                        .padding(.horizontal, 16)
 
-                    Text(localization.string("mood_desc"))
-                        .font(.system(size: 14, weight: .light))
-                        .foregroundColor(.black.opacity(0.5))
+                    // Mood Metrics List
+                    VStack(alignment: .leading, spacing: 12) {
+                        ForEach(moodData, id: \.1) { emoji, label, percentage in
+                            HStack(spacing: 12) {
+                                Text(emoji)
+                                    .font(.system(size: 20))
+
+                                VStack(alignment: .leading, spacing: 4) {
+                                    Text(label)
+                                        .font(.system(size: 14, weight: .regular))
+                                        .foregroundColor(.black.opacity(0.7))
+
+                                    Text("\(percentage)%")
+                                        .font(.system(size: 12, weight: .light))
+                                        .foregroundColor(.black.opacity(0.4))
+                                }
+
+                                Spacer()
+
+                                // Progress bar
+                                GeometryReader { geo in
+                                    ZStack(alignment: .leading) {
+                                        RoundedRectangle(cornerRadius: 4)
+                                            .fill(Color.black.opacity(0.08))
+
+                                        RoundedRectangle(cornerRadius: 4)
+                                            .fill(Color.black.opacity(0.15))
+                                            .frame(width: geo.size.width * CGFloat(percentage) / 100)
+                                    }
+                                }
+                                .frame(height: 6)
+                                .frame(maxWidth: 100)
+                            }
+                            .padding(12)
+                            .background(Color.white.opacity(0.5))
+                            .cornerRadius(8)
+                        }
+                    }
+                    .padding(.horizontal, 16)
+
+                    // Streak Counters
+                    HStack(spacing: 16) {
+                        StreakBadge(label: "Longest Streak", value: "12 Days 🔥")
+                        StreakBadge(label: "Average Mood", value: "😄 3.78")
+                    }
+                    .padding(.horizontal, 16)
+
+                    Spacer(minLength: 40)
                 }
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(20)
-                .background(Color.white.opacity(0.8))
-                .cornerRadius(12)
-
-                Spacer()
+                .padding(.bottom, 80)
             }
-            .padding(20)
         }
+    }
+}
+
+// MARK: - Mood Wheel Chart
+struct MoodWheelChart: View {
+    let data: [(emoji: String, label: String, value: Int)]
+
+    var body: some View {
+        ZStack {
+            // Outer circle
+            Circle()
+                .stroke(Color.black.opacity(0.08), lineWidth: 1)
+
+            // Mood segments
+            Canvas { context in
+                let total = data.reduce(0) { $0 + $1.value }
+                var startAngle: Double = -90
+
+                for (emoji, _, value) in data {
+                    let percentage = Double(value) / Double(total)
+                    let angle = percentage * 360
+
+                    var path = Path()
+                    path.move(to: CGPoint(x: 150, y: 150))
+                    path.addArc(
+                        center: CGPoint(x: 150, y: 150),
+                        radius: 100,
+                        startAngle: .degrees(startAngle),
+                        endAngle: .degrees(startAngle + angle),
+                        clockwise: false
+                    )
+                    path.closeSubpath()
+
+                    context.fill(path, with: .color(.black.opacity(0.1)))
+
+                    // Emoji placement
+                    let midAngle = startAngle + angle / 2
+                    let radians = midAngle * .pi / 180
+                    let x = 150 + 65 * cos(radians)
+                    let y = 150 + 65 * sin(radians)
+
+                    context.draw(
+                        Text(emoji).font(.system(size: 28)),
+                        at: CGPoint(x: x, y: y),
+                        anchor: .center
+                    )
+
+                    startAngle += angle
+                }
+            }
+            .frame(width: 300, height: 300)
+
+            // Center circle
+            Circle()
+                .fill(Color(red: 0.98, green: 0.97, blue: 0.95))
+                .frame(width: 80, height: 80)
+
+            Text("RUH\nHALİ")
+                .font(.system(size: 14, weight: .light, design: .serif))
+                .multilineTextAlignment(.center)
+                .foregroundColor(.black.opacity(0.5))
+        }
+    }
+}
+
+// MARK: - Streak Badge
+struct StreakBadge: View {
+    let label: String
+    let value: String
+
+    var body: some View {
+        VStack(spacing: 8) {
+            Text(label)
+                .font(.system(size: 12, weight: .light))
+                .foregroundColor(.black.opacity(0.5))
+
+            Text(value)
+                .font(.system(size: 16, weight: .semibold, design: .serif))
+                .foregroundColor(.black.opacity(0.7))
+        }
+        .frame(maxWidth: .infinity)
+        .padding(16)
+        .background(Color.white.opacity(0.8))
+        .cornerRadius(12)
+        .shadow(color: Color.black.opacity(0.04), radius: 8, x: 0, y: 2)
     }
 }
 
@@ -438,39 +572,137 @@ struct ToolbarButton: View {
     }
 }
 
-// MARK: - Calendar View
+// MARK: - Calendar View (Memory Archive)
 struct CalendarView: View {
     @EnvironmentObject var localization: LocalizationManager
+    let currentDate = Date()
 
     var body: some View {
         ZStack {
             Color(red: 0.98, green: 0.97, blue: 0.95)
                 .ignoresSafeArea()
 
-            VStack(spacing: 20) {
-                Text(localization.string("calendar_title"))
-                    .font(.system(size: 28, weight: .light, design: .serif))
-                    .tracking(1.0)
-                    .foregroundColor(.black.opacity(0.8))
+            ScrollView {
+                VStack(spacing: 24) {
+                    Text(localization.string("calendar_title"))
+                        .font(.system(size: 28, weight: .light, design: .serif))
+                        .tracking(1.0)
+                        .foregroundColor(.black.opacity(0.8))
+                        .padding(.top, 20)
 
-                VStack(alignment: .leading, spacing: 12) {
-                    Text(localization.string("memory_timeline"))
-                        .font(.system(size: 16, weight: .regular))
-                        .foregroundColor(.black.opacity(0.7))
+                    // Monthly Calendar Grid
+                    MonthlyCalendarGrid()
+                        .padding(.horizontal, 16)
 
-                    Text(localization.string("calendar_desc"))
-                        .font(.system(size: 14, weight: .light))
-                        .foregroundColor(.black.opacity(0.5))
+                    Divider()
+                        .padding(.horizontal, 16)
+
+                    // Memory Timeline
+                    VStack(alignment: .leading, spacing: 16) {
+                        Text("Anılar")
+                            .font(.system(size: 16, weight: .light, design: .serif))
+                            .foregroundColor(.black.opacity(0.6))
+                            .padding(.horizontal, 16)
+
+                        ForEach(0..<3, id: \.self) { index in
+                            MemoryTimelineItem(
+                                date: "28 Mayıs 2024",
+                                snippet: "Bugün harika bir gün geçirdim. Doğanın içinde vakit geçirmek bana çok iyi geldi.",
+                                emoji: ["🌸", "🌿", "☁️"][index % 3]
+                            )
+                            .padding(.horizontal, 16)
+                        }
+                    }
+                    .padding(.vertical, 16)
+
+                    Spacer(minLength: 40)
                 }
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(20)
-                .background(Color.white.opacity(0.8))
-                .cornerRadius(12)
-
-                Spacer()
+                .padding(.bottom, 80)
             }
-            .padding(20)
         }
+    }
+}
+
+// MARK: - Monthly Calendar Grid
+struct MonthlyCalendarGrid: View {
+    let columns = Array(repeating: GridItem(.flexible(), spacing: 8), count: 7)
+    let daysWithMemories = [3, 8, 15, 22, 28] // Sample days with memories
+
+    var body: some View {
+        VStack(spacing: 12) {
+            // Day headers
+            HStack(spacing: 8) {
+                ForEach(["Paz", "Pts", "Sal", "Çrş", "Prş", "Cum", "Ctsi"], id: \.self) { day in
+                    Text(day)
+                        .font(.system(size: 12, weight: .light))
+                        .foregroundColor(.black.opacity(0.4))
+                        .frame(maxWidth: .infinity)
+                }
+            }
+
+            // Calendar days
+            LazyVGrid(columns: columns, spacing: 8) {
+                ForEach(1...30, id: \.self) { day in
+                    ZStack {
+                        if daysWithMemories.contains(day) {
+                            RoundedRectangle(cornerRadius: 8)
+                                .fill(Color.black.opacity(0.08))
+                        }
+
+                        VStack(spacing: 2) {
+                            Text("\(day)")
+                                .font(.system(size: 13, weight: .regular))
+                                .foregroundColor(.black.opacity(0.7))
+
+                            if daysWithMemories.contains(day) {
+                                Text("📷")
+                                    .font(.system(size: 10))
+                            }
+                        }
+                    }
+                    .frame(height: 50)
+                }
+            }
+        }
+        .padding(16)
+        .background(Color.white.opacity(0.8))
+        .cornerRadius(12)
+    }
+}
+
+// MARK: - Memory Timeline Item
+struct MemoryTimelineItem: View {
+    let date: String
+    let snippet: String
+    let emoji: String
+
+    var body: some View {
+        HStack(spacing: 12) {
+            // Mini image placeholder
+            ZStack {
+                Color.black.opacity(0.08)
+                Text(emoji)
+                    .font(.system(size: 24))
+            }
+            .frame(width: 60, height: 60)
+            .cornerRadius(6)
+
+            VStack(alignment: .leading, spacing: 4) {
+                Text(date)
+                    .font(.system(size: 12, weight: .light, design: .serif))
+                    .foregroundColor(.black.opacity(0.5))
+
+                Text(snippet)
+                    .font(.system(size: 14, weight: .light))
+                    .foregroundColor(.black.opacity(0.6))
+                    .lineLimit(2)
+            }
+
+            Spacer()
+        }
+        .padding(12)
+        .background(Color.white.opacity(0.8))
+        .cornerRadius(8)
     }
 }
 

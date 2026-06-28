@@ -69,9 +69,13 @@ struct PolaroidCard: View {
                         .tag(index)
                     }
                 }
-                .frame(width: 280, height: 320)
+                .frame(width: 280, height: 340)
                 .clipped()
                 .zIndex(1)
+                .overlay(alignment: .bottom) {
+                    Color(red: 0.995, green: 0.992, blue: 0.988)
+                        .frame(height: 40)
+                }
 
                 VStack(spacing: 8) {
                     Text("Anı")

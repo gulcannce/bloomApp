@@ -1,5 +1,6 @@
 import SwiftUI
 import Combine
+import PhotosUI
 
 // MARK: - Localization
 enum Language: String, CaseIterable {
@@ -404,6 +405,8 @@ struct CreateView: View {
     @EnvironmentObject var localization: LocalizationManager
     @State private var diaryText: String = ""
     @FocusState private var isTextFocused: Bool
+    @State private var selectedItem: PhotosPickerItem? = nil
+    @State private var processedImage: Image? = nil
 
     var body: some View {
         ZStack {
@@ -425,7 +428,7 @@ struct CreateView: View {
                         // Scrapbook Card with Polaroid
                         VStack(spacing: 16) {
                             // Decorative tape corners (visual placeholders)
-                            CreatePhotoView()
+                            CreatePhotoView(image: processedImage)
                                 .frame(height: 260)
                                 .overlay(alignment: .topLeading) {
                                     Text("📌")
@@ -486,7 +489,21 @@ struct CreateView: View {
                 HStack(spacing: 16) {
                     ToolbarButton(icon: "textformat.size", label: "Aa")
                     ToolbarButton(icon: "smiley", label: "😊")
-                    ToolbarButton(icon: "photo.stack", label: "📷")
+
+                    // Photo Picker Button
+                    PhotosPicker(selection: $selectedItem, matching: .images) {
+                        ToolbarButton(icon: "photo.stack", label: "📷")
+                    }
+                    .onChange(of: selectedItem) { newItem in
+                        Task {
+                            if let data = try? await newItem?.loadTransferable(type: Data.self),
+                               let uiImage = UIImage(data: data) {
+                                processedImage = Image(uiImage: uiImage)
+                                print("QA_LOG: Photo Selected and Loaded")
+                            }
+                        }
+                    }
+
                     ToolbarButton(icon: "scribble", label: "✏️")
                     ToolbarButton(icon: "square.grid.2x2", label: "■■")
 
@@ -510,18 +527,27 @@ struct CreateView: View {
 
 // MARK: - Create Photo View
 struct CreatePhotoView: View {
+    let image: Image?
+
     var body: some View {
         ZStack {
             Color(red: 0.92, green: 0.92, blue: 0.92)
 
-            VStack(spacing: 12) {
-                Image(systemName: "photo.artframe")
-                    .font(.system(size: 48, weight: .light))
-                    .foregroundColor(.black.opacity(0.2))
+            if let image = image {
+                image
+                    .resizable()
+                    .scaledToFill()
+                    .clipped()
+            } else {
+                VStack(spacing: 12) {
+                    Image(systemName: "photo.artframe")
+                        .font(.system(size: 48, weight: .light))
+                        .foregroundColor(.black.opacity(0.2))
 
-                Text("Fotoğraf Ekle")
-                    .font(.system(size: 14, weight: .light))
-                    .foregroundColor(.black.opacity(0.3))
+                    Text("Fotoğraf Ekle")
+                        .font(.system(size: 14, weight: .light))
+                        .foregroundColor(.black.opacity(0.3))
+                }
             }
         }
         .cornerRadius(8)

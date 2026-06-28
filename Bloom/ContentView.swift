@@ -50,6 +50,7 @@ struct PolaroidCard: View {
             VStack(spacing: 16) {
                 PhotoWindow(scale: $photoScale, offset: $photoOffset, rotation: $photoRotation)
                     .frame(width: 280, height: 280)
+                    .clipped()
 
                 VStack(spacing: 8) {
                     Text("Anı")
@@ -66,8 +67,11 @@ struct PolaroidCard: View {
 
                 Spacer()
             }
+            .frame(width: 320, height: 420)
             .padding(.top, 20)
         }
+        .frame(width: 320, height: 420)
+        .clipped()
     }
 }
 

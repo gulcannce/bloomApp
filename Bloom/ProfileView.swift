@@ -90,7 +90,23 @@ struct ProfileView: View {
                         )
                     }
 
-                    Spacer(minLength: 40)
+                    Spacer(minLength: 20)
+
+                    Button(action: {
+                        MemoryStore.injectMockData()
+                        print("QA_LOG: Mock data loaded for testing")
+                    }) {
+                        Text(localization.currentLanguage == .turkish ? "Test Verisi Yükle" : "Load Mock Data")
+                            .font(.system(size: 14, weight: .light, design: .serif))
+                            .foregroundColor(.black.opacity(0.6))
+                            .frame(maxWidth: .infinity)
+                            .padding(12)
+                            .background(Color.white.opacity(0.6))
+                            .cornerRadius(8)
+                    }
+                    .padding(.horizontal, 20)
+
+                    Spacer(minLength: 20)
 
                     Button(action: {
                         print("QA_LOG: Logout triggered")

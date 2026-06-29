@@ -26,6 +26,7 @@ struct Memory: Identifiable {
     let date: Date
     let emoji: String
     var stickers: [Sticker] = []
+    var images: [Image] = []
 
     init(image: Image? = nil, note: String, emoji: String = "🌸", stickers: [Sticker] = []) {
         self.id = UUID()
@@ -34,6 +35,7 @@ struct Memory: Identifiable {
         self.date = Date()
         self.emoji = emoji
         self.stickers = stickers
+        self.images = image.map { [$0] } ?? []
     }
 
     init(image: Image? = nil, note: String, emoji: String = "🌸", date: Date, stickers: [Sticker] = []) {
@@ -43,6 +45,7 @@ struct Memory: Identifiable {
         self.date = date
         self.emoji = emoji
         self.stickers = stickers
+        self.images = image.map { [$0] } ?? []
     }
 
     func toCodable() -> CodableMemory {

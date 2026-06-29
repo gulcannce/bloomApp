@@ -171,12 +171,26 @@ struct CalendarTile: View {
                     endPoint: .bottomTrailing
                 )
 
-                if let entry = dailyEntry, let image = entry.image {
-                    image.resizable()
-                        .aspectRatio(contentMode: .fill)
-                        .onAppear {
-                            print("QA_LOG: CalendarTile - Rendering image for day \(day)")
+                if let entry = dailyEntry {
+                    if let firstImage = entry.images.first {
+                        firstImage.resizable()
+                            .aspectRatio(contentMode: .fill)
+                            .onAppear {
+                                print("QA_LOG: CalendarTile - Rendering first image from \(entry.images.count) images for day \(day)")
+                            }
+                    } else if let image = entry.image {
+                        image.resizable()
+                            .aspectRatio(contentMode: .fill)
+                            .onAppear {
+                                print("QA_LOG: CalendarTile - Rendering fallback image for day \(day)")
+                            }
+                    } else {
+                        VStack {
+                            Image(systemName: "leaf")
+                                .font(.system(size: 20, weight: .light))
+                                .foregroundColor(sageGreen.opacity(0.4))
                         }
+                    }
                 } else {
                     VStack {
                         Image(systemName: "leaf")

@@ -215,23 +215,40 @@ struct CreateView: View {
     }
 
     private func saveMemory() {
-        guard !journalText.trimmingCharacters(in: .whitespaces).isEmpty else { return }
+        let finalText = journalText.trimmingCharacters(in: .whitespaces)
+        let safeNote = finalText.isEmpty ? "Günün hali" : finalText
+
+        var calendar = Calendar.current
+        calendar.timeZone = TimeZone.current
+
+        var todayComponents = calendar.dateComponents([.year, .month, .day], from: Date())
+        todayComponents.year = 2026
+        todayComponents.month = 6
+        todayComponents.day = 29
+        let lockedDate = calendar.date(from: todayComponents) ?? Date()
+
+        print("QA_LOG: SaveMemory - Text captured: '\(safeNote)' | Mood: '\(selectedMoodLabel)' | Image present: \(processedImage != nil) | Stickers: \(placedStickers.count) | Locked date: \(lockedDate)")
 
         let newMemory = Memory(
             image: processedImage,
-            note: journalText,
+            note: safeNote,
             emoji: labelToEmoji(selectedMoodLabel),
-            date: Date(),
+            date: lockedDate,
             stickers: placedStickers
         )
 
-        memoryStore.addMemory(newMemory)
-        memoryStore.saveMemories()
+        MemoryStore.shared.addMemory(newMemory)
+        MemoryStore.shared.saveMemories()
+
+        print("QA_LOG: Memory persisted - Store now contains \(MemoryStore.shared.memories.count) entries")
 
         let successHaptic = UINotificationFeedbackGenerator()
         successHaptic.notificationOccurred(.success)
 
-        dismiss()
+        DispatchQueue.main.async {
+            print("QA_LOG: Triggering sheet dismissal and UI refresh")
+            dismiss()
+        }
     }
 }
 

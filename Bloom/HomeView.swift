@@ -25,11 +25,19 @@ struct HomeView: View {
                 .ignoresSafeArea()
 
             VStack(spacing: 0) {
-                HStack {
-                    Text(localization.string("bloom_title"))
-                        .font(.system(size: 28, weight: .light, design: .serif))
-                        .tracking(1.0)
-                        .foregroundColor(BloomTheme.textPrimary)
+                HStack(alignment: .top, spacing: 16) {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(localization.string("bloom_title"))
+                            .font(.system(size: 32, weight: .thin, design: .serif))
+                            .tracking(1.2)
+                            .foregroundColor(BloomTheme.textPrimary)
+
+                        Text("Senin anın, senin hikayen.")
+                            .font(.system(size: 13, weight: .light, design: .serif))
+                            .italic()
+                            .tracking(0.3)
+                            .foregroundColor(BloomTheme.textSecondary.opacity(0.8))
+                    }
 
                     Spacer()
 
@@ -38,6 +46,7 @@ struct HomeView: View {
                             .font(.system(size: 18, weight: .light))
                             .foregroundColor(Color(red: 0.70, green: 0.65, blue: 0.60))
                     }
+                    .padding(.top, 2)
                 }
                 .padding(.horizontal, 20)
                 .padding(.vertical, 20)
@@ -66,19 +75,6 @@ struct HomeView: View {
                 } else {
                     ScrollView(showsIndicators: false) {
                         VStack(spacing: 24) {
-                            HStack(spacing: 8) {
-                                Text("Merhaba,")
-                                    .font(.system(size: 36, weight: .light, design: .serif))
-                                    .tracking(0.5)
-                                    .foregroundColor(BloomTheme.textPrimary)
-
-                                Image(systemName: "leaf.rose")
-                                    .font(.system(size: 28, weight: .ultraLight))
-                                    .foregroundColor(BloomTheme.driedRose)
-                            }
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .padding(.horizontal, 20)
-
                             ScrollView(.horizontal, showsIndicators: false) {
                                 HStack(spacing: 16) {
                                     let moods = [

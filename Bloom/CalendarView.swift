@@ -84,8 +84,8 @@ struct CalendarView: View {
                     LazyVGrid(columns: columns, spacing: 12) {
                         ForEach(currentMonthDays, id: \.self) { day in
                             if let tileDate = getTileDate(day: day) {
-                                if let dailyEntry = getDailyEntry(for: tileDate) {
-                                    NavigationLink(destination: MemoryDetailView(memory: dailyEntry)
+                                if getDailyEntry(for: tileDate) != nil {
+                                    NavigationLink(destination: DailyMemoriesView(selectedDate: tileDate)
                                         .environmentObject(memoryStore)
                                         .environmentObject(localization)
                                     ) {

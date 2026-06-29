@@ -5,114 +5,126 @@ import UIKit
 struct CreateView: View {
     @EnvironmentObject var localization: LocalizationManager
     @StateObject private var memoryStore = MemoryStore.shared
-    @State private var diaryText: String = ""
-    @FocusState private var isTextFocused: Bool
-    @State private var selectedItem: PhotosPickerItem? = nil
-    @State private var processedImage: Image? = nil
-    @State private var savedSuccessfully = false
+    @Environment(\.dismiss) var dismiss
+
+    @State private var journalText: String = ""
+    @State private var selectedItem: PhotosPickerItem?
+    @State private var processedImage: Image?
     @State private var selectedMoodEmoji: String = "🌸"
-    @State private var selectedStickers: Set<String> = []
+    @State private var placedStickers: [Sticker] = []
 
     let moodSymbols = ["🥀", "🌿", "🌾", "🌸", "🍂"]
-    let availableStickers = ["🌸", "🎀", "🩹", "🤍", "✨", "🌹", "🍄", "🦋"]
+    let botanicalStickers = [
+        ("pressed_daisy", "🌼"),
+        ("dried_rose_petal", "🥀"),
+        ("vintage_tape", "📌"),
+        ("dried_fern", "🌿"),
+        ("wax_seal", "✨")
+    ]
 
     var body: some View {
         ZStack {
-            BloomTheme.background
-                .ignoresSafeArea()
+            BloomTheme.background.ignoresSafeArea()
 
             VStack(spacing: 0) {
-                ScrollView {
+                HStack {
+                    Button(action: { dismiss() }) {
+                        Image(systemName: "xmark.circle.fill")
+                            .font(.system(size: 24, weight: .light))
+                            .foregroundColor(BloomTheme.driedRose)
+                    }
+                    Spacer()
+                    Button(action: saveMemory) {
+                        Image(systemName: "checkmark.circle.fill")
+                            .font(.system(size: 24, weight: .light))
+                            .foregroundColor(BloomTheme.driedRose)
+                    }
+                }
+                .padding(20)
+
+                ScrollView(showsIndicators: false) {
                     VStack(spacing: 24) {
-                        VStack(spacing: 8) {
-                            Text(formattedDate())
-                                .font(.system(size: 18, weight: .light, design: .serif))
-                                .tracking(0.5)
-                                .foregroundColor(BloomTheme.textPrimary)
-                        }
-                        .padding(.top, 24)
-
-                        ZStack(alignment: .top) {
+                        ZStack(alignment: .topTrailing) {
                             RoundedRectangle(cornerRadius: 12)
-                                .fill(BloomTheme.agedParchment)
-                                .offset(x: 4, y: 6)
-                                .rotationEffect(.degrees(-2.5), anchor: .center)
+                                .fill(Color.white)
+                                .shadow(color: Color.black.opacity(0.08), radius: 8, x: 0, y: 4)
 
-                            VStack(spacing: 16) {
-                                CreatePhotoView(image: processedImage)
-                                    .frame(height: 260)
-                                    .overlay(alignment: .topLeading) {
-                                        Text("📌")
-                                            .font(.system(size: 20))
-                                            .offset(x: -12, y: -12)
-                                    }
-                                    .overlay(alignment: .topTrailing) {
-                                        Text("📌")
-                                            .font(.system(size: 20))
-                                            .offset(x: 12, y: -12)
+                            VStack(spacing: 0) {
+                                ZStack(alignment: .center) {
+                                    LinearGradient(gradient: Gradient(colors: [BloomTheme.agedParchment, BloomTheme.agedParchment.opacity(0.9)]), startPoint: .topLeading, endPoint: .bottomTrailing)
+
+                                    if let image = processedImage {
+                                        image.resizable().scaledToFill()
+                                    } else {
+                                        VStack(spacing: 12) {
+                                            Image(systemName: "photo.artframe")
+                                                .font(.system(size: 48, weight: .light))
+                                                .foregroundColor(BloomTheme.textTertiary)
+                                            Text("Fotoğraf Ekle")
+                                                .font(.system(size: 14, weight: .light))
+                                                .foregroundColor(BloomTheme.textSecondary)
+                                        }
                                     }
 
-                                HStack(spacing: 200) {
-                                    Text("🌸")
-                                        .font(.system(size: 16))
-                                    Text("🌼")
-                                        .font(.system(size: 16))
+                                    ForEach(placedStickers) { sticker in
+                                        Text(getEmojiForSticker(sticker.name))
+                                            .font(.system(size: 24))
+                                            .offset(x: sticker.offsetX, y: sticker.offsetY)
+                                            .scaleEffect(sticker.scale)
+                                            .rotationEffect(.degrees(sticker.rotation))
+                                            .gesture(
+                                                SimultaneousGesture(
+                                                    DragGesture()
+                                                        .onChanged { value in
+                                                            if let index = placedStickers.firstIndex(where: { $0.id == sticker.id }) {
+                                                                placedStickers[index].offsetX = value.translation.width
+                                                                placedStickers[index].offsetY = value.translation.height
+                                                            }
+                                                        },
+                                                    SimultaneousGesture(
+                                                        MagnificationGesture()
+                                                            .onChanged { value in
+                                                                if let index = placedStickers.firstIndex(where: { $0.id == sticker.id }) {
+                                                                    placedStickers[index].scale = min(max(value, 0.5), 3.0)
+                                                                }
+                                                            },
+                                                        RotationGesture()
+                                                            .onChanged { value in
+                                                                if let index = placedStickers.firstIndex(where: { $0.id == sticker.id }) {
+                                                                    placedStickers[index].rotation = value.degrees
+                                                                }
+                                                            }
+                                                    )
+                                                )
+                                            )
+                                    }
                                 }
-                                .frame(maxWidth: .infinity)
-                                .padding(.vertical, 4)
-                            }
-                            .padding(20)
-                            .background(BloomTheme.cardBackground)
-                            .cornerRadius(12)
-                            .shadow(color: Color.black.opacity(0.06), radius: 8, x: 0, y: 4)
-
-                            RoundedRectangle(cornerRadius: 1.5)
-                                .fill(Color.white.opacity(0.55))
-                                .frame(width: 60, height: 18)
-                                .overlay(
-                                    RoundedRectangle(cornerRadius: 1.5)
-                                        .stroke(Color.white.opacity(0.3), lineWidth: 0.5)
-                                )
-                                .shadow(color: Color.black.opacity(0.08), radius: 2, x: 0, y: 1)
-                                .offset(y: 8)
-                                .rotationEffect(.degrees(2.0), anchor: .center)
-                        }
-                        .padding(.horizontal, 16)
-
-                        VStack(alignment: .leading, spacing: 8) {
-                            Text("Bugün'ün Öyküsü")
-                                .font(.system(size: 14, weight: .light, design: .serif))
-                                .foregroundColor(BloomTheme.textSecondary)
-                                .padding(.horizontal, 16)
-
-                            TextEditor(text: $diaryText)
-                                .font(.system(size: 16, weight: .light, design: .default))
-                                .lineSpacing(4)
-                                .padding(12)
-                                .frame(minHeight: 140)
-                                .background(BloomTheme.cardBackground)
+                                .frame(height: 240)
                                 .cornerRadius(8)
-                                .overlay(
-                                    RoundedRectangle(cornerRadius: 8)
-                                        .stroke(Color.black.opacity(0.05), lineWidth: 1)
-                                )
-                                .padding(.horizontal, 16)
-                                .focused($isTextFocused)
+                                .padding(12)
+
+                                VStack(alignment: .leading, spacing: 8) {
+                                    TextField("Bugün'ün Öyküsü", text: $journalText)
+                                        .font(.system(size: 12, weight: .light))
+                                        .lineSpacing(2)
+                                        .foregroundColor(BloomTheme.textPrimary)
+                                        .padding(8)
+                                }
+                                .padding(.horizontal, 12)
+                                .padding(.bottom, 12)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                            }
                         }
-                        .padding(.vertical, 16)
+                        .frame(maxWidth: 320)
 
                         VStack(alignment: .leading, spacing: 8) {
-                            Text(localization.currentLanguage == .turkish ? "Bugünün Hali" : "Today's Mood")
-                                .font(.system(size: 14, weight: .light, design: .serif))
+                            Text("Bugün'ün Hali")
+                                .font(.system(size: 12, weight: .light, design: .serif))
                                 .foregroundColor(BloomTheme.textSecondary)
-                                .padding(.horizontal, 16)
 
-                            HStack(spacing: 12) {
+                            HStack(spacing: 8) {
                                 ForEach(moodSymbols, id: \.self) { emoji in
-                                    Button(action: {
-                                        selectedMoodEmoji = emoji
-                                        triggerEmojiHaptic()
-                                    }) {
+                                    Button(action: { selectedMoodEmoji = emoji }) {
                                         Text(emoji)
                                             .font(.system(size: 24))
                                             .scaleEffect(selectedMoodEmoji == emoji ? 1.2 : 1.0)
@@ -124,169 +136,70 @@ struct CreateView: View {
                                     .cornerRadius(8)
                                 }
                             }
-                            .padding(.horizontal, 16)
                         }
-                        .padding(.vertical, 16)
+                        .padding(.horizontal, 20)
+                    }
+                    .padding(.vertical, 24)
+                }
 
-                        VStack(alignment: .leading, spacing: 8) {
-                            Text(localization.currentLanguage == .turkish ? "Dekorasyon Stickerleri" : "Decoration Stickers")
-                                .font(.system(size: 14, weight: .light, design: .serif))
-                                .foregroundColor(BloomTheme.textSecondary)
-                                .padding(.horizontal, 16)
+                VStack(spacing: 12) {
+                    Text("Sticker Tray")
+                        .font(.system(size: 12, weight: .light, design: .serif))
+                        .foregroundColor(BloomTheme.textSecondary)
+                        .padding(.horizontal, 20)
+                        .frame(maxWidth: .infinity, alignment: .leading)
 
-                            ScrollView(.horizontal, showsIndicators: false) {
-                                HStack(spacing: 10) {
-                                    ForEach(availableStickers, id: \.self) { sticker in
-                                        Button(action: {
-                                            if selectedStickers.contains(sticker) {
-                                                selectedStickers.remove(sticker)
-                                            } else {
-                                                selectedStickers.insert(sticker)
-                                            }
-                                        }) {
-                                            Text(sticker)
-                                                .font(.system(size: 28))
-                                                .scaleEffect(selectedStickers.contains(sticker) ? 1.15 : 1.0)
-                                                .animation(.spring(response: 0.3, dampingFraction: 0.6), value: selectedStickers)
-                                        }
-                                        .frame(width: 48, height: 48)
-                                        .background(selectedStickers.contains(sticker) ? Color.white.opacity(0.8) : Color.white.opacity(0.5))
+                    ScrollView(.horizontal, showsIndicators: false) {
+                        HStack(spacing: 10) {
+                            ForEach(botanicalStickers, id: \.0) { name, emoji in
+                                Button(action: {
+                                    let newSticker = Sticker(name: name)
+                                    placedStickers.append(newSticker)
+                                }) {
+                                    Text(emoji)
+                                        .font(.system(size: 32))
+                                        .frame(width: 56, height: 56)
+                                        .background(Color.white.opacity(0.6))
                                         .cornerRadius(8)
-                                    }
                                 }
-                                .padding(.horizontal, 16)
                             }
                         }
-                        .padding(.vertical, 16)
+                        .padding(.horizontal, 20)
                     }
-                    .padding(.bottom, 80)
+                    .frame(height: 80)
                 }
-
-                Spacer()
-
-                HStack(spacing: 16) {
-                    ToolbarButton(icon: "textformat.size", label: "Aa")
-
-                    PhotosPicker(selection: $selectedItem, matching: .images) {
-                        ToolbarButton(icon: "photo.stack", label: "📷")
-                    }
-                    .onChange(of: selectedItem) {
-                        Task {
-                            if let data = try? await selectedItem?.loadTransferable(type: Data.self),
-                               let uiImage = UIImage(data: data) {
-                                processedImage = Image(uiImage: uiImage)
-                            }
-                        }
-                    }
-
-                    ToolbarButton(icon: "scribble", label: "✏️")
-
-                    Spacer()
-
-                    Button(action: saveMemory) {
-                        HStack(spacing: 4) {
-                            Image(systemName: "checkmark")
-                                .font(.system(size: 16, weight: .semibold))
-                            Text(localization.currentLanguage == .turkish ? "Kaydet" : "Save")
-                                .font(.system(size: 12, weight: .light))
-                        }
-                        .padding(8)
-                        .padding(.horizontal, 4)
-                        .background(Color.black.opacity(0.05))
-                        .cornerRadius(6)
-                    }
-                }
-                .padding(12)
-                .background(BloomTheme.cardBackground)
-                .cornerRadius(12)
-                .padding(8)
+                .padding(.vertical, 12)
             }
         }
     }
 
-    private func formattedDate() -> String {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "dd MMMM yyyy"
-        formatter.locale = localization.currentLanguage == .turkish ? Locale(identifier: "tr_TR") : Locale(identifier: "en_US")
-        return formatter.string(from: Date())
-    }
-
-    private func triggerEmojiHaptic() {
-        let lightHaptic = UIImpactFeedbackGenerator(style: .light)
-        lightHaptic.impactOccurred()
+    private func getEmojiForSticker(_ name: String) -> String {
+        botanicalStickers.first(where: { $0.0 == name })?.1 ?? "🌸"
     }
 
     private func saveMemory() {
-        guard !diaryText.trimmingCharacters(in: .whitespaces).isEmpty else {
-            return
-        }
-        let stickerObjects = selectedStickers.map { emoji in
-            Sticker(name: emoji)
-        }
-        let newMemory = Memory(image: processedImage, note: diaryText, emoji: selectedMoodEmoji, stickers: stickerObjects)
+        guard !journalText.trimmingCharacters(in: .whitespaces).isEmpty else { return }
+
+        let newMemory = Memory(
+            image: processedImage,
+            note: journalText,
+            emoji: selectedMoodEmoji,
+            date: Date(),
+            stickers: placedStickers
+        )
+
         memoryStore.addMemory(newMemory)
+        memoryStore.saveMemories()
 
         let successHaptic = UINotificationFeedbackGenerator()
         successHaptic.notificationOccurred(.success)
 
-        diaryText = ""
-        processedImage = nil
-        savedSuccessfully = true
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
-            savedSuccessfully = false
-        }
+        dismiss()
     }
 }
 
-struct CreatePhotoView: View {
-    let image: Image?
-
-    var body: some View {
-        ZStack {
-            LinearGradient(gradient: Gradient(colors: [BloomTheme.agedParchment, BloomTheme.agedParchment.opacity(0.9)]), startPoint: .topLeading, endPoint: .bottomTrailing)
-
-            if let image = image {
-                image
-                    .resizable()
-                    .scaledToFill()
-                    .clipped()
-            } else {
-                VStack(spacing: 12) {
-                    Image(systemName: "photo.artframe")
-                        .font(.system(size: 48, weight: .light))
-                        .foregroundColor(BloomTheme.textTertiary)
-
-                    Text("Fotoğraf Ekle")
-                        .font(.system(size: 14, weight: .light))
-                        .foregroundColor(BloomTheme.textSecondary)
-                }
-            }
-        }
-        .cornerRadius(8)
-        .overlay(
-            RoundedRectangle(cornerRadius: 8)
-                .stroke(Color.black.opacity(0.05), lineWidth: 1)
-        )
-    }
-}
-
-struct ToolbarButton: View {
-    let icon: String
-    let label: String
-
-    var body: some View {
-        Button(action: {}) {
-            VStack(spacing: 4) {
-                Image(systemName: icon)
-                    .font(.system(size: 16, weight: .light))
-                    .foregroundColor(BloomTheme.textPrimary)
-
-                Text(label)
-                    .font(.system(size: 10, weight: .light))
-                    .foregroundColor(BloomTheme.textSecondary)
-            }
-            .frame(maxWidth: .infinity)
-            .padding(.vertical, 8)
-        }
-    }
+#Preview {
+    CreateView()
+        .environmentObject(LocalizationManager())
+        .environmentObject(MemoryStore.shared)
 }

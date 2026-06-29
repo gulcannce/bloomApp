@@ -71,20 +71,93 @@ struct HomeView: View {
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                 } else {
                     ScrollView(showsIndicators: false) {
-                        LazyVGrid(columns: columns, spacing: 12) {
-                            ForEach(memoryStore.memories, id: \.id) { memory in
-                                PinterestMemoryCard(
-                                    memory: memory,
-                                    onTap: {
-                                        withAnimation(.spring(response: 0.52, dampingFraction: 0.78)) {
-                                            expandedMemoryId = memory.id
+                        VStack(spacing: 24) {
+                            Text("Merhaba, 🌸")
+                                .font(.system(size: 36, weight: .light, design: .serif))
+                                .tracking(0.5)
+                                .foregroundColor(BloomTheme.textPrimary)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .padding(.horizontal, 20)
+
+                            ScrollView(.horizontal, showsIndicators: false) {
+                                HStack(spacing: 12) {
+                                    ForEach(["🌸", "🌿", "🌾", "🥀", "🍂"], id: \.self) { mood in
+                                        Text(mood)
+                                            .font(.system(size: 28))
+                                            .frame(width: 48, height: 48)
+                                            .background(Color.white.opacity(0.6))
+                                            .cornerRadius(12)
+                                    }
+                                }
+                                .padding(.horizontal, 20)
+                            }
+                            .frame(height: 60)
+
+                            if let firstMemory = memoryStore.memories.first {
+                                VStack(spacing: 0) {
+                                    ZStack(alignment: .topTrailing) {
+                                        RoundedRectangle(cornerRadius: 4)
+                                            .fill(BloomTheme.agedParchment)
+                                            .frame(maxWidth: 280, maxHeight: 320)
+                                            .offset(x: 3, y: 4)
+
+                                        VStack(spacing: 0) {
+                                            ZStack {
+                                                LinearGradient(gradient: Gradient(colors: [BloomTheme.agedParchment, BloomTheme.agedParchment.opacity(0.9)]), startPoint: .topLeading, endPoint: .bottomTrailing)
+                                                if let image = firstMemory.image {
+                                                    image.resizable().scaledToFill()
+                                                } else {
+                                                    Image(systemName: "photo.artframe")
+                                                        .font(.system(size: 48, weight: .light))
+                                                        .foregroundColor(BloomTheme.textTertiary)
+                                                }
+                                            }
+                                            .frame(height: 240)
+
+                                            VStack(alignment: .leading, spacing: 8) {
+                                                Text(firstMemory.note.prefix(80) + (firstMemory.note.count > 80 ? "..." : ""))
+                                                    .font(.system(size: 12, weight: .light))
+                                                    .lineSpacing(2)
+                                                    .foregroundColor(BloomTheme.textPrimary)
+                                                    .lineLimit(2)
+
+                                                Text(formattedDate(firstMemory.date))
+                                                    .font(.system(size: 10, weight: .light, design: .serif))
+                                                    .foregroundColor(BloomTheme.textSecondary)
+                                            }
+                                            .padding(12)
+                                            .frame(maxWidth: .infinity, alignment: .leading)
                                         }
-                                    },
-                                    animationNamespace: animationNamespace
-                                )
+                                        .background(Color.white)
+                                        .cornerRadius(2)
+
+                                        Text("🌼")
+                                            .font(.system(size: 24))
+                                            .offset(x: -8, y: -8)
+                                    }
+                                    .frame(maxWidth: 280)
+
+                                    HStack(spacing: 8) {
+                                        Spacer()
+                                        Text("\(longestStreak()) gün streak 🔥")
+                                            .font(.system(size: 11, weight: .light, design: .serif))
+                                            .foregroundColor(BloomTheme.textSecondary)
+                                            .padding(8)
+                                            .background(Color.white.opacity(0.8))
+                                            .cornerRadius(6)
+                                    }
+                                    .padding(.top, 12)
+                                    .padding(.horizontal, 12)
+                                }
+                                .frame(maxWidth: .infinity)
+                                .onTapGesture {
+                                    withAnimation(.spring(response: 0.52, dampingFraction: 0.78)) {
+                                        expandedMemoryId = firstMemory.id
+                                    }
+                                }
                             }
                         }
-                        .padding(12)
+                        .padding(.vertical, 24)
                     }
                 }
             }
@@ -255,6 +328,28 @@ struct HomeView: View {
         let formatter = DateFormatter()
         formatter.dateFormat = localization.currentLanguage == .turkish ? "dd.MM.yyyy" : "MM/dd/yyyy"
         return formatter.string(from: date)
+    }
+
+    private func longestStreak() -> Int {
+        guard !memoryStore.memories.isEmpty else { return 0 }
+        let calendar = Calendar.current
+        let dates = Set(memoryStore.memories.map { calendar.startOfDay(for: $0.date) })
+        let sortedDates = dates.sorted(by: >)
+
+        var streak = 1
+        var maxStreak = 1
+        for i in 0..<(sortedDates.count - 1) {
+            let current = sortedDates[i]
+            let next = sortedDates[i + 1]
+            let daysDifference = calendar.dateComponents([.day], from: next, to: current).day ?? 0
+            if daysDifference == 1 {
+                streak += 1
+                maxStreak = max(maxStreak, streak)
+            } else {
+                streak = 1
+            }
+        }
+        return maxStreak
     }
 }
 

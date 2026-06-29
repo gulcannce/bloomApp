@@ -7,6 +7,7 @@ struct HomeView: View {
     @EnvironmentObject var localization: LocalizationManager
     @EnvironmentObject var memoryStore: MemoryStore
     @EnvironmentObject var createViewState: CreateViewState
+    @Binding var showCreateSheet: Bool
     @State private var expandedMemoryId: UUID? = nil
     @Namespace private var animationNamespace
     @State private var selectedStickerName: String? = nil
@@ -14,8 +15,7 @@ struct HomeView: View {
     @State private var stickerScale: CGFloat = 1.0
     @State private var stickerRotation: Double = 0
     @State private var showProfileSheet = false
-    @State private var showCreateSheet = false
-    @State private var selectedItem: PhotosPickerItem? = nil
+    @State private var localSelectedItem: PhotosPickerItem? = nil
 
     let columns = [
         GridItem(.flexible(), spacing: 12),
@@ -167,7 +167,7 @@ struct HomeView: View {
                         }
                         .padding(.vertical, 24)
 
-                        PhotosPicker(selection: $selectedItem, matching: .images) {
+                        PhotosPicker(selection: $localSelectedItem, matching: .images) {
                             HStack(spacing: 8) {
                                 Image(systemName: "pencil")
                                     .font(.system(size: 16, weight: .light))
@@ -319,7 +319,7 @@ struct HomeView: View {
                 }
             }
         }
-        .onChange(of: selectedItem) { newItem in
+        .onChange(of: localSelectedItem) { newItem in
             Task {
                 if let newItem = newItem {
                     if let data = try? await newItem.loadTransferable(type: Data.self) {
@@ -334,12 +334,6 @@ struct HomeView: View {
                     }
                 }
             }
-        }
-        .sheet(isPresented: $showCreateSheet) {
-            CreateView(showCreateSheet: $showCreateSheet)
-                .environmentObject(localization)
-                .environmentObject(memoryStore)
-                .environmentObject(createViewState)
         }
     }
 
@@ -501,9 +495,10 @@ struct PinterestMemoryCard: View {
 
 struct HomeViewPreviewContainer: View {
     @StateObject var store = MemoryStore.shared
+    @State private var showCreateSheet = false
 
     var body: some View {
-        HomeView()
+        HomeView(showCreateSheet: $showCreateSheet)
             .environmentObject(store)
             .environmentObject(LocalizationManager())
             .onAppear {

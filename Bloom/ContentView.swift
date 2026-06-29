@@ -21,9 +21,10 @@ struct ContentView: View {
                     switch selectedTab {
                     case 0:
                         NavigationStack {
-                            HomeView()
+                            HomeView(showCreateSheet: $showCreateSheet)
                                 .environmentObject(localization)
                                 .environmentObject(memoryStore)
+                                .environmentObject(createViewState)
                         }
                     case 1:
                         StatsView()
@@ -40,9 +41,10 @@ struct ContentView: View {
                         }
                     default:
                         NavigationStack {
-                            HomeView()
+                            HomeView(showCreateSheet: $showCreateSheet)
                                 .environmentObject(localization)
                                 .environmentObject(memoryStore)
+                                .environmentObject(createViewState)
                         }
                     }
                 }

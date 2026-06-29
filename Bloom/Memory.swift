@@ -1,15 +1,33 @@
 import SwiftUI
 import Combine
 
+struct Sticker: Identifiable, Codable {
+    let id: UUID
+    var name: String
+    var offsetX: CGFloat = 0
+    var offsetY: CGFloat = 0
+    var scale: CGFloat = 1.0
+    var rotation: Double = 0
+
+    init(name: String, offsetX: CGFloat = 0, offsetY: CGFloat = 0, scale: CGFloat = 1.0, rotation: Double = 0) {
+        self.id = UUID()
+        self.name = name
+        self.offsetX = offsetX
+        self.offsetY = offsetY
+        self.scale = scale
+        self.rotation = rotation
+    }
+}
+
 struct Memory: Identifiable {
     let id: UUID
     let image: Image?
     let note: String
     let date: Date
     let emoji: String
-    var stickers: [String] = []
+    var stickers: [Sticker] = []
 
-    init(image: Image? = nil, note: String, emoji: String = "🌸", stickers: [String] = []) {
+    init(image: Image? = nil, note: String, emoji: String = "🌸", stickers: [Sticker] = []) {
         self.id = UUID()
         self.image = image
         self.note = note
@@ -18,7 +36,7 @@ struct Memory: Identifiable {
         self.stickers = stickers
     }
 
-    init(image: Image? = nil, note: String, emoji: String = "🌸", date: Date, stickers: [String] = []) {
+    init(image: Image? = nil, note: String, emoji: String = "🌸", date: Date, stickers: [Sticker] = []) {
         self.id = UUID()
         self.image = image
         self.note = note
@@ -38,10 +56,10 @@ struct CodableMemory: Codable {
     let date: Date
     let emoji: String
     let hasImage: Bool
-    let stickers: [String]
+    let stickers: [Sticker]
 
     func toMemory() -> Memory {
-        Memory(image: nil, note: note, emoji: emoji, stickers: stickers)
+        Memory(image: nil, note: note, emoji: emoji, date: date, stickers: stickers)
     }
 }
 

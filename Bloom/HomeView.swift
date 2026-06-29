@@ -6,6 +6,10 @@ struct HomeView: View {
     @StateObject private var memoryStore = MemoryStore.shared
     @State private var expandedMemoryId: UUID? = nil
     @Namespace private var animationNamespace
+    @State private var selectedStickerName: String? = nil
+    @State private var draggingStickerId: UUID? = nil
+    @State private var stickerScale: CGFloat = 1.0
+    @State private var stickerRotation: Double = 0
 
     let columns = [
         GridItem(.flexible(), spacing: 12),
@@ -155,16 +159,44 @@ struct HomeView: View {
                                             .lineSpacing(3)
                                             .foregroundColor(BloomTheme.textPrimary)
 
-                                        if !expandedMemory.stickers.isEmpty {
-                                            HStack(spacing: 8) {
-                                                ForEach(expandedMemory.stickers, id: \.self) { sticker in
-                                                    Text(sticker)
-                                                        .font(.system(size: 20))
-                                                        .opacity(0.7)
-                                                }
+                                        ZStack(alignment: .topLeading) {
+                                            RoundedRectangle(cornerRadius: 8)
+                                                .fill(BloomTheme.agedParchment.opacity(0.5))
+                                                .frame(height: 140)
+
+                                            ForEach(expandedMemory.stickers) { sticker in
+                                                InteractiveStickerView(sticker: sticker)
+                                                    .offset(x: sticker.offsetX, y: sticker.offsetY)
+                                                    .scaleEffect(sticker.scale)
+                                                    .rotationEffect(.degrees(sticker.rotation))
+                                                    .gesture(
+                                                        SimultaneousGesture(
+                                                            DragGesture()
+                                                                .onChanged { value in
+                                                                    if let index = expandedMemory.stickers.firstIndex(where: { $0.id == sticker.id }) {
+                                                                        memoryStore.memories[memoryStore.memories.firstIndex(where: { $0.id == expandedMemoryId! })!].stickers[index].offsetX = value.translation.width
+                                                                        memoryStore.memories[memoryStore.memories.firstIndex(where: { $0.id == expandedMemoryId! })!].stickers[index].offsetY = value.translation.height
+                                                                    }
+                                                                },
+                                                            SimultaneousGesture(
+                                                                MagnificationGesture()
+                                                                    .onChanged { value in
+                                                                        if let index = expandedMemory.stickers.firstIndex(where: { $0.id == sticker.id }) {
+                                                                            memoryStore.memories[memoryStore.memories.firstIndex(where: { $0.id == expandedMemoryId! })!].stickers[index].scale = value
+                                                                        }
+                                                                    },
+                                                                RotationGesture()
+                                                                    .onChanged { value in
+                                                                        if let index = expandedMemory.stickers.firstIndex(where: { $0.id == sticker.id }) {
+                                                                            memoryStore.memories[memoryStore.memories.firstIndex(where: { $0.id == expandedMemoryId! })!].stickers[index].rotation = value.degrees
+                                                                        }
+                                                                    }
+                                                            )
+                                                        )
+                                                    )
                                             }
-                                            .padding(.top, 4)
                                         }
+                                        .padding(.top, 8)
                                     }
                                     .frame(maxWidth: .infinity, alignment: .leading)
                                 }
@@ -191,6 +223,17 @@ struct HomeView: View {
         let formatter = DateFormatter()
         formatter.dateFormat = localization.currentLanguage == .turkish ? "dd.MM.yyyy" : "MM/dd/yyyy"
         return formatter.string(from: date)
+    }
+}
+
+struct InteractiveStickerView: View {
+    let sticker: Sticker
+    let botanicalStickers = ["pressed_daisy": "🌼", "dried_rose_petal": "🥀", "vintage_tape": "📌", "dried_fern": "🌿", "wax_seal": "✨"]
+
+    var body: some View {
+        Text(botanicalStickers[sticker.name] ?? sticker.name)
+            .font(.system(size: 28))
+            .opacity(0.75)
     }
 }
 

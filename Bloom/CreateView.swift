@@ -220,7 +220,10 @@ struct CreateView: View {
         guard !diaryText.trimmingCharacters(in: .whitespaces).isEmpty else {
             return
         }
-        let newMemory = Memory(image: processedImage, note: diaryText, emoji: selectedMoodEmoji, stickers: Array(selectedStickers))
+        let stickerObjects = selectedStickers.map { emoji in
+            Sticker(name: emoji)
+        }
+        let newMemory = Memory(image: processedImage, note: diaryText, emoji: selectedMoodEmoji, stickers: stickerObjects)
         memoryStore.addMemory(newMemory)
 
         let successHaptic = UINotificationFeedbackGenerator()

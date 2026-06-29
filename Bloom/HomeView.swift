@@ -115,7 +115,7 @@ struct HomeView: View {
                             .padding(20)
                         }
 
-                        ScrollView {
+                        ScrollView(showsIndicators: false) {
                             VStack(spacing: 24) {
                                 HStack(spacing: 20) {
                                     VStack(spacing: 16) {
@@ -209,11 +209,43 @@ struct HomeView: View {
                             }
                             .padding(16)
                         }
+
+                        VStack(spacing: 12) {
+                            Text("Sticker Tray")
+                                .font(.system(size: 12, weight: .light, design: .serif))
+                                .foregroundColor(BloomTheme.textSecondary)
+                                .padding(.horizontal, 16)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+
+                            ScrollView(.horizontal, showsIndicators: false) {
+                                HStack(spacing: 10) {
+                                    ForEach(["pressed_daisy", "dried_rose_petal", "vintage_tape", "dried_fern", "wax_seal"], id: \.self) { stickerName in
+                                        let botanicalMap = ["pressed_daisy": "🌼", "dried_rose_petal": "🥀", "vintage_tape": "📌", "dried_fern": "🌿", "wax_seal": "✨"]
+                                        Button(action: {
+                                            if let memoryIndex = memoryStore.memories.firstIndex(where: { $0.id == expandedMemoryId! }) {
+                                                let newSticker = Sticker(name: stickerName)
+                                                memoryStore.memories[memoryIndex].stickers.append(newSticker)
+                                                memoryStore.saveMemories()
+                                            }
+                                        }) {
+                                            Text(botanicalMap[stickerName] ?? stickerName)
+                                                .font(.system(size: 32))
+                                                .frame(width: 56, height: 56)
+                                                .background(Color.white.opacity(0.6))
+                                                .cornerRadius(8)
+                                        }
+                                    }
+                                }
+                                .padding(.horizontal, 16)
+                            }
+                            .frame(height: 80)
+                        }
+                        .padding(.vertical, 12)
                     }
                     .background(BloomTheme.cardBackground)
                     .cornerRadius(20)
                     .padding(16)
-                    .frame(maxHeight: 600)
+                    .frame(maxHeight: 700)
                 }
             }
         }

@@ -78,7 +78,7 @@ class MemoryStore: ObservableObject {
         saveMemories()
     }
 
-    private func saveMemories() {
+    func saveMemories() {
         let codableMemories = memories.map { $0.toCodable() }
         if let encoded = try? JSONEncoder().encode(codableMemories) {
             UserDefaults.standard.set(encoded, forKey: memoriesKey)

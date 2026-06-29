@@ -68,7 +68,7 @@ struct ContentView: View {
             }
         }
         .sheet(isPresented: $showCreateSheet) {
-            CreateView()
+            CreateView(showCreateSheet: $showCreateSheet)
                 .environmentObject(localization)
                 .environmentObject(memoryStore)
                 .environmentObject(createViewState)

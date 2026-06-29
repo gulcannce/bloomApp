@@ -78,6 +78,13 @@ class MemoryStore: ObservableObject {
         saveMemories()
     }
 
+    func addEntry(_ entry: Memory) {
+        print("QA_LOG: MemoryStore.addEntry() - Adding entry with note: '\(entry.note)' on date: \(entry.date)")
+        memories.insert(entry, at: 0)
+        saveMemories()
+        print("QA_LOG: MemoryStore.addEntry() - Store now contains \(memories.count) entries")
+    }
+
     func saveMemories() {
         let codableMemories = memories.map { $0.toCodable() }
         if let encoded = try? JSONEncoder().encode(codableMemories) {

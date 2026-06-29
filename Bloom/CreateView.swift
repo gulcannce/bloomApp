@@ -7,6 +7,7 @@ struct CreateView: View {
     @EnvironmentObject var memoryStore: MemoryStore
     @EnvironmentObject var createViewState: CreateViewState
     @Environment(\.dismiss) var dismiss
+    @Binding var showCreateSheet: Bool
 
     @State private var journalText: String = ""
     @State private var selectedItem: PhotosPickerItem?
@@ -229,7 +230,7 @@ struct CreateView: View {
 
         print("QA_LOG: SaveMemory - Text captured: '\(safeNote)' | Mood: '\(selectedMoodLabel)' | Image present: \(processedImage != nil) | Stickers: \(placedStickers.count) | Locked date: \(lockedDate)")
 
-        let newMemory = Memory(
+        let newEntry = Memory(
             image: processedImage,
             note: safeNote,
             emoji: labelToEmoji(selectedMoodLabel),
@@ -237,23 +238,24 @@ struct CreateView: View {
             stickers: placedStickers
         )
 
-        MemoryStore.shared.addMemory(newMemory)
-        MemoryStore.shared.saveMemories()
+        MemoryStore.shared.addEntry(newEntry)
 
-        print("QA_LOG: Memory persisted - Store now contains \(MemoryStore.shared.memories.count) entries")
+        print("QA_LOG: Entry persisted - Store now contains \(MemoryStore.shared.memories.count) entries")
 
         let successHaptic = UINotificationFeedbackGenerator()
         successHaptic.notificationOccurred(.success)
 
         DispatchQueue.main.async {
-            print("QA_LOG: Triggering sheet dismissal and UI refresh")
-            dismiss()
+            print("QA_LOG: Explicitly toggling showCreateSheet = false to trigger parent re-render")
+            showCreateSheet = false
+            print("QA_LOG: Parent ContentView binding updated - HomeView and CalendarView will refresh")
         }
     }
 }
 
 #Preview {
-    CreateView()
+    CreateView(showCreateSheet: .constant(true))
         .environmentObject(LocalizationManager())
         .environmentObject(MemoryStore.shared)
+        .environmentObject(CreateViewState())
 }

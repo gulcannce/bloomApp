@@ -4,6 +4,7 @@ import Combine
 struct HomeView: View {
     @EnvironmentObject var localization: LocalizationManager
     @EnvironmentObject var memoryStore: MemoryStore
+    @EnvironmentObject var createViewState: CreateViewState
     @State private var expandedMemoryId: UUID? = nil
     @Namespace private var animationNamespace
     @State private var selectedStickerName: String? = nil
@@ -265,35 +266,7 @@ struct HomeView: View {
                                                 .frame(height: 140)
 
                                             ForEach(expandedMemory.stickers) { sticker in
-                                                InteractiveStickerView(sticker: sticker)
-                                                    .offset(x: sticker.offsetX, y: sticker.offsetY)
-                                                    .scaleEffect(sticker.scale)
-                                                    .rotationEffect(.degrees(sticker.rotation))
-                                                    .gesture(
-                                                        SimultaneousGesture(
-                                                            DragGesture()
-                                                                .onChanged { value in
-                                                                    if let index = expandedMemory.stickers.firstIndex(where: { $0.id == sticker.id }) {
-                                                                        memoryStore.memories[memoryStore.memories.firstIndex(where: { $0.id == expandedMemoryId! })!].stickers[index].offsetX = value.translation.width
-                                                                        memoryStore.memories[memoryStore.memories.firstIndex(where: { $0.id == expandedMemoryId! })!].stickers[index].offsetY = value.translation.height
-                                                                    }
-                                                                },
-                                                            SimultaneousGesture(
-                                                                MagnificationGesture()
-                                                                    .onChanged { value in
-                                                                        if let index = expandedMemory.stickers.firstIndex(where: { $0.id == sticker.id }) {
-                                                                            memoryStore.memories[memoryStore.memories.firstIndex(where: { $0.id == expandedMemoryId! })!].stickers[index].scale = value
-                                                                        }
-                                                                    },
-                                                                RotationGesture()
-                                                                    .onChanged { value in
-                                                                        if let index = expandedMemory.stickers.firstIndex(where: { $0.id == sticker.id }) {
-                                                                            memoryStore.memories[memoryStore.memories.firstIndex(where: { $0.id == expandedMemoryId! })!].stickers[index].rotation = value.degrees
-                                                                        }
-                                                                    }
-                                                            )
-                                                        )
-                                                    )
+                                                buildStickerView(sticker, from: expandedMemory)
                                             }
                                         }
                                         .padding(.top, 8)
@@ -350,9 +323,10 @@ struct HomeView: View {
             }
         }
         .sheet(isPresented: $showCreateSheet) {
-            CreateView()
+            CreateView(showCreateSheet: $showCreateSheet)
                 .environmentObject(localization)
                 .environmentObject(memoryStore)
+                .environmentObject(createViewState)
         }
     }
 
@@ -382,6 +356,45 @@ struct HomeView: View {
             }
         }
         return maxStreak
+    }
+
+    @ViewBuilder
+    private func buildStickerView(_ sticker: Sticker, from memory: Memory) -> some View {
+        InteractiveStickerView(sticker: sticker)
+            .offset(x: sticker.offsetX, y: sticker.offsetY)
+            .scaleEffect(sticker.scale)
+            .rotationEffect(.degrees(sticker.rotation))
+            .gesture(
+                SimultaneousGesture(
+                    DragGesture()
+                        .onChanged { value in
+                            if let index = memory.stickers.firstIndex(where: { $0.id == sticker.id }) {
+                                if let memoryIndex = memoryStore.memories.firstIndex(where: { $0.id == expandedMemoryId! }) {
+                                    memoryStore.memories[memoryIndex].stickers[index].offsetX = value.translation.width
+                                    memoryStore.memories[memoryIndex].stickers[index].offsetY = value.translation.height
+                                }
+                            }
+                        },
+                    SimultaneousGesture(
+                        MagnificationGesture()
+                            .onChanged { value in
+                                if let index = memory.stickers.firstIndex(where: { $0.id == sticker.id }) {
+                                    if let memoryIndex = memoryStore.memories.firstIndex(where: { $0.id == expandedMemoryId! }) {
+                                        memoryStore.memories[memoryIndex].stickers[index].scale = value
+                                    }
+                                }
+                            },
+                        RotationGesture()
+                            .onChanged { value in
+                                if let index = memory.stickers.firstIndex(where: { $0.id == sticker.id }) {
+                                    if let memoryIndex = memoryStore.memories.firstIndex(where: { $0.id == expandedMemoryId! }) {
+                                        memoryStore.memories[memoryIndex].stickers[index].rotation = value.degrees
+                                    }
+                                }
+                            }
+                    )
+                )
+            )
     }
 }
 

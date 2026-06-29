@@ -276,11 +276,31 @@ struct PinterestMemoryCard: View {
     }
 }
 
+struct HomeViewPreviewContainer: View {
+    @StateObject var store = MemoryStore.shared
+
+    var body: some View {
+        HomeView()
+            .environmentObject(store)
+            .environmentObject(LocalizationManager())
+            .onAppear {
+                let today = Date()
+                let calendar = Calendar.current
+                let yesterday = calendar.date(byAdding: .day, value: -1, to: today) ?? today
+                let threeDaysAgo = calendar.date(byAdding: .day, value: -3, to: today) ?? today
+                let fiveDaysAgo = calendar.date(byAdding: .day, value: -5, to: today) ?? today
+
+                let testMemories = [
+                    Memory(image: nil, note: "A serene moment.", emoji: "🌸", date: today, stickers: []),
+                    Memory(image: nil, note: "This was such a meaningful day with unexpected discoveries and beautiful encounters that I want to remember forever.", emoji: "🌿", date: yesterday, stickers: []),
+                    Memory(image: nil, note: "Captured a golden hour.", emoji: "🥀", date: threeDaysAgo, stickers: []),
+                    Memory(image: nil, note: "Peaceful reflections.", emoji: "🌾", date: fiveDaysAgo, stickers: [])
+                ]
+                store.memories = testMemories
+            }
+    }
+}
+
 #Preview {
-    HomeView()
-        .environmentObject(MemoryStore.shared)
-        .environmentObject(LocalizationManager())
-        .onAppear {
-            MemoryStore.injectMockData()
-        }
+    HomeViewPreviewContainer()
 }

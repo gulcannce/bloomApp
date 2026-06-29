@@ -119,19 +119,11 @@ struct HomeView: View {
                                             .shadow(color: Color.black.opacity(0.08), radius: 8, x: 0, y: 4)
 
                                         VStack(spacing: 0) {
-                                            ZStack(alignment: .topTrailing) {
+                                            ZStack {
                                                 LinearGradient(gradient: Gradient(colors: [BloomTheme.agedParchment, BloomTheme.agedParchment.opacity(0.9)]), startPoint: .topLeading, endPoint: .bottomTrailing)
                                                 if let image = firstMemory.image {
                                                     image.resizable().scaledToFill()
-                                                } else {
-                                                    Image(systemName: "photo.artframe")
-                                                        .font(.system(size: 48, weight: .light))
-                                                        .foregroundColor(BloomTheme.textTertiary)
                                                 }
-
-                                                Text("🌼")
-                                                    .font(.system(size: 28))
-                                                    .offset(x: 8, y: 8)
                                             }
                                             .frame(height: 240)
                                             .cornerRadius(8)

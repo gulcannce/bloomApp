@@ -53,77 +53,76 @@ struct MemoryDetailView: View {
                 .padding(.vertical, 16)
                 .background(BloomTheme.agedParchment)
 
-                VStack(spacing: 0) {
-                    ScrollView(showsIndicators: false) {
-                        VStack(spacing: 24) {
-                            PolaroidCarouselView(memory: $memory)
-                                .matchedGeometryEffect(id: memory.id, in: animationNamespace)
+                ScrollView(showsIndicators: false) {
+                    VStack(spacing: 24) {
+                        PolaroidCarouselView(memory: $memory)
+                            .matchedGeometryEffect(id: memory.id, in: animationNamespace)
 
-                            ZStack(alignment: .topLeading) {
-                                RoundedRectangle(cornerRadius: 12)
-                                    .fill(Color.white)
-                                    .shadow(color: Color.black.opacity(0.08), radius: 8, x: 0, y: 2)
+                        ZStack(alignment: .topLeading) {
+                            RoundedRectangle(cornerRadius: 12)
+                                .fill(Color.white)
+                                .shadow(color: Color.black.opacity(0.08), radius: 8, x: 0, y: 2)
 
-                                if let image = memory.image {
-                                    image.resizable()
-                                        .scaledToFill()
-                                        .clipped()
-                                        .cornerRadius(12)
-                                }
-
-                                ForEach(placedStickers) { sticker in
-                                    buildStickerView(sticker)
-                                        .zIndex(100)
-                                }
+                            if let image = memory.image {
+                                image.resizable()
+                                    .scaledToFill()
+                                    .clipped()
+                                    .cornerRadius(12)
                             }
-                            .frame(height: 280)
-                            .padding(.horizontal, 20)
 
-                            VStack(alignment: .leading, spacing: 12) {
-                                Text("Notlar")
-                                    .font(.system(size: 12, weight: .light, design: .serif))
-                                    .foregroundColor(BloomTheme.textSecondary)
-                                    .padding(.horizontal, 20)
-
-                                TextEditor(text: $editingNote)
-                                    .font(.system(size: 13, weight: .light))
-                                    .foregroundColor(BloomTheme.textPrimary)
-                                    .frame(height: 90)
-                                    .padding(12)
-                                    .background(Color.white.opacity(0.6))
-                                    .cornerRadius(8)
-                                    .overlay(RoundedRectangle(cornerRadius: 8).stroke(BloomTheme.textTertiary.opacity(0.1), lineWidth: 0.5))
-                                    .padding(.horizontal, 20)
+                            ForEach(placedStickers) { sticker in
+                                buildStickerView(sticker)
+                                    .zIndex(100)
                             }
-                            .padding(.bottom, 20)
                         }
-                        .padding(.vertical, 24)
-                    }
+                        .frame(height: 280)
+                        .padding(.horizontal, 20)
 
-                    VStack(spacing: 0) {
-                        ScrollView(.horizontal, showsIndicators: false) {
-                            HStack(spacing: 12) {
-                                ForEach(stickerAssets, id: \.self) { stickerName in
-                                    Button(action: {
-                                        let newSticker = PlacedSticker(name: stickerName)
-                                        placedStickers.append(newSticker)
-                                        activeStickerId = newSticker.id
-                                        print("QA_LOG: MemoryDetailView - Added sticker: \(stickerName)")
-                                    }) {
-                                        Text(stickerMap[stickerName] ?? stickerName)
-                                            .font(.system(size: 32))
-                                            .frame(width: 52, height: 52)
-                                            .background(Color.white.opacity(0.4))
-                                            .cornerRadius(8)
-                                    }
-                                }
-                            }
-                            .padding(.horizontal, 20)
+                        VStack(alignment: .leading, spacing: 12) {
+                            Text("Notlar")
+                                .font(.system(size: 12, weight: .light, design: .serif))
+                                .foregroundColor(BloomTheme.textSecondary)
+                                .padding(.horizontal, 20)
+
+                            TextEditor(text: $editingNote)
+                                .font(.system(size: 13, weight: .light))
+                                .foregroundColor(BloomTheme.textPrimary)
+                                .frame(minHeight: 90)
+                                .padding(12)
+                                .background(Color.white.opacity(0.6))
+                                .cornerRadius(8)
+                                .overlay(RoundedRectangle(cornerRadius: 8).stroke(BloomTheme.textTertiary.opacity(0.1), lineWidth: 0.5))
+                                .padding(.horizontal, 20)
                         }
-                        .frame(height: 80)
-                        .background(Color.white.opacity(0.2))
+                        .padding(.bottom, 20)
                     }
+                    .padding(.vertical, 24)
                 }
+
+                VStack(spacing: 0) {
+                    ScrollView(.horizontal, showsIndicators: false) {
+                        HStack(spacing: 12) {
+                            ForEach(stickerAssets, id: \.self) { stickerName in
+                                Button(action: {
+                                    let newSticker = PlacedSticker(name: stickerName)
+                                    placedStickers.append(newSticker)
+                                    activeStickerId = newSticker.id
+                                    print("QA_LOG: MemoryDetailView - Added sticker: \(stickerName)")
+                                }) {
+                                    Text(stickerMap[stickerName] ?? stickerName)
+                                        .font(.system(size: 32))
+                                        .frame(width: 52, height: 52)
+                                        .background(Color.white.opacity(0.4))
+                                        .cornerRadius(8)
+                                }
+                            }
+                        }
+                        .padding(.horizontal, 20)
+                    }
+                    .frame(height: 80)
+                    .background(Color.white.opacity(0.2))
+                }
+                .ignoresSafeArea(edges: .bottom)
             }
         }
         .onAppear {

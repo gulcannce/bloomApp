@@ -35,9 +35,17 @@ struct CreateView: View {
                     }
                     Spacer()
                     Button(action: saveMemory) {
-                        Image(systemName: "checkmark.circle.fill")
-                            .font(.system(size: 24, weight: .light))
-                            .foregroundColor(BloomTheme.driedRose)
+                        HStack(spacing: 6) {
+                            Image(systemName: "checkmark")
+                                .font(.system(size: 16, weight: .light))
+                            Text("Kaydet")
+                                .font(.system(size: 14, weight: .light, design: .serif))
+                        }
+                        .foregroundColor(.white)
+                        .padding(.horizontal, 16)
+                        .padding(.vertical, 8)
+                        .background(BloomTheme.driedRose)
+                        .cornerRadius(8)
                     }
                 }
                 .padding(20)

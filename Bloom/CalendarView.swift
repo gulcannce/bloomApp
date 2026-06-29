@@ -140,19 +140,28 @@ struct CalendarTile: View {
             .cornerRadius(8)
             .clipped()
 
-            HStack(spacing: 6) {
-                Text("\(day)")
-                    .font(.system(size: 14, weight: .light, design: .serif))
-                    .foregroundColor(Color.black.opacity(0.8))
+            VStack(alignment: .leading, spacing: 4) {
+                HStack(spacing: 6) {
+                    Text("\(day)")
+                        .font(.system(size: 14, weight: .light, design: .serif))
+                        .foregroundColor(Color.black.opacity(0.8))
 
-                if let memory = memory {
-                    let symbolName = moodEmojiToSymbol(memory.emoji)
-                    Image(systemName: symbolName)
-                        .font(.system(size: 11, weight: .ultraLight))
-                        .foregroundColor(sageGreen.opacity(0.7))
+                    if let memory = memory {
+                        let symbolName = moodEmojiToSymbol(memory.emoji)
+                        Image(systemName: symbolName)
+                            .font(.system(size: 11, weight: .ultraLight))
+                            .foregroundColor(sageGreen.opacity(0.7))
+                    }
+
+                    Spacer()
                 }
 
-                Spacer()
+                if let memory = memory {
+                    Text(memory.note.prefix(40) + (memory.note.count > 40 ? "..." : ""))
+                        .font(.system(size: 9, weight: .light))
+                        .foregroundColor(Color.black.opacity(0.6))
+                        .lineLimit(1)
+                }
             }
             .padding(8)
             .frame(maxWidth: .infinity, alignment: .leading)

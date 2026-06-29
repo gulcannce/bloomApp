@@ -94,15 +94,14 @@ struct HomeView: View {
                             .frame(height: 60)
 
                             if let firstMemory = memoryStore.memories.first {
-                                VStack(spacing: 0) {
+                                VStack(spacing: 16) {
                                     ZStack(alignment: .topTrailing) {
-                                        RoundedRectangle(cornerRadius: 4)
-                                            .fill(BloomTheme.agedParchment)
-                                            .frame(maxWidth: 280, maxHeight: 320)
-                                            .offset(x: 3, y: 4)
+                                        RoundedRectangle(cornerRadius: 12)
+                                            .fill(Color.white)
+                                            .shadow(color: Color.black.opacity(0.08), radius: 8, x: 0, y: 4)
 
                                         VStack(spacing: 0) {
-                                            ZStack {
+                                            ZStack(alignment: .topTrailing) {
                                                 LinearGradient(gradient: Gradient(colors: [BloomTheme.agedParchment, BloomTheme.agedParchment.opacity(0.9)]), startPoint: .topLeading, endPoint: .bottomTrailing)
                                                 if let image = firstMemory.image {
                                                     image.resizable().scaledToFill()
@@ -111,10 +110,16 @@ struct HomeView: View {
                                                         .font(.system(size: 48, weight: .light))
                                                         .foregroundColor(BloomTheme.textTertiary)
                                                 }
+
+                                                Text("🌼")
+                                                    .font(.system(size: 28))
+                                                    .offset(x: 8, y: 8)
                                             }
                                             .frame(height: 240)
+                                            .cornerRadius(8)
+                                            .padding(12)
 
-                                            VStack(alignment: .leading, spacing: 8) {
+                                            VStack(alignment: .leading, spacing: 6) {
                                                 Text(firstMemory.note.prefix(80) + (firstMemory.note.count > 80 ? "..." : ""))
                                                     .font(.system(size: 12, weight: .light))
                                                     .lineSpacing(2)
@@ -125,17 +130,13 @@ struct HomeView: View {
                                                     .font(.system(size: 10, weight: .light, design: .serif))
                                                     .foregroundColor(BloomTheme.textSecondary)
                                             }
-                                            .padding(12)
+                                            .padding(.horizontal, 12)
+                                            .padding(.bottom, 12)
                                             .frame(maxWidth: .infinity, alignment: .leading)
                                         }
-                                        .background(Color.white)
-                                        .cornerRadius(2)
-
-                                        Text("🌼")
-                                            .font(.system(size: 24))
-                                            .offset(x: -8, y: -8)
+                                        .frame(maxWidth: .infinity)
                                     }
-                                    .frame(maxWidth: 280)
+                                    .frame(maxWidth: 320)
 
                                     HStack(spacing: 8) {
                                         Spacer()
@@ -146,8 +147,7 @@ struct HomeView: View {
                                             .background(Color.white.opacity(0.8))
                                             .cornerRadius(6)
                                     }
-                                    .padding(.top, 12)
-                                    .padding(.horizontal, 12)
+                                    .padding(.horizontal, 20)
                                 }
                                 .frame(maxWidth: .infinity)
                                 .onTapGesture {

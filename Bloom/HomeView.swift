@@ -105,62 +105,62 @@ struct HomeView: View {
                             .frame(height: 80)
 
                             if let firstMemory = memoryStore.memories.first {
-                                VStack(spacing: 16) {
-                                    ZStack(alignment: .topTrailing) {
-                                        RoundedRectangle(cornerRadius: 12)
-                                            .fill(Color.white)
-                                            .shadow(color: Color.black.opacity(0.08), radius: 8, x: 0, y: 4)
+                                NavigationLink(destination: MemoryDetailView(memory: firstMemory)
+                                    .environmentObject(memoryStore)
+                                    .environmentObject(localization)
+                                ) {
+                                    VStack(spacing: 16) {
+                                        ZStack(alignment: .topTrailing) {
+                                            RoundedRectangle(cornerRadius: 12)
+                                                .fill(Color.white)
+                                                .shadow(color: Color.black.opacity(0.08), radius: 8, x: 0, y: 4)
 
-                                        VStack(spacing: 0) {
-                                            ZStack {
-                                                LinearGradient(gradient: Gradient(colors: [BloomTheme.agedParchment, BloomTheme.agedParchment.opacity(0.9)]), startPoint: .topLeading, endPoint: .bottomTrailing)
-                                                if let image = firstMemory.image {
-                                                    image.resizable().scaledToFill()
+                                            VStack(spacing: 0) {
+                                                ZStack {
+                                                    LinearGradient(gradient: Gradient(colors: [BloomTheme.agedParchment, BloomTheme.agedParchment.opacity(0.9)]), startPoint: .topLeading, endPoint: .bottomTrailing)
+                                                    if let image = firstMemory.image {
+                                                        image.resizable().scaledToFill()
+                                                    }
                                                 }
+                                                .frame(height: 240)
+                                                .cornerRadius(8)
+                                                .padding(12)
+
+                                                VStack(alignment: .leading, spacing: 6) {
+                                                    Text(firstMemory.note.prefix(80) + (firstMemory.note.count > 80 ? "..." : ""))
+                                                        .font(.system(size: 12, weight: .light))
+                                                        .lineSpacing(2)
+                                                        .foregroundColor(BloomTheme.textPrimary)
+                                                        .lineLimit(2)
+
+                                                    Text(formattedDate(firstMemory.date))
+                                                        .font(.system(size: 10, weight: .light, design: .serif))
+                                                        .foregroundColor(BloomTheme.textSecondary)
+                                                }
+                                                .padding(.horizontal, 12)
+                                                .padding(.bottom, 12)
+                                                .frame(maxWidth: .infinity, alignment: .leading)
                                             }
-                                            .frame(height: 240)
-                                            .cornerRadius(8)
-                                            .padding(12)
+                                            .frame(maxWidth: .infinity)
+                                        }
+                                        .frame(maxWidth: 320)
 
-                                            VStack(alignment: .leading, spacing: 6) {
-                                                Text(firstMemory.note.prefix(80) + (firstMemory.note.count > 80 ? "..." : ""))
-                                                    .font(.system(size: 12, weight: .light))
-                                                    .lineSpacing(2)
-                                                    .foregroundColor(BloomTheme.textPrimary)
-                                                    .lineLimit(2)
-
-                                                Text(formattedDate(firstMemory.date))
-                                                    .font(.system(size: 10, weight: .light, design: .serif))
-                                                    .foregroundColor(BloomTheme.textSecondary)
+                                        HStack(spacing: 8) {
+                                            Spacer()
+                                            HStack(spacing: 4) {
+                                                Text("\(longestStreak()) gün streak")
+                                                    .font(.system(size: 11, weight: .light, design: .serif))
+                                                Image(systemName: "flame.fill")
+                                                    .font(.system(size: 10, weight: .ultraLight))
                                             }
-                                            .padding(.horizontal, 12)
-                                            .padding(.bottom, 12)
-                                            .frame(maxWidth: .infinity, alignment: .leading)
+                                            .foregroundColor(BloomTheme.textSecondary)
+                                            .padding(8)
+                                            .background(Color.white.opacity(0.8))
+                                            .cornerRadius(6)
                                         }
-                                        .frame(maxWidth: .infinity)
+                                        .padding(.horizontal, 20)
                                     }
-                                    .frame(maxWidth: 320)
-
-                                    HStack(spacing: 8) {
-                                        Spacer()
-                                        HStack(spacing: 4) {
-                                            Text("\(longestStreak()) gün streak")
-                                                .font(.system(size: 11, weight: .light, design: .serif))
-                                            Image(systemName: "flame.fill")
-                                                .font(.system(size: 10, weight: .ultraLight))
-                                        }
-                                        .foregroundColor(BloomTheme.textSecondary)
-                                        .padding(8)
-                                        .background(Color.white.opacity(0.8))
-                                        .cornerRadius(6)
-                                    }
-                                    .padding(.horizontal, 20)
-                                }
-                                .frame(maxWidth: .infinity)
-                                .onTapGesture {
-                                    withAnimation(.spring(response: 0.52, dampingFraction: 0.78)) {
-                                        expandedMemoryId = firstMemory.id
-                                    }
+                                    .frame(maxWidth: .infinity)
                                 }
                             }
 

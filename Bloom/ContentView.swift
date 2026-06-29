@@ -20,9 +20,11 @@ struct ContentView: View {
                 Group {
                     switch selectedTab {
                     case 0:
-                        HomeView()
-                            .environmentObject(localization)
-                            .environmentObject(memoryStore)
+                        NavigationStack {
+                            HomeView()
+                                .environmentObject(localization)
+                                .environmentObject(memoryStore)
+                        }
                     case 1:
                         StatsView()
                             .environmentObject(localization)
@@ -31,13 +33,17 @@ struct ContentView: View {
                         AchievementsView()
                             .environmentObject(localization)
                     case 3:
-                        CalendarView()
-                            .environmentObject(localization)
-                            .environmentObject(memoryStore)
+                        NavigationStack {
+                            CalendarView()
+                                .environmentObject(localization)
+                                .environmentObject(memoryStore)
+                        }
                     default:
-                        HomeView()
-                            .environmentObject(localization)
-                            .environmentObject(memoryStore)
+                        NavigationStack {
+                            HomeView()
+                                .environmentObject(localization)
+                                .environmentObject(memoryStore)
+                        }
                     }
                 }
 

@@ -84,12 +84,26 @@ struct CalendarView: View {
                     LazyVGrid(columns: columns, spacing: 12) {
                         ForEach(currentMonthDays, id: \.self) { day in
                             if let tileDate = getTileDate(day: day) {
-                                CalendarTile(
-                                    day: day,
-                                    tileDate: tileDate,
-                                    memoryStore: memoryStore,
-                                    sageGreen: BloomTheme.sageGreen
-                                )
+                                if let dailyEntry = getDailyEntry(for: tileDate) {
+                                    NavigationLink(destination: MemoryDetailView(memory: dailyEntry)
+                                        .environmentObject(memoryStore)
+                                        .environmentObject(localization)
+                                    ) {
+                                        CalendarTile(
+                                            day: day,
+                                            tileDate: tileDate,
+                                            memoryStore: memoryStore,
+                                            sageGreen: BloomTheme.sageGreen
+                                        )
+                                    }
+                                } else {
+                                    CalendarTile(
+                                        day: day,
+                                        tileDate: tileDate,
+                                        memoryStore: memoryStore,
+                                        sageGreen: BloomTheme.sageGreen
+                                    )
+                                }
                             }
                         }
                     }
@@ -126,6 +140,12 @@ struct CalendarView: View {
         dateComponents.month = selectedMonth
         dateComponents.day = day
         return calendar.date(from: dateComponents)
+    }
+
+    private func getDailyEntry(for tileDate: Date) -> Memory? {
+        memoryStore.memories.first { memory in
+            calendar.isDate(memory.date, inSameDayAs: tileDate)
+        }
     }
 }
 

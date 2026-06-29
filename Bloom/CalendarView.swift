@@ -164,7 +164,7 @@ struct CalendarTile: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            ZStack {
+            ZStack(alignment: .center) {
                 LinearGradient(
                     gradient: Gradient(colors: [Color(red: 0.96, green: 0.94, blue: 0.91), Color(red: 0.96, green: 0.94, blue: 0.91).opacity(0.9)]),
                     startPoint: .topLeading,
@@ -172,7 +172,8 @@ struct CalendarTile: View {
                 )
 
                 if let entry = dailyEntry, let image = entry.image {
-                    image.resizable().scaledToFill()
+                    image.resizable()
+                        .aspectRatio(contentMode: .fill)
                         .onAppear {
                             print("QA_LOG: CalendarTile - Rendering image for day \(day)")
                         }
@@ -217,6 +218,7 @@ struct CalendarTile: View {
         .background(Color.white)
         .cornerRadius(10)
         .shadow(color: Color.black.opacity(0.06), radius: 6, x: 0, y: 2)
+        .contentShape(Rectangle())
     }
 }
 

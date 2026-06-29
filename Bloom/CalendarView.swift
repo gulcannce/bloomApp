@@ -24,19 +24,18 @@ struct CalendarView: View {
     var memoryMap: [Int: Memory] {
         var map: [Int: Memory] = [:]
         for memory in memoryStore.memories {
-            var dateComponents = DateComponents()
-            dateComponents.year = selectedYear
-            dateComponents.month = selectedMonth
-            dateComponents.day = 1
+            for day in currentMonthDays {
+                var dateComponents = DateComponents()
+                dateComponents.year = selectedYear
+                dateComponents.month = selectedMonth
+                dateComponents.day = day
 
-            guard let monthStart = calendar.date(from: dateComponents) else { continue }
-            guard let monthEnd = calendar.date(byAdding: .month, value: 1, to: monthStart) else { continue }
+                guard let tileDate = calendar.date(from: dateComponents) else { continue }
 
-            let isInSelectedMonth = memory.date >= monthStart && memory.date < monthEnd
-            if isInSelectedMonth {
-                let day = calendar.component(.day, from: memory.date)
-                print("QA_LOG: CalendarView.memoryMap - Mapped memory on day \(day): '\(memory.note.prefix(30))'")
-                map[day] = memory
+                if calendar.isDate(memory.date, inSameDayAs: tileDate) {
+                    print("QA_LOG: CalendarView.memoryMap - Mapped memory on day \(day): '\(memory.note.prefix(30))'")
+                    map[day] = memory
+                }
             }
         }
         return map
@@ -84,11 +83,14 @@ struct CalendarView: View {
 
                     LazyVGrid(columns: columns, spacing: 12) {
                         ForEach(currentMonthDays, id: \.self) { day in
-                            CalendarTile(
-                                day: day,
-                                memory: memoryMap[day],
-                                sageGreen: BloomTheme.sageGreen
-                            )
+                            if let tileDate = getTileDate(day: day) {
+                                CalendarTile(
+                                    day: day,
+                                    tileDate: tileDate,
+                                    memoryStore: memoryStore,
+                                    sageGreen: BloomTheme.sageGreen
+                                )
+                            }
                         }
                     }
                     .padding(.horizontal, 16)
@@ -117,12 +119,28 @@ struct CalendarView: View {
             selectedMonth += 1
         }
     }
+
+    private func getTileDate(day: Int) -> Date? {
+        var dateComponents = DateComponents()
+        dateComponents.year = selectedYear
+        dateComponents.month = selectedMonth
+        dateComponents.day = day
+        return calendar.date(from: dateComponents)
+    }
 }
 
 struct CalendarTile: View {
     let day: Int
-    let memory: Memory?
+    let tileDate: Date
+    @ObservedObject var memoryStore: MemoryStore
     let sageGreen: Color
+    let calendar = Calendar.current
+
+    var dailyEntry: Memory? {
+        memoryStore.memories.first { memory in
+            calendar.isDate(memory.date, inSameDayAs: tileDate)
+        }
+    }
 
     var body: some View {
         VStack(spacing: 0) {
@@ -133,8 +151,11 @@ struct CalendarTile: View {
                     endPoint: .bottomTrailing
                 )
 
-                if let memory = memory, let image = memory.image {
+                if let entry = dailyEntry, let image = entry.image {
                     image.resizable().scaledToFill()
+                        .onAppear {
+                            print("QA_LOG: CalendarTile - Rendering image for day \(day)")
+                        }
                 } else {
                     VStack {
                         Image(systemName: "leaf")
@@ -153,8 +174,8 @@ struct CalendarTile: View {
                         .font(.system(size: 14, weight: .light, design: .serif))
                         .foregroundColor(Color.black.opacity(0.8))
 
-                    if let memory = memory {
-                        let symbolName = moodEmojiToSymbol(memory.emoji)
+                    if let entry = dailyEntry {
+                        let symbolName = moodEmojiToSymbol(entry.emoji)
                         Image(systemName: symbolName)
                             .font(.system(size: 11, weight: .ultraLight))
                             .foregroundColor(sageGreen.opacity(0.7))
@@ -163,8 +184,8 @@ struct CalendarTile: View {
                     Spacer()
                 }
 
-                if let memory = memory {
-                    Text(memory.note.prefix(40) + (memory.note.count > 40 ? "..." : ""))
+                if let entry = dailyEntry {
+                    Text(entry.note.prefix(40) + (entry.note.count > 40 ? "..." : ""))
                         .font(.system(size: 9, weight: .light))
                         .foregroundColor(Color.black.opacity(0.6))
                         .lineLimit(1)

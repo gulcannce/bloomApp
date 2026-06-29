@@ -112,12 +112,29 @@ struct CreateView: View {
                                 .cornerRadius(8)
                                 .padding(12)
 
-                                VStack(alignment: .leading, spacing: 8) {
-                                    TextField("Bugün'ün Öyküsü", text: $journalText)
-                                        .font(.system(size: 12, weight: .light))
-                                        .lineSpacing(2)
+                                VStack(alignment: .leading, spacing: 6) {
+                                    HStack {
+                                        Text("Bugün'ün Öyküsü")
+                                            .font(.system(size: 11, weight: .light, design: .serif))
+                                            .foregroundColor(BloomTheme.textSecondary)
+                                        Spacer()
+                                        Text("\(journalText.count)/500")
+                                            .font(.system(size: 10, weight: .light))
+                                            .foregroundColor(journalText.count > 500 ? BloomTheme.driedRose : BloomTheme.textTertiary)
+                                    }
+                                    .padding(.horizontal, 8)
+                                    .padding(.top, 8)
+
+                                    TextEditor(text: $journalText)
+                                        .font(.system(size: 13, weight: .light))
+                                        .lineSpacing(3)
                                         .foregroundColor(BloomTheme.textPrimary)
-                                        .padding(8)
+                                        .scrollContentBackground(.hidden)
+                                        .background(BloomTheme.agedParchment.opacity(0.3))
+                                        .cornerRadius(6)
+                                        .frame(minHeight: 100)
+                                        .padding(.horizontal, 8)
+                                        .padding(.bottom, 8)
                                 }
                                 .padding(.horizontal, 12)
                                 .padding(.bottom, 12)
@@ -246,6 +263,13 @@ struct CreateView: View {
         successHaptic.notificationOccurred(.success)
 
         DispatchQueue.main.async {
+            print("QA_LOG: Resetting temporary picker states for next session")
+            journalText = ""
+            processedImage = nil
+            placedStickers = []
+            selectedMoodLabel = "Harika"
+            createViewState.processedImage = nil
+
             print("QA_LOG: Explicitly toggling showCreateSheet = false to trigger parent re-render")
             showCreateSheet = false
             print("QA_LOG: Parent ContentView binding updated - HomeView and CalendarView will refresh")

@@ -123,10 +123,12 @@ struct CreateView: View {
                                 .foregroundColor(BloomTheme.textSecondary)
 
                             HStack(spacing: 8) {
-                                ForEach(moodSymbols, id: \.self) { emoji in
+                                let moodPairs = [("🥀", "wind"), ("🌿", "leaf"), ("🌾", "sun.haze"), ("🌸", "leaf.rose"), ("🍂", "drop")]
+                                ForEach(moodPairs, id: \.0) { emoji, symbol in
                                     Button(action: { selectedMoodEmoji = emoji }) {
-                                        Text(emoji)
-                                            .font(.system(size: 24))
+                                        Image(systemName: symbol)
+                                            .font(.system(size: 20, weight: .ultraLight))
+                                            .foregroundColor(selectedMoodEmoji == emoji ? BloomTheme.driedRose : BloomTheme.textSecondary)
                                             .scaleEffect(selectedMoodEmoji == emoji ? 1.2 : 1.0)
                                             .animation(.spring(response: 0.3, dampingFraction: 0.6), value: selectedMoodEmoji)
                                     }

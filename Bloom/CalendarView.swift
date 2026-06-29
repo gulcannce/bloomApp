@@ -146,8 +146,10 @@ struct CalendarTile: View {
                     .foregroundColor(Color.black.opacity(0.8))
 
                 if let memory = memory {
-                    Text(memory.emoji)
-                        .font(.system(size: 12))
+                    let symbolName = moodEmojiToSymbol(memory.emoji)
+                    Image(systemName: symbolName)
+                        .font(.system(size: 11, weight: .ultraLight))
+                        .foregroundColor(sageGreen.opacity(0.7))
                 }
 
                 Spacer()
@@ -158,6 +160,17 @@ struct CalendarTile: View {
         .background(Color.white)
         .cornerRadius(10)
         .shadow(color: Color.black.opacity(0.06), radius: 6, x: 0, y: 2)
+    }
+}
+
+func moodEmojiToSymbol(_ emoji: String) -> String {
+    switch emoji {
+    case "🌸": return "leaf.rose"
+    case "🌿": return "leaf"
+    case "🌾": return "sun.haze"
+    case "🍂": return "drop"
+    case "🥀": return "wind"
+    default: return "leaf"
     }
 }
 

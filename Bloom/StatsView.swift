@@ -133,8 +133,9 @@ struct StatsView: View {
                             HStack(spacing: 8) {
                                 ForEach(moodDistribution, id: \.emoji) { emoji, count in
                                     VStack(spacing: 6) {
-                                        Text(emoji)
-                                            .font(.system(size: 20))
+                                        Image(systemName: moodEmojiToSymbol(emoji))
+                                            .font(.system(size: 18, weight: .ultraLight))
+                                            .foregroundColor(BloomTheme.driedRose)
 
                                         Text("\(count)")
                                             .font(.system(size: 12, weight: .light, design: .serif))

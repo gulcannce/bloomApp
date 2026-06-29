@@ -1,5 +1,7 @@
 import SwiftUI
 import Combine
+import PhotosUI
+import UIKit
 
 struct HomeView: View {
     @EnvironmentObject var localization: LocalizationManager
@@ -13,6 +15,7 @@ struct HomeView: View {
     @State private var stickerRotation: Double = 0
     @State private var showProfileSheet = false
     @State private var showCreateSheet = false
+    @State private var selectedItem: PhotosPickerItem? = nil
 
     let columns = [
         GridItem(.flexible(), spacing: 12),
@@ -164,9 +167,7 @@ struct HomeView: View {
                         }
                         .padding(.vertical, 24)
 
-                        Button(action: {
-                            showCreateSheet = true
-                        }) {
+                        PhotosPicker(selection: $selectedItem, matching: .images) {
                             HStack(spacing: 8) {
                                 Image(systemName: "pencil")
                                     .font(.system(size: 16, weight: .light))
@@ -315,6 +316,22 @@ struct HomeView: View {
                     .cornerRadius(20)
                     .padding(16)
                     .frame(maxHeight: 700)
+                }
+            }
+        }
+        .onChange(of: selectedItem) { newItem in
+            Task {
+                if let newItem = newItem {
+                    if let data = try? await newItem.loadTransferable(type: Data.self) {
+                        if let uiImage = UIImage(data: data) {
+                            DispatchQueue.main.async {
+                                print("QA_LOG: HomeView photo picker - Image loaded and set to createViewState")
+                                createViewState.processedImage = Image(uiImage: uiImage)
+                                print("QA_LOG: HomeView photo picker - Opening CreateView sheet with image")
+                                showCreateSheet = true
+                            }
+                        }
+                    }
                 }
             }
         }

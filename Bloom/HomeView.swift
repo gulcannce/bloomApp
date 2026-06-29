@@ -3,9 +3,8 @@ import Combine
 
 struct HomeView: View {
     @EnvironmentObject var localization: LocalizationManager
-    @StateObject private var memoryStore = MemoryStore.shared
+    @EnvironmentObject var memoryStore: MemoryStore
     @State private var expandedMemoryId: UUID? = nil
-    @State private var showCreateSheet = false
     @Namespace private var animationNamespace
     @State private var selectedStickerName: String? = nil
     @State private var draggingStickerId: UUID? = nil
@@ -180,23 +179,6 @@ struct HomeView: View {
                                 }
                             }
 
-                            Button(action: {
-                                showCreateSheet = true
-                            }) {
-                                HStack(spacing: 8) {
-                                    Image(systemName: "pencil")
-                                        .font(.system(size: 16, weight: .light))
-                                    Text(localization.currentLanguage == .turkish ? "Bugünün Öyküsü" : "Today's Story")
-                                        .font(.system(size: 16, weight: .light, design: .serif))
-                                }
-                                .foregroundColor(.white)
-                                .frame(maxWidth: .infinity)
-                                .padding(14)
-                                .background(BloomTheme.driedRose)
-                                .cornerRadius(10)
-                            }
-                            .padding(.horizontal, 20)
-                            .padding(.top, 24)
                         }
                         .padding(.vertical, 24)
                     }
@@ -362,11 +344,6 @@ struct HomeView: View {
                     .frame(maxHeight: 700)
                 }
             }
-        }
-        .sheet(isPresented: $showCreateSheet) {
-            CreateView()
-                .environmentObject(localization)
-                .environmentObject(memoryStore)
         }
     }
 

@@ -3,45 +3,53 @@ import SwiftUI
 struct ContentView: View {
     @State private var selectedTab: Int = 0
     @StateObject private var localization = LocalizationManager()
+    @StateObject private var memoryStore = MemoryStore.shared
+    @State private var showCreateSheet = false
 
     var body: some View {
-        TabView(selection: $selectedTab) {
-            HomeView()
-                .environmentObject(localization)
-                .tabItem {
-                    Label(localization.string("anasayfa"), systemImage: "house.fill")
+        ZStack {
+            VStack(spacing: 0) {
+                Group {
+                    switch selectedTab {
+                    case 0:
+                        HomeView()
+                            .environmentObject(localization)
+                            .environmentObject(memoryStore)
+                    case 1:
+                        StatsView()
+                            .environmentObject(localization)
+                            .environmentObject(memoryStore)
+                    case 2:
+                        AchievementsView()
+                            .environmentObject(localization)
+                    case 3:
+                        CalendarView()
+                            .environmentObject(localization)
+                            .environmentObject(memoryStore)
+                    case 4:
+                        ProfileView()
+                            .environmentObject(localization)
+                    default:
+                        HomeView()
+                            .environmentObject(localization)
+                            .environmentObject(memoryStore)
+                    }
                 }
-                .tag(0)
 
-            StatsView()
-                .environmentObject(localization)
-                .tabItem {
-                    Label(localization.string("istatistikler"), systemImage: "chart.bar.fill")
-                }
-                .tag(1)
+                Spacer()
+            }
 
-            AchievementsView()
-                .environmentObject(localization)
-                .tabItem {
-                    Label(localization.currentLanguage == .turkish ? "Başarımlar" : "Achievements", systemImage: "star.fill")
-                }
-                .tag(2)
-
-            CalendarView()
-                .environmentObject(localization)
-                .tabItem {
-                    Label(localization.string("takvim"), systemImage: "calendar")
-                }
-                .tag(3)
-
-            ProfileView()
-                .environmentObject(localization)
-                .tabItem {
-                    Label(localization.string("profil"), systemImage: "person.fill")
-                }
-                .tag(4)
+            VStack(spacing: 0) {
+                Spacer()
+                CustomTabBar(selectedTab: $selectedTab, showCreateSheet: $showCreateSheet)
+            }
+            .ignoresSafeArea(edges: .bottom)
         }
-        .tint(.black.opacity(0.7))
+        .sheet(isPresented: $showCreateSheet) {
+            CreateView()
+                .environmentObject(localization)
+                .environmentObject(memoryStore)
+        }
     }
 }
 

@@ -87,20 +87,31 @@ struct HomeView: View {
                             .padding(.horizontal, 20)
 
                             ScrollView(.horizontal, showsIndicators: false) {
-                                HStack(spacing: 12) {
-                                    let moodSymbols = [("🌸", "leaf.rose"), ("🌿", "leaf"), ("🌾", "sun.haze"), ("🍂", "drop"), ("🥀", "wind")]
-                                    ForEach(moodSymbols, id: \.0) { emoji, symbol in
-                                        Image(systemName: symbol)
-                                            .font(.system(size: 20, weight: .ultraLight))
-                                            .foregroundColor(BloomTheme.driedRose)
-                                            .frame(width: 48, height: 48)
-                                            .background(Color.white.opacity(0.6))
-                                            .cornerRadius(12)
+                                HStack(spacing: 16) {
+                                    let moods = [
+                                        ("🥀", "Harika", Color(red: 0.85, green: 0.75, blue: 0.80)),      // Muted Pink
+                                        ("🌿", "İyi", Color(red: 0.80, green: 0.85, blue: 0.78)),          // Pale Sage
+                                        ("🌾", "Orta", Color(red: 0.88, green: 0.82, blue: 0.70)),         // Soft Ochre
+                                        ("🌸", "Kötü", Color(red: 0.83, green: 0.72, blue: 0.75)),         // Muted Rose
+                                        ("🍂", "Berbat", Color(red: 0.78, green: 0.68, blue: 0.55))        // Autumn Brown
+                                    ]
+                                    ForEach(moods, id: \.1) { emoji, label, color in
+                                        VStack(spacing: 6) {
+                                            Text(emoji)
+                                                .font(.system(size: 24))
+                                                .frame(width: 40, height: 40)
+                                                .background(Circle().fill(color))
+
+                                            Text(label)
+                                                .font(.system(size: 10, weight: .light, design: .serif))
+                                                .foregroundColor(BloomTheme.textSecondary)
+                                        }
+                                        .frame(width: 52)
                                     }
                                 }
                                 .padding(.horizontal, 20)
                             }
-                            .frame(height: 60)
+                            .frame(height: 80)
 
                             if let firstMemory = memoryStore.memories.first {
                                 VStack(spacing: 16) {

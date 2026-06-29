@@ -132,14 +132,22 @@ struct StatsView: View {
 
                             HStack(spacing: 8) {
                                 ForEach(moodDistribution, id: \.emoji) { emoji, count in
+                                    let moodLabel = moodEmojiToLabel(emoji)
+                                    let moodColor = moodEmojiToColor(emoji)
                                     VStack(spacing: 6) {
-                                        Image(systemName: moodEmojiToSymbol(emoji))
-                                            .font(.system(size: 18, weight: .ultraLight))
-                                            .foregroundColor(BloomTheme.driedRose)
+                                        Text(emoji)
+                                            .font(.system(size: 22))
+                                            .frame(width: 44, height: 44)
+                                            .background(Circle().fill(moodColor))
 
-                                        Text("\(count)")
-                                            .font(.system(size: 12, weight: .light, design: .serif))
-                                            .foregroundColor(BloomTheme.textSecondary)
+                                        VStack(spacing: 2) {
+                                            Text("\(count)")
+                                                .font(.system(size: 12, weight: .light, design: .serif))
+                                                .foregroundColor(BloomTheme.textPrimary)
+                                            Text(moodLabel)
+                                                .font(.system(size: 9, weight: .light))
+                                                .foregroundColor(BloomTheme.textSecondary)
+                                        }
                                     }
                                     .frame(maxWidth: .infinity)
                                     .padding(12)
@@ -156,6 +164,28 @@ struct StatsView: View {
                 .padding(.bottom, 80)
             }
         }
+    }
+}
+
+func moodEmojiToLabel(_ emoji: String) -> String {
+    switch emoji {
+    case "🥀": return "Harika"
+    case "🌿": return "İyi"
+    case "🌾": return "Orta"
+    case "🌸": return "Kötü"
+    case "🍂": return "Berbat"
+    default: return "Ruh Hali"
+    }
+}
+
+func moodEmojiToColor(_ emoji: String) -> Color {
+    switch emoji {
+    case "🥀": return Color(red: 0.85, green: 0.75, blue: 0.80)      // Muted Pink
+    case "🌿": return Color(red: 0.80, green: 0.85, blue: 0.78)       // Pale Sage
+    case "🌾": return Color(red: 0.88, green: 0.82, blue: 0.70)       // Soft Ochre
+    case "🌸": return Color(red: 0.83, green: 0.72, blue: 0.75)       // Muted Rose
+    case "🍂": return Color(red: 0.78, green: 0.68, blue: 0.55)       // Autumn Brown
+    default: return Color.gray.opacity(0.3)
     }
 }
 

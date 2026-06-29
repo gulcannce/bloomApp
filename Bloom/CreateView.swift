@@ -122,20 +122,32 @@ struct CreateView: View {
                                 .font(.system(size: 12, weight: .light, design: .serif))
                                 .foregroundColor(BloomTheme.textSecondary)
 
-                            HStack(spacing: 8) {
-                                let moodPairs = [("🥀", "wind"), ("🌿", "leaf"), ("🌾", "sun.haze"), ("🌸", "leaf.rose"), ("🍂", "drop")]
-                                ForEach(moodPairs, id: \.0) { emoji, symbol in
-                                    Button(action: { selectedMoodEmoji = emoji }) {
-                                        Image(systemName: symbol)
-                                            .font(.system(size: 20, weight: .ultraLight))
-                                            .foregroundColor(selectedMoodEmoji == emoji ? BloomTheme.driedRose : BloomTheme.textSecondary)
-                                            .scaleEffect(selectedMoodEmoji == emoji ? 1.2 : 1.0)
-                                            .animation(.spring(response: 0.3, dampingFraction: 0.6), value: selectedMoodEmoji)
+                            VStack(spacing: 12) {
+                                HStack(spacing: 10) {
+                                    let moods = [
+                                        ("🥀", "Harika", Color(red: 0.85, green: 0.75, blue: 0.80)),
+                                        ("🌿", "İyi", Color(red: 0.80, green: 0.85, blue: 0.78)),
+                                        ("🌾", "Orta", Color(red: 0.88, green: 0.82, blue: 0.70)),
+                                        ("🌸", "Kötü", Color(red: 0.83, green: 0.72, blue: 0.75)),
+                                        ("🍂", "Berbat", Color(red: 0.78, green: 0.68, blue: 0.55))
+                                    ]
+                                    ForEach(moods, id: \.1) { emoji, label, color in
+                                        Button(action: { selectedMoodEmoji = emoji }) {
+                                            VStack(spacing: 4) {
+                                                Text(emoji)
+                                                    .font(.system(size: 20))
+                                                    .frame(width: 36, height: 36)
+                                                    .background(Circle().fill(selectedMoodEmoji == emoji ? color.opacity(0.9) : color))
+                                                    .scaleEffect(selectedMoodEmoji == emoji ? 1.1 : 1.0)
+                                                    .animation(.spring(response: 0.3, dampingFraction: 0.6), value: selectedMoodEmoji)
+
+                                                Text(label)
+                                                    .font(.system(size: 9, weight: .light, design: .serif))
+                                                    .foregroundColor(BloomTheme.textSecondary)
+                                            }
+                                        }
+                                        .frame(maxWidth: .infinity)
                                     }
-                                    .frame(maxWidth: .infinity)
-                                    .padding(.vertical, 8)
-                                    .background(selectedMoodEmoji == emoji ? BloomTheme.driedRose.opacity(0.2) : Color.white.opacity(0.5))
-                                    .cornerRadius(8)
                                 }
                             }
                         }

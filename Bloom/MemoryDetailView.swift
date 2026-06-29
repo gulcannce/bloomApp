@@ -1,129 +1,128 @@
 import SwiftUI
 import Combine
 
+struct PlacedSticker: Identifiable {
+    let id: UUID
+    let name: String
+    var offset: CGPoint = .zero
+    var scale: CGFloat = 1.0
+    var rotation: Double = 0
+
+    init(name: String) {
+        self.id = UUID()
+        self.name = name
+    }
+}
+
 struct MemoryDetailView: View {
     @Environment(\.presentationMode) var presentationMode
     @EnvironmentObject var memoryStore: MemoryStore
     @EnvironmentObject var localization: LocalizationManager
     @State var memory: Memory
     @State private var editingNote = ""
+    @State private var placedStickers: [PlacedSticker] = []
+    @State private var activeStickerId: UUID? = nil
     @Namespace private var animationNamespace
 
-    let botanicalMap = ["dried_daisy": "🌼", "mini_heart": "🤎", "vintage_seal": "🪞", "candlelight": "✨"]
+    let stickerMap = ["dried_daisy": "🌼", "vintage_seal": "🪞", "mini_heart": "🤎", "candlelight": "✨"]
+    let stickerAssets = ["dried_daisy", "vintage_seal", "mini_heart", "candlelight"]
 
     var body: some View {
         ZStack {
-            BloomTheme.background.ignoresSafeArea()
+            BloomTheme.agedParchment.ignoresSafeArea()
 
             VStack(spacing: 0) {
-                HStack {
+                HStack(alignment: .center, spacing: 12) {
                     Button(action: { saveAndDismiss() }) {
                         Image(systemName: "chevron.left")
-                            .font(.system(size: 16, weight: .light))
-                            .foregroundColor(BloomTheme.driedRose)
+                            .font(.system(size: 18, weight: .thin))
+                            .foregroundColor(BloomTheme.textSecondary)
                     }
+
                     Spacer()
+
                     Text(formattedDate(memory.date))
-                        .font(.system(size: 14, weight: .light, design: .serif))
+                        .font(.system(size: 13, weight: .light, design: .serif))
                         .foregroundColor(BloomTheme.textSecondary)
+
+                    Spacer()
+
+                    Color.clear.frame(width: 18)
                 }
-                .padding(20)
+                .padding(.horizontal, 20)
+                .padding(.vertical, 16)
+                .background(BloomTheme.agedParchment)
 
                 ScrollView(showsIndicators: false) {
                     VStack(spacing: 24) {
-                        ZStack(alignment: .top) {
-                            RoundedRectangle(cornerRadius: 4)
-                                .fill(BloomTheme.agedParchment)
-                                .frame(maxWidth: 280, maxHeight: 360)
-                                .offset(x: 3, y: 4)
-
-                            VStack(spacing: 0) {
-                                ZStack {
-                                    LinearGradient(gradient: Gradient(colors: [BloomTheme.agedParchment, BloomTheme.agedParchment.opacity(0.9)]), startPoint: .topLeading, endPoint: .bottomTrailing)
-                                    if let image = memory.image {
-                                        image.resizable().scaledToFill()
-                                    }
-                                }
-                                .frame(height: 240)
-                                .cornerRadius(8)
-                                .padding(12)
-
-                                VStack(alignment: .leading, spacing: 6) {
-                                    Text(memory.note.prefix(80) + (memory.note.count > 80 ? "..." : ""))
-                                        .font(.system(size: 12, weight: .light))
-                                        .lineSpacing(2)
-                                        .foregroundColor(BloomTheme.textPrimary)
-                                        .lineLimit(2)
-
-                                    Text(memory.emoji)
-                                        .font(.system(size: 24))
-                                }
-                                .padding(.horizontal, 12)
-                                .padding(.bottom, 12)
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                            }
-
-                            ZStack(alignment: .topLeading) {
-                                RoundedRectangle(cornerRadius: 4)
-                                    .fill(Color.clear)
-
-                                ForEach($memory.stickers) { $sticker in
-                                    buildStickerView($sticker)
-                                }
-                            }
-                            .frame(maxWidth: 280, maxHeight: 360)
+                        PolaroidCarouselView(memory: $memory)
                             .matchedGeometryEffect(id: memory.id, in: animationNamespace)
+
+                        ZStack(alignment: .topLeading) {
+                            RoundedRectangle(cornerRadius: 12)
+                                .fill(Color.white)
+                                .shadow(color: Color.black.opacity(0.08), radius: 8, x: 0, y: 2)
+                                .frame(height: 300)
+
+                            if let image = memory.image {
+                                image.resizable()
+                                    .scaledToFill()
+                                    .clipped()
+                                    .cornerRadius(12)
+                            }
+
+                            ForEach(placedStickers) { sticker in
+                                buildStickerView(sticker)
+                                    .zIndex(100)
+                            }
                         }
-                        .frame(width: 280, height: 360)
+                        .frame(height: 300)
+                        .padding(.horizontal, 20)
 
                         VStack(alignment: .leading, spacing: 12) {
                             Text("Notlar")
                                 .font(.system(size: 12, weight: .light, design: .serif))
                                 .foregroundColor(BloomTheme.textSecondary)
+                                .padding(.horizontal, 20)
 
                             TextEditor(text: $editingNote)
                                 .font(.system(size: 13, weight: .light))
                                 .foregroundColor(BloomTheme.textPrimary)
                                 .frame(height: 100)
                                 .padding(12)
-                                .background(Color.white.opacity(0.8))
+                                .background(Color.white.opacity(0.6))
                                 .cornerRadius(8)
-                                .overlay(RoundedRectangle(cornerRadius: 8).stroke(BloomTheme.textTertiary.opacity(0.2), lineWidth: 0.5))
+                                .overlay(RoundedRectangle(cornerRadius: 8).stroke(BloomTheme.textTertiary.opacity(0.1), lineWidth: 0.5))
+                                .padding(.horizontal, 20)
                         }
-                        .padding(.horizontal, 20)
                     }
                     .padding(.vertical, 24)
                 }
 
-                VStack(spacing: 12) {
-                    Text("Sticker Tray")
-                        .font(.system(size: 12, weight: .light, design: .serif))
-                        .foregroundColor(BloomTheme.textSecondary)
-                        .padding(.horizontal, 20)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-
+                VStack(spacing: 16) {
                     ScrollView(.horizontal, showsIndicators: false) {
-                        HStack(spacing: 10) {
-                            ForEach(["dried_daisy", "mini_heart", "vintage_seal", "candlelight"], id: \.self) { stickerName in
+                        HStack(spacing: 12) {
+                            ForEach(stickerAssets, id: \.self) { stickerName in
                                 Button(action: {
-                                    let newSticker = Sticker(name: stickerName)
-                                    memory.stickers.append(newSticker)
+                                    let newSticker = PlacedSticker(name: stickerName)
+                                    placedStickers.append(newSticker)
+                                    activeStickerId = newSticker.id
                                     print("QA_LOG: MemoryDetailView - Added sticker: \(stickerName)")
                                 }) {
-                                    Text(botanicalMap[stickerName] ?? stickerName)
+                                    Text(stickerMap[stickerName] ?? stickerName)
                                         .font(.system(size: 32))
-                                        .frame(width: 56, height: 56)
-                                        .background(Color.white.opacity(0.6))
+                                        .frame(width: 52, height: 52)
+                                        .background(Color.white.opacity(0.4))
                                         .cornerRadius(8)
                                 }
                             }
                         }
                         .padding(.horizontal, 20)
                     }
-                    .frame(height: 80)
+                    .frame(height: 70)
                 }
                 .padding(.vertical, 12)
-                .background(Color.white.opacity(0.3))
+                .background(Color.white.opacity(0.2))
             }
         }
         .onAppear {
@@ -132,26 +131,39 @@ struct MemoryDetailView: View {
     }
 
     @ViewBuilder
-    private func buildStickerView(_ sticker: Binding<Sticker>) -> some View {
-        MemoryDetailStickerView(sticker: sticker.wrappedValue)
-            .offset(x: sticker.offsetX.wrappedValue, y: sticker.offsetY.wrappedValue)
-            .scaleEffect(sticker.scale.wrappedValue)
-            .rotationEffect(.degrees(sticker.rotation.wrappedValue))
+    private func buildStickerView(_ sticker: PlacedSticker) -> some View {
+        Text(stickerMap[sticker.name] ?? sticker.name)
+            .font(.system(size: 28))
+            .opacity(0.8)
+            .offset(x: sticker.offset.x, y: sticker.offset.y)
+            .scaleEffect(sticker.scale)
+            .rotationEffect(.degrees(sticker.rotation))
             .gesture(
                 SimultaneousGesture(
                     DragGesture()
                         .onChanged { value in
-                            sticker.offsetX.wrappedValue = value.translation.width
-                            sticker.offsetY.wrappedValue = value.translation.height
+                            if let index = placedStickers.firstIndex(where: { $0.id == sticker.id }) {
+                                placedStickers[index].offset = CGPoint(x: value.translation.width, y: value.translation.height)
+                                activeStickerId = sticker.id
+                            }
+                        }
+                        .onEnded { _ in
+                            print("QA_LOG: MemoryDetailView - Sticker drag ended")
                         },
                     SimultaneousGesture(
                         MagnificationGesture()
                             .onChanged { value in
-                                sticker.scale.wrappedValue = value
+                                if let index = placedStickers.firstIndex(where: { $0.id == sticker.id }) {
+                                    placedStickers[index].scale = value
+                                    activeStickerId = sticker.id
+                                }
                             },
                         RotationGesture()
                             .onChanged { value in
-                                sticker.rotation.wrappedValue = value.degrees
+                                if let index = placedStickers.firstIndex(where: { $0.id == sticker.id }) {
+                                    placedStickers[index].rotation = value.degrees
+                                    activeStickerId = sticker.id
+                                }
                             }
                     )
                 )
@@ -163,26 +175,62 @@ struct MemoryDetailView: View {
         if let index = memoryStore.memories.firstIndex(where: { $0.id == memory.id }) {
             memoryStore.memories[index] = memory
             memoryStore.saveMemories()
-            print("QA_LOG: MemoryDetailView - Saved memory with \(memory.stickers.count) stickers")
+            print("QA_LOG: MemoryDetailView - Saved memory with \(placedStickers.count) placed stickers")
         }
         presentationMode.wrappedValue.dismiss()
     }
 
     private func formattedDate(_ date: Date) -> String {
         let formatter = DateFormatter()
-        formatter.dateFormat = localization.currentLanguage == .turkish ? "dd.MM.yyyy" : "MM/dd/yyyy"
-        return formatter.string(from: date)
+        if localization.currentLanguage == .turkish {
+            formatter.dateFormat = "dd MMMM yyyy"
+            formatter.locale = Locale(identifier: "tr_TR")
+            let dateStr = formatter.string(from: date)
+            return dateStr.capitalized
+        } else {
+            formatter.dateFormat = "MMMM dd, yyyy"
+            return formatter.string(from: date)
+        }
     }
 }
 
-struct MemoryDetailStickerView: View {
-    let sticker: Sticker
-    let stickerMap = ["dried_daisy": "🌼", "mini_heart": "🤎", "vintage_seal": "🪞", "candlelight": "✨"]
+struct PolaroidCarouselView: View {
+    @Binding var memory: Memory
 
     var body: some View {
-        Text(stickerMap[sticker.name] ?? sticker.name)
-            .font(.system(size: 28))
-            .opacity(0.75)
+        VStack(spacing: 12) {
+            if let image = memory.image {
+                ZStack(alignment: .topTrailing) {
+                    RoundedRectangle(cornerRadius: 12)
+                        .fill(Color.white)
+                        .shadow(color: Color.black.opacity(0.08), radius: 8, x: 0, y: 4)
+
+                    VStack(spacing: 0) {
+                        image.resizable()
+                            .scaledToFill()
+                            .frame(height: 240)
+                            .cornerRadius(8)
+                            .padding(12)
+
+                        VStack(alignment: .leading, spacing: 6) {
+                            Text(memory.note.prefix(60) + (memory.note.count > 60 ? "..." : ""))
+                                .font(.system(size: 11, weight: .light))
+                                .lineSpacing(2)
+                                .foregroundColor(BloomTheme.textPrimary)
+                                .lineLimit(2)
+
+                            Text(memory.emoji)
+                                .font(.system(size: 20))
+                        }
+                        .padding(.horizontal, 12)
+                        .padding(.bottom, 12)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                    }
+                }
+                .frame(maxWidth: 280)
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .center)
     }
 }
 

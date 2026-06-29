@@ -4,7 +4,8 @@ import UIKit
 
 struct CreateView: View {
     @EnvironmentObject var localization: LocalizationManager
-    @StateObject private var memoryStore = MemoryStore.shared
+    @EnvironmentObject var memoryStore: MemoryStore
+    @EnvironmentObject var createViewState: CreateViewState
     @Environment(\.dismiss) var dismiss
 
     @State private var journalText: String = ""
@@ -12,6 +13,7 @@ struct CreateView: View {
     @State private var processedImage: Image?
     @State private var selectedMoodLabel: String = "Harika"
     @State private var placedStickers: [Sticker] = []
+
     let botanicalStickers = [
         ("pressed_daisy", "🌼"),
         ("dried_rose_petal", "🥀"),
@@ -180,6 +182,11 @@ struct CreateView: View {
                     .frame(height: 80)
                 }
                 .padding(.vertical, 12)
+            }
+        }
+        .onAppear {
+            if processedImage == nil, let selectedImage = createViewState.processedImage {
+                processedImage = selectedImage
             }
         }
     }

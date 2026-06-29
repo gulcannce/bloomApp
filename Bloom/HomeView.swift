@@ -208,22 +208,17 @@ struct PinterestMemoryCard: View {
     }
 
     var body: some View {
-        VStack(spacing: 0) {
-            ZStack {
-                LinearGradient(gradient: Gradient(colors: [BloomTheme.agedParchment, BloomTheme.agedParchment.opacity(0.9)]), startPoint: .topLeading, endPoint: .bottomTrailing)
-
-                if let image = memory.image {
+        VStack(spacing: 8) {
+            if let image = memory.image {
+                ZStack {
+                    LinearGradient(gradient: Gradient(colors: [BloomTheme.agedParchment, BloomTheme.agedParchment.opacity(0.9)]), startPoint: .topLeading, endPoint: .bottomTrailing)
                     image.resizable().scaledToFill()
-                } else {
-                    Image(systemName: "photo.artframe")
-                        .font(.system(size: 32, weight: .light))
-                        .foregroundColor(BloomTheme.textTertiary)
                 }
+                .frame(height: 180)
+                .cornerRadius(16)
+                .clipped()
+                .matchedGeometryEffect(id: memory.id, in: animationNamespace)
             }
-            .frame(height: 180)
-            .cornerRadius(16)
-            .clipped()
-            .matchedGeometryEffect(id: memory.id, in: animationNamespace)
 
             VStack(alignment: .leading, spacing: 8) {
                 HStack(spacing: 8) {
@@ -238,12 +233,12 @@ struct PinterestMemoryCard: View {
                 }
 
                 Text(memory.note.prefix(60) + (memory.note.count > 60 ? "..." : ""))
-                    .font(.system(size: 12, weight: .light))
+                    .font(.system(size: 12, weight: .light, design: .default))
                     .lineSpacing(2)
                     .foregroundColor(BloomTheme.textPrimary)
                     .lineLimit(3)
             }
-            .padding(12)
+            .padding(14)
             .frame(maxWidth: .infinity, alignment: .leading)
         }
         .background(BloomTheme.cardBackground)

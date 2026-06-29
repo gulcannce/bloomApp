@@ -184,4 +184,5 @@ struct CustomTabBarWithPhotoPicker: View {
 
 #Preview {
     ContentView()
+        .environmentObject(CreateViewState())
 }

@@ -76,7 +76,7 @@ struct ContentView: View {
             }
         }
         .sheet(isPresented: $showCreateSheet) {
-            CreateView(showCreateSheet: $showCreateSheet)
+            CreateView(showCreateSheet: $showCreateSheet, selectedTab: $selectedTab)
                 .environmentObject(localization)
                 .environmentObject(memoryStore)
                 .environmentObject(createViewState)

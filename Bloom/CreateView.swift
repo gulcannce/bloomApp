@@ -8,6 +8,7 @@ struct CreateView: View {
     @EnvironmentObject var createViewState: CreateViewState
     @Environment(\.dismiss) var dismiss
     @Binding var showCreateSheet: Bool
+    @Binding var selectedTab: Int
 
     @State private var journalText: String = ""
     @State private var selectedItem: PhotosPickerItem?
@@ -272,13 +273,15 @@ struct CreateView: View {
 
             print("QA_LOG: Explicitly toggling showCreateSheet = false to trigger parent re-render")
             showCreateSheet = false
+            print("QA_LOG: Navigating to Calendar tab (selectedTab = 3)")
+            selectedTab = 3
             print("QA_LOG: Parent ContentView binding updated - HomeView and CalendarView will refresh")
         }
     }
 }
 
 #Preview {
-    CreateView(showCreateSheet: .constant(true))
+    CreateView(showCreateSheet: .constant(true), selectedTab: .constant(0))
         .environmentObject(LocalizationManager())
         .environmentObject(MemoryStore.shared)
         .environmentObject(CreateViewState())

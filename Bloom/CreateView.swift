@@ -10,10 +10,8 @@ struct CreateView: View {
     @State private var journalText: String = ""
     @State private var selectedItem: PhotosPickerItem?
     @State private var processedImage: Image?
-    @State private var selectedMoodEmoji: String = "🌸"
+    @State private var selectedMoodLabel: String = "Harika"
     @State private var placedStickers: [Sticker] = []
-
-    let moodSymbols = ["🥀", "🌿", "🌾", "🌸", "🍂"]
     let botanicalStickers = [
         ("pressed_daisy", "🌼"),
         ("dried_rose_petal", "🥀"),
@@ -125,21 +123,20 @@ struct CreateView: View {
                             VStack(spacing: 12) {
                                 HStack(spacing: 10) {
                                     let moods = [
-                                        ("🥀", "Harika", Color(red: 0.85, green: 0.75, blue: 0.80)),
-                                        ("🌿", "İyi", Color(red: 0.80, green: 0.85, blue: 0.78)),
-                                        ("🌾", "Orta", Color(red: 0.88, green: 0.82, blue: 0.70)),
-                                        ("🌸", "Kötü", Color(red: 0.83, green: 0.72, blue: 0.75)),
-                                        ("🍂", "Berbat", Color(red: 0.78, green: 0.68, blue: 0.55))
+                                        ("Harika", Color(red: 0.85, green: 0.75, blue: 0.80)),
+                                        ("İyi", Color(red: 0.80, green: 0.85, blue: 0.78)),
+                                        ("Orta", Color(red: 0.88, green: 0.82, blue: 0.70)),
+                                        ("Kötü", Color(red: 0.83, green: 0.72, blue: 0.75)),
+                                        ("Berbat", Color(red: 0.78, green: 0.68, blue: 0.55))
                                     ]
-                                    ForEach(moods, id: \.1) { emoji, label, color in
-                                        Button(action: { selectedMoodEmoji = emoji }) {
+                                    ForEach(moods, id: \.0) { label, color in
+                                        Button(action: { selectedMoodLabel = label }) {
                                             VStack(spacing: 4) {
-                                                Text(emoji)
-                                                    .font(.system(size: 20))
+                                                MoodDoodleFace(mood: label, size: 36)
                                                     .frame(width: 36, height: 36)
-                                                    .background(Circle().fill(selectedMoodEmoji == emoji ? color.opacity(0.9) : color))
-                                                    .scaleEffect(selectedMoodEmoji == emoji ? 1.1 : 1.0)
-                                                    .animation(.spring(response: 0.3, dampingFraction: 0.6), value: selectedMoodEmoji)
+                                                    .background(Circle().fill(selectedMoodLabel == label ? color.opacity(0.9) : color))
+                                                    .scaleEffect(selectedMoodLabel == label ? 1.1 : 1.0)
+                                                    .animation(.spring(response: 0.3, dampingFraction: 0.6), value: selectedMoodLabel)
 
                                                 Text(label)
                                                     .font(.system(size: 9, weight: .light, design: .serif))
@@ -191,13 +188,24 @@ struct CreateView: View {
         botanicalStickers.first(where: { $0.0 == name })?.1 ?? "🌸"
     }
 
+    private func labelToEmoji(_ label: String) -> String {
+        switch label {
+        case "Harika": return "🥀"
+        case "İyi": return "🌿"
+        case "Orta": return "🌾"
+        case "Kötü": return "🌸"
+        case "Berbat": return "🍂"
+        default: return "🌸"
+        }
+    }
+
     private func saveMemory() {
         guard !journalText.trimmingCharacters(in: .whitespaces).isEmpty else { return }
 
         let newMemory = Memory(
             image: processedImage,
             note: journalText,
-            emoji: selectedMoodEmoji,
+            emoji: labelToEmoji(selectedMoodLabel),
             date: Date(),
             stickers: placedStickers
         )

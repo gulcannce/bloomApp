@@ -135,8 +135,7 @@ struct StatsView: View {
                                     let moodLabel = moodEmojiToLabel(emoji)
                                     let moodColor = moodEmojiToColor(emoji)
                                     VStack(spacing: 6) {
-                                        Text(emoji)
-                                            .font(.system(size: 22))
+                                        MoodDoodleFace(mood: moodLabel, size: 44)
                                             .frame(width: 44, height: 44)
                                             .background(Circle().fill(moodColor))
 

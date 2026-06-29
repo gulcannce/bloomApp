@@ -89,16 +89,15 @@ struct HomeView: View {
                             ScrollView(.horizontal, showsIndicators: false) {
                                 HStack(spacing: 16) {
                                     let moods = [
-                                        ("🥀", "Harika", Color(red: 0.85, green: 0.75, blue: 0.80)),      // Muted Pink
-                                        ("🌿", "İyi", Color(red: 0.80, green: 0.85, blue: 0.78)),          // Pale Sage
-                                        ("🌾", "Orta", Color(red: 0.88, green: 0.82, blue: 0.70)),         // Soft Ochre
-                                        ("🌸", "Kötü", Color(red: 0.83, green: 0.72, blue: 0.75)),         // Muted Rose
-                                        ("🍂", "Berbat", Color(red: 0.78, green: 0.68, blue: 0.55))        // Autumn Brown
+                                        ("Harika", Color(red: 0.85, green: 0.75, blue: 0.80)),
+                                        ("İyi", Color(red: 0.80, green: 0.85, blue: 0.78)),
+                                        ("Orta", Color(red: 0.88, green: 0.82, blue: 0.70)),
+                                        ("Kötü", Color(red: 0.83, green: 0.72, blue: 0.75)),
+                                        ("Berbat", Color(red: 0.78, green: 0.68, blue: 0.55))
                                     ]
-                                    ForEach(moods, id: \.1) { emoji, label, color in
+                                    ForEach(moods, id: \.0) { label, color in
                                         VStack(spacing: 6) {
-                                            Text(emoji)
-                                                .font(.system(size: 24))
+                                            MoodDoodleFace(mood: label, size: 40)
                                                 .frame(width: 40, height: 40)
                                                 .background(Circle().fill(color))
 

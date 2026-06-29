@@ -164,7 +164,7 @@ struct HomeView: View {
                                 HStack(spacing: 8) {
                                     Image(systemName: "pencil")
                                         .font(.system(size: 16, weight: .light))
-                                    Text(localization.currentLanguage == .turkish ? "Bugün Yaz" : "Write Today")
+                                    Text(localization.currentLanguage == .turkish ? "Bugünün Öyküsü" : "Today's Story")
                                         .font(.system(size: 16, weight: .light, design: .serif))
                                 }
                                 .foregroundColor(.white)

@@ -3,7 +3,7 @@ import Combine
 
 struct CalendarView: View {
     @EnvironmentObject var localization: LocalizationManager
-    @StateObject private var memoryStore = MemoryStore.shared
+    @ObservedObject var memoryStore = MemoryStore.shared
     @State private var selectedMonth = Calendar.current.component(.month, from: Date())
     @State private var selectedYear = Calendar.current.component(.year, from: Date())
 
@@ -24,11 +24,18 @@ struct CalendarView: View {
     var memoryMap: [Int: Memory] {
         var map: [Int: Memory] = [:]
         for memory in memoryStore.memories {
-            let day = calendar.component(.day, from: memory.date)
-            let month = calendar.component(.month, from: memory.date)
-            let year = calendar.component(.year, from: memory.date)
+            var dateComponents = DateComponents()
+            dateComponents.year = selectedYear
+            dateComponents.month = selectedMonth
+            dateComponents.day = 1
 
-            if month == selectedMonth && year == selectedYear {
+            guard let monthStart = calendar.date(from: dateComponents) else { continue }
+            guard let monthEnd = calendar.date(byAdding: .month, value: 1, to: monthStart) else { continue }
+
+            let isInSelectedMonth = memory.date >= monthStart && memory.date < monthEnd
+            if isInSelectedMonth {
+                let day = calendar.component(.day, from: memory.date)
+                print("QA_LOG: CalendarView.memoryMap - Mapped memory on day \(day): '\(memory.note.prefix(30))'")
                 map[day] = memory
             }
         }

@@ -73,18 +73,26 @@ struct HomeView: View {
                 } else {
                     ScrollView(showsIndicators: false) {
                         VStack(spacing: 24) {
-                            Text("Merhaba, 🌸")
-                                .font(.system(size: 36, weight: .light, design: .serif))
-                                .tracking(0.5)
-                                .foregroundColor(BloomTheme.textPrimary)
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                                .padding(.horizontal, 20)
+                            HStack(spacing: 8) {
+                                Text("Merhaba,")
+                                    .font(.system(size: 36, weight: .light, design: .serif))
+                                    .tracking(0.5)
+                                    .foregroundColor(BloomTheme.textPrimary)
+
+                                Image(systemName: "leaf.rose")
+                                    .font(.system(size: 28, weight: .ultraLight))
+                                    .foregroundColor(BloomTheme.driedRose)
+                            }
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .padding(.horizontal, 20)
 
                             ScrollView(.horizontal, showsIndicators: false) {
                                 HStack(spacing: 12) {
-                                    ForEach(["🌸", "🌿", "🌾", "🥀", "🍂"], id: \.self) { mood in
-                                        Text(mood)
-                                            .font(.system(size: 28))
+                                    let moodSymbols = [("🌸", "leaf.rose"), ("🌿", "leaf"), ("🌾", "sun.haze"), ("🍂", "drop"), ("🥀", "wind")]
+                                    ForEach(moodSymbols, id: \.0) { emoji, symbol in
+                                        Image(systemName: symbol)
+                                            .font(.system(size: 20, weight: .ultraLight))
+                                            .foregroundColor(BloomTheme.driedRose)
                                             .frame(width: 48, height: 48)
                                             .background(Color.white.opacity(0.6))
                                             .cornerRadius(12)
@@ -141,12 +149,16 @@ struct HomeView: View {
 
                                     HStack(spacing: 8) {
                                         Spacer()
-                                        Text("\(longestStreak()) gün streak 🔥")
-                                            .font(.system(size: 11, weight: .light, design: .serif))
-                                            .foregroundColor(BloomTheme.textSecondary)
-                                            .padding(8)
-                                            .background(Color.white.opacity(0.8))
-                                            .cornerRadius(6)
+                                        HStack(spacing: 4) {
+                                            Text("\(longestStreak()) gün streak")
+                                                .font(.system(size: 11, weight: .light, design: .serif))
+                                            Image(systemName: "flame.fill")
+                                                .font(.system(size: 10, weight: .ultraLight))
+                                        }
+                                        .foregroundColor(BloomTheme.textSecondary)
+                                        .padding(8)
+                                        .background(Color.white.opacity(0.8))
+                                        .cornerRadius(6)
                                     }
                                     .padding(.horizontal, 20)
                                 }

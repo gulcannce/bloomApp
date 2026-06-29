@@ -275,3 +275,12 @@ struct PinterestMemoryCard: View {
         }
     }
 }
+
+#Preview {
+    HomeView()
+        .environmentObject(MemoryStore.shared)
+        .environmentObject(LocalizationManager())
+        .onAppear {
+            MemoryStore.injectMockData()
+        }
+}

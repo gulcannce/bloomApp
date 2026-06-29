@@ -11,6 +11,7 @@ struct HomeView: View {
     @State private var stickerScale: CGFloat = 1.0
     @State private var stickerRotation: Double = 0
     @State private var showProfileSheet = false
+    @State private var showCreateSheet = false
 
     let columns = [
         GridItem(.flexible(), spacing: 12),
@@ -165,6 +166,24 @@ struct HomeView: View {
 
                         }
                         .padding(.vertical, 24)
+
+                        Button(action: {
+                            showCreateSheet = true
+                        }) {
+                            HStack(spacing: 8) {
+                                Image(systemName: "pencil")
+                                    .font(.system(size: 16, weight: .light))
+                                Text("Bugünün Öyküsü")
+                                    .font(.system(size: 16, weight: .light, design: .serif))
+                            }
+                            .foregroundColor(.white)
+                            .frame(maxWidth: .infinity)
+                            .padding(14)
+                            .background(BloomTheme.driedRose)
+                            .cornerRadius(10)
+                        }
+                        .padding(.horizontal, 20)
+                        .padding(.bottom, 24)
                     }
                 }
             }
@@ -328,6 +347,11 @@ struct HomeView: View {
                     .frame(maxHeight: 700)
                 }
             }
+        }
+        .sheet(isPresented: $showCreateSheet) {
+            CreateView()
+                .environmentObject(localization)
+                .environmentObject(memoryStore)
         }
     }
 

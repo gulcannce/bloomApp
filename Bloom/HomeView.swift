@@ -10,6 +10,7 @@ struct HomeView: View {
     @State private var draggingStickerId: UUID? = nil
     @State private var stickerScale: CGFloat = 1.0
     @State private var stickerRotation: Double = 0
+    @State private var showProfileSheet = false
 
     let columns = [
         GridItem(.flexible(), spacing: 12),
@@ -30,27 +31,18 @@ struct HomeView: View {
 
                     Spacer()
 
-                    Menu {
-                        ForEach(Language.allCases, id: \.self) { language in
-                            Button(action: {
-                                localization.currentLanguage = language
-                            }) {
-                                HStack {
-                                    Text(language.displayName)
-                                    if localization.currentLanguage == language {
-                                        Image(systemName: "checkmark")
-                                    }
-                                }
-                            }
-                        }
-                    } label: {
-                        Image(systemName: "globe")
-                            .font(.system(size: 18))
-                            .foregroundColor(BloomTheme.textSecondary)
+                    Button(action: { showProfileSheet = true }) {
+                        Image(systemName: "person.fill")
+                            .font(.system(size: 18, weight: .light))
+                            .foregroundColor(Color(red: 0.70, green: 0.65, blue: 0.60))
                     }
                 }
                 .padding(.horizontal, 20)
                 .padding(.vertical, 20)
+                .sheet(isPresented: $showProfileSheet) {
+                    ProfileView()
+                        .environmentObject(localization)
+                }
 
                 if memoryStore.memories.isEmpty {
                     VStack(spacing: 20) {

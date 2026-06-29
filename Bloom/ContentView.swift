@@ -34,9 +34,6 @@ struct ContentView: View {
                         CalendarView()
                             .environmentObject(localization)
                             .environmentObject(memoryStore)
-                    case 4:
-                        ProfileView()
-                            .environmentObject(localization)
                     default:
                         HomeView()
                             .environmentObject(localization)
@@ -87,8 +84,7 @@ struct CustomTabBarWithPhotoPicker: View {
         (icon: "house.fill", tag: 0, color: Color(red: 0.72, green: 0.55, blue: 0.50)),
         (icon: "chart.bar.fill", tag: 1, color: BloomTheme.sageGreen),
         (icon: "star.fill", tag: 2, color: Color(red: 0.82, green: 0.75, blue: 0.55)),
-        (icon: "calendar", tag: 3, color: Color(red: 0.68, green: 0.60, blue: 0.50)),
-        (icon: "person.fill", tag: 4, color: Color(red: 0.70, green: 0.65, blue: 0.60))
+        (icon: "calendar", tag: 3, color: Color(red: 0.68, green: 0.60, blue: 0.50))
     ]
 
     var body: some View {
@@ -97,8 +93,8 @@ struct CustomTabBarWithPhotoPicker: View {
                 .foregroundColor(BloomTheme.textTertiary.opacity(0.2))
 
             HStack(spacing: 0) {
-                // Left side - 2 items (Home, Stats)
-                ForEach(0..<2, id: \.self) { index in
+                // Left side - 1 item (Home)
+                ForEach(0..<1, id: \.self) { index in
                     VStack(spacing: 4) {
                         Button(action: { selectedTab = index }) {
                             Image(systemName: tabItems[index].icon)
@@ -114,6 +110,22 @@ struct CustomTabBarWithPhotoPicker: View {
                     }
                     .frame(maxWidth: .infinity)
                 }
+
+                // Center-Left - Stats
+                VStack(spacing: 4) {
+                    Button(action: { selectedTab = 1 }) {
+                        Image(systemName: tabItems[1].icon)
+                            .font(.system(size: 20, weight: .light))
+                            .foregroundColor(tabItems[1].color.opacity(selectedTab == 1 ? 1.0 : 0.6))
+                    }
+
+                    if selectedTab == 1 {
+                        RoundedRectangle(cornerRadius: 1.5)
+                            .fill(tabItems[1].color)
+                            .frame(width: 16, height: 3)
+                    }
+                }
+                .frame(maxWidth: .infinity)
 
                 // Center - Plus Button with PhotosPicker
                 PhotosPicker(selection: $selectedItem, matching: .images) {
@@ -123,23 +135,37 @@ struct CustomTabBarWithPhotoPicker: View {
                 }
                 .frame(maxWidth: .infinity)
 
-                // Right side - 2 items (Achievements, Calendar, Profile)
-                ForEach(2..<5, id: \.self) { index in
-                    VStack(spacing: 4) {
-                        Button(action: { selectedTab = index }) {
-                            Image(systemName: tabItems[index].icon)
-                                .font(.system(size: 20, weight: .light))
-                                .foregroundColor(tabItems[index].color.opacity(selectedTab == index ? 1.0 : 0.6))
-                        }
-
-                        if selectedTab == index {
-                            RoundedRectangle(cornerRadius: 1.5)
-                                .fill(tabItems[index].color)
-                                .frame(width: 16, height: 3)
-                        }
+                // Center-Right - Achievements
+                VStack(spacing: 4) {
+                    Button(action: { selectedTab = 2 }) {
+                        Image(systemName: tabItems[2].icon)
+                            .font(.system(size: 20, weight: .light))
+                            .foregroundColor(tabItems[2].color.opacity(selectedTab == 2 ? 1.0 : 0.6))
                     }
-                    .frame(maxWidth: .infinity)
+
+                    if selectedTab == 2 {
+                        RoundedRectangle(cornerRadius: 1.5)
+                            .fill(tabItems[2].color)
+                            .frame(width: 16, height: 3)
+                    }
                 }
+                .frame(maxWidth: .infinity)
+
+                // Right side - Calendar
+                VStack(spacing: 4) {
+                    Button(action: { selectedTab = 3 }) {
+                        Image(systemName: tabItems[3].icon)
+                            .font(.system(size: 20, weight: .light))
+                            .foregroundColor(tabItems[3].color.opacity(selectedTab == 3 ? 1.0 : 0.6))
+                    }
+
+                    if selectedTab == 3 {
+                        RoundedRectangle(cornerRadius: 1.5)
+                            .fill(tabItems[3].color)
+                            .frame(width: 16, height: 3)
+                    }
+                }
+                .frame(maxWidth: .infinity)
             }
             .padding(.horizontal, 16)
             .padding(.vertical, 12)

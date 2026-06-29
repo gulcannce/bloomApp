@@ -28,16 +28,13 @@ struct CustomTabBar: View {
                     .frame(maxWidth: .infinity)
                 }
 
-                // Center - Plus Button
+                // Center - Plus Button (resized to match surrounding icons)
                 Button(action: { showCreateSheet = true }) {
                     Image(systemName: "plus")
-                        .font(.system(size: 24, weight: .light))
-                        .foregroundColor(.white)
+                        .font(.system(size: 20, weight: .light))
+                        .foregroundColor(BloomTheme.driedRose)
                 }
-                .frame(width: 56, height: 56)
-                .background(Circle().fill(BloomTheme.driedRose))
-                .shadow(color: BloomTheme.driedRose.opacity(0.3), radius: 8, x: 0, y: 4)
-                .offset(y: -20)
+                .frame(maxWidth: .infinity)
 
                 // Right side - 2 items (Achievements, Calendar, Profile - 3 items squeezed)
                 ForEach(2..<5, id: \.self) { index in

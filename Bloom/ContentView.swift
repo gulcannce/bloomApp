@@ -14,6 +14,7 @@ struct ContentView: View {
     @State private var selectedItem: PhotosPickerItem? = nil
     @StateObject private var createViewState = CreateViewState()
     @State private var didInjectMockData = false
+    @State private var storyText = ""
 
     var body: some View {
         ZStack {
@@ -22,7 +23,7 @@ struct ContentView: View {
                     switch selectedTab {
                     case 0:
                             NavigationStack {
-                                HomeView(showCreateSheet: $showCreateSheet)
+                                HomeView(showCreateSheet: $showCreateSheet, storyText: $storyText)
                                     .environmentObject(localization)
                                     .environmentObject(memoryStore)
                                     .environmentObject(createViewState)
@@ -43,7 +44,7 @@ struct ContentView: View {
                         }
                     default:
                         NavigationStack {
-                            HomeView(showCreateSheet: $showCreateSheet)
+                            HomeView(showCreateSheet: $showCreateSheet, storyText: $storyText)
                                 .environmentObject(localization)
                                 .environmentObject(memoryStore)
                                 .environmentObject(createViewState)
@@ -78,7 +79,7 @@ struct ContentView: View {
             }
         }
         .sheet(isPresented: $showCreateSheet) {
-            CreateView(showCreateSheet: $showCreateSheet, selectedTab: $selectedTab)
+            CreateView(showCreateSheet: $showCreateSheet, selectedTab: $selectedTab, storyText: $storyText)
                 .environmentObject(localization)
                 .environmentObject(memoryStore)
                 .environmentObject(createViewState)

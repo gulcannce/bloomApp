@@ -9,8 +9,7 @@ struct CreateView: View {
     @Environment(\.dismiss) var dismiss
     @Binding var showCreateSheet: Bool
     @Binding var selectedTab: Int
-
-    @State private var journalText: String = ""
+    @Binding var storyText: String
     @State private var selectedItems: [PhotosPickerItem] = []
     @State private var processedImages: [Image] = []
     @State private var selectedMoodLabel: String = "Harika"
@@ -175,14 +174,14 @@ struct CreateView: View {
                                                 .font(.system(size: 11, weight: .light, design: .serif))
                                                 .foregroundColor(BloomTheme.textSecondary)
                                             Spacer()
-                                            Text("\(journalText.count)/500")
+                                            Text("\(storyText.count)/500")
                                                 .font(.system(size: 10, weight: .light))
-                                                .foregroundColor(journalText.count > 500 ? BloomTheme.driedRose : BloomTheme.textTertiary)
+                                                .foregroundColor(storyText.count > 500 ? BloomTheme.driedRose : BloomTheme.textTertiary)
                                         }
                                         .padding(.horizontal, 8)
                                         .padding(.top, 8)
 
-                                        TextEditor(text: $journalText)
+                                        TextEditor(text: $storyText)
                                             .font(.system(size: 13, weight: .light, design: .serif))
                                             .lineSpacing(3)
                                             .foregroundColor(selectedTextColor)
@@ -365,7 +364,7 @@ struct CreateView: View {
     }
 
     private func saveMemory() {
-        let finalText = journalText.trimmingCharacters(in: .whitespaces)
+        let finalText = storyText.trimmingCharacters(in: .whitespaces)
         let safeNote = finalText.isEmpty ? "Günün hali" : finalText
 
         let now = Date()
@@ -392,7 +391,7 @@ struct CreateView: View {
 
         DispatchQueue.main.async {
             print("QA_LOG: Resetting temporary picker states for next session")
-            journalText = ""
+            storyText = ""
             processedImages = []
             placedStickers = []
             selectedMoodLabel = "Harika"
@@ -483,7 +482,7 @@ struct CreateView: View {
 }
 
 #Preview {
-    CreateView(showCreateSheet: .constant(true), selectedTab: .constant(0))
+    CreateView(showCreateSheet: .constant(true), selectedTab: .constant(0), storyText: .constant(""))
         .environmentObject(LocalizationManager())
         .environmentObject(MemoryStore.shared)
         .environmentObject(CreateViewState())

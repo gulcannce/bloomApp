@@ -6,6 +6,7 @@ struct HomeView: View {
     @EnvironmentObject var memoryStore: MemoryStore
     @EnvironmentObject var createViewState: CreateViewState
     @Binding var showCreateSheet: Bool
+    @Binding var storyText: String
     @State private var expandedMemoryId: UUID? = nil
     @Namespace private var animationNamespace
     @State private var selectedStickerName: String? = nil
@@ -16,8 +17,6 @@ struct HomeView: View {
     @State private var localSelectedItem: PhotosPickerItem? = nil
     @State private var selectedMood: String? = nil
     @State private var showStoryInput = false
-    // Persistent draft state: survives sheet dismissal, only clears on explicit save/delete
-    @State private var storyText = ""
     @Environment(\.colorScheme) var colorScheme
 
     private let moods: [(label: String, emoji: String, color: Color)] = [
@@ -156,7 +155,8 @@ struct HomeView: View {
 
                                         // Caption section
                                         VStack(alignment: .leading, spacing: 8) {
-                                            Text(latestMemory.note.isEmpty ? "Küçük şeyler, büyük mutluluklar." : latestMemory.note)
+                                            let displayText = !storyText.isEmpty ? storyText : (latestMemory.note.isEmpty ? "Küçük şeyler, büyük mutluluklar." : latestMemory.note)
+                                            Text(displayText)
                                                 .font(.system(size: 14, weight: .light, design: .serif))
                                                 .italic()
                                                 .tracking(0.6)
@@ -604,9 +604,10 @@ struct PinterestMemoryCard: View {
 struct HomeViewPreviewContainer: View {
     @StateObject var store = MemoryStore.shared
     @State private var showCreateSheet = false
+    @State private var storyText = ""
 
     var body: some View {
-        HomeView(showCreateSheet: $showCreateSheet)
+        HomeView(showCreateSheet: $showCreateSheet, storyText: $storyText)
             .environmentObject(store)
             .environmentObject(LocalizationManager())
             .onAppear {

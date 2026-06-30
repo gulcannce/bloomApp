@@ -1,7 +1,5 @@
 import SwiftUI
-import Combine
 import PhotosUI
-import UIKit
 
 struct HomeView: View {
     @EnvironmentObject var localization: LocalizationManager
@@ -16,7 +14,16 @@ struct HomeView: View {
     @State private var stickerRotation: Double = 0
     @State private var showProfileSheet = false
     @State private var localSelectedItem: PhotosPickerItem? = nil
+    @State private var selectedMood: String? = nil
     @Environment(\.colorScheme) var colorScheme
+
+    private let moods: [(label: String, emoji: String, color: Color)] = [
+        ("Harika", "😊", Color(red: 0.85, green: 0.75, blue: 0.80)),
+        ("İyi",    "🙂", Color(red: 0.80, green: 0.85, blue: 0.78)),
+        ("Orta",   "😐", Color(red: 0.88, green: 0.82, blue: 0.70)),
+        ("Kötü",   "😟", Color(red: 0.83, green: 0.72, blue: 0.75)),
+        ("Berbat", "😠", Color(red: 0.78, green: 0.68, blue: 0.55))
+    ]
 
     let columns = [
         GridItem(.flexible(), spacing: 12),
@@ -58,56 +65,68 @@ struct HomeView: View {
                         .environmentObject(localization)
                 }
 
-                if memoryStore.memories.isEmpty {
+                ScrollView(showsIndicators: false) {
                     VStack(spacing: 20) {
-                        Spacer()
-                        Image(systemName: "photo.artframe")
-                            .font(.system(size: 48, weight: .light))
-                            .foregroundColor(BloomTheme.textTertiary)
-                        VStack(spacing: 8) {
-                            Text(localization.currentLanguage == .turkish ? "Henüz anı yok" : "No memories yet")
-                                .font(.system(size: 16, weight: .regular, design: .serif))
-                                .foregroundColor(BloomTheme.textPrimary)
-                            Text(localization.currentLanguage == .turkish ? "Bugün Yaz sekmesine git" : "Go to Create tab")
-                                .font(.system(size: 14, weight: .light))
-                                .foregroundColor(BloomTheme.textSecondary)
-                        }
-                        Spacer()
-                    }
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                } else {
-                    ScrollView(showsIndicators: false) {
-                        VStack(spacing: 20) {
-                            // Mood selector row
-                            VStack(alignment: .leading, spacing: 10) {
-                                ScrollView(.horizontal, showsIndicators: false) {
-                                    HStack(spacing: 12) {
-                                        let moods = [
-                                            ("Harika", "😊", Color(red: 0.85, green: 0.75, blue: 0.80)),
-                                            ("İyi", "🙂", Color(red: 0.80, green: 0.85, blue: 0.78)),
-                                            ("Orta", "😐", Color(red: 0.88, green: 0.82, blue: 0.70)),
-                                            ("Kötü", "😟", Color(red: 0.83, green: 0.72, blue: 0.75)),
-                                            ("Berbat", "😠", Color(red: 0.78, green: 0.68, blue: 0.55))
-                                        ]
-                                        ForEach(moods, id: \.0) { label, emoji, color in
-                                            VStack(spacing: 6) {
-                                                Text(emoji)
-                                                    .font(.system(size: 28))
-                                                    .frame(width: 48, height: 48)
-                                                    .background(Circle().fill(Color.white))
-                                                    .overlay(Circle().stroke(Color.white, lineWidth: 2))
-
-                                                Text(label)
-                                                    .font(.system(size: 10, weight: .light, design: .serif))
-                                                    .foregroundColor(BloomTheme.textSecondary)
-                                            }
-                                            .frame(width: 60)
+                        // Mood selector row — always visible
+                        ScrollView(.horizontal, showsIndicators: false) {
+                            HStack(spacing: 12) {
+                                ForEach(moods, id: \.label) { mood in
+                                    Button(action: {
+                                        withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
+                                            selectedMood = selectedMood == mood.label ? nil : mood.label
                                         }
+                                        print("QA_LOG: Mood selected: \(mood.label)")
+                                    }) {
+                                        VStack(spacing: 6) {
+                                            Text(mood.emoji)
+                                                .font(.system(size: 28))
+                                                .frame(width: 52, height: 52)
+                                                .background(
+                                                    Circle()
+                                                        .fill(selectedMood == mood.label ? mood.color.opacity(0.35) : Color.white)
+                                                        .shadow(color: Color.black.opacity(0.06), radius: 4, x: 0, y: 2)
+                                                )
+                                                .overlay(
+                                                    Circle().stroke(
+                                                        selectedMood == mood.label ? mood.color : Color.clear,
+                                                        lineWidth: 2
+                                                    )
+                                                )
+                                                .scaleEffect(selectedMood == mood.label ? 1.08 : 1.0)
+
+                                            Text(mood.label)
+                                                .font(.system(size: 10, weight: .light, design: .serif))
+                                                .foregroundColor(selectedMood == mood.label ? mood.color : BloomTheme.textSecondary)
+                                        }
+                                        .frame(width: 64)
                                     }
-                                    .padding(.horizontal, 20)
+                                    .buttonStyle(.plain)
                                 }
-                                .frame(height: 90)
                             }
+                            .padding(.horizontal, 20)
+                        }
+                        .frame(height: 90)
+
+                        if memoryStore.memories.isEmpty {
+                            VStack(spacing: 16) {
+                                Spacer(minLength: 40)
+                                Image(systemName: "photo.artframe")
+                                    .font(.system(size: 48, weight: .ultraLight))
+                                    .foregroundColor(BloomTheme.textTertiary)
+                                VStack(spacing: 6) {
+                                    Text(localization.currentLanguage == .turkish ? "Henüz anı yok" : "No memories yet")
+                                        .font(.system(size: 16, weight: .light, design: .serif))
+                                        .foregroundColor(BloomTheme.textPrimary)
+                                    Text(localization.currentLanguage == .turkish ? "İlk anını eklemek için ✏️ Bugün Yaz'a dokun" : "Tap ✏️ Write Today to add your first memory")
+                                        .font(.system(size: 13, weight: .light, design: .serif))
+                                        .foregroundColor(BloomTheme.textSecondary)
+                                        .multilineTextAlignment(.center)
+                                }
+                                Spacer(minLength: 40)
+                            }
+                            .frame(maxWidth: .infinity)
+                            .padding(.horizontal, 20)
+                        } else {
 
                             // Hero Polaroid card
                             if let latestMemory = memoryStore.memories.sorted(by: { $0.date > $1.date }).first {
@@ -180,31 +199,32 @@ struct HomeView: View {
                                     .padding(.bottom, 12)
                                 }
                                 .padding(.horizontal, 20)
-                            }
+                            } // end if let latestMemory
+                        } // end if !memories.isEmpty else block
 
-                            // "Bugün Yaz" primary CTA button
-                            PhotosPicker(selection: $localSelectedItem, matching: .images) {
-                                HStack(spacing: 8) {
-                                    Text("✏️")
-                                        .font(.system(size: 16))
-                                    Text("Bugün Yaz")
-                                        .font(.system(size: 16, weight: .light, design: .serif))
-                                        .tracking(0.3)
-                                }
-                                .foregroundColor(.white)
-                                .frame(maxWidth: .infinity)
-                                .padding(16)
-                                .background(BloomTheme.driedRose)
-                                .cornerRadius(12)
-                                .shadow(color: BloomTheme.driedRose.opacity(0.35), radius: 10, x: 0, y: 5)
+                        // "Bugün Yaz" primary CTA button — always visible
+                        PhotosPicker(selection: $localSelectedItem, matching: .images) {
+                            HStack(spacing: 8) {
+                                Text("✏️")
+                                    .font(.system(size: 16))
+                                Text("Bugün Yaz")
+                                    .font(.system(size: 16, weight: .light, design: .serif))
+                                    .tracking(0.3)
                             }
-                            .padding(.horizontal, 20)
-                            .padding(.top, 12)
+                            .foregroundColor(.white)
+                            .frame(maxWidth: .infinity)
+                            .padding(16)
+                            .background(BloomTheme.driedRose)
+                            .cornerRadius(12)
+                            .shadow(color: BloomTheme.driedRose.opacity(0.35), radius: 10, x: 0, y: 5)
                         }
-                        .padding(.vertical, 24)
+                        .padding(.horizontal, 20)
+                        .padding(.top, 4)
+                        .padding(.bottom, 12)
                     }
-                    .padding(.bottom, 90)
+                    .padding(.vertical, 12)
                 }
+                .padding(.bottom, 90)
             }
 
             if let expandedId = expandedMemoryId,

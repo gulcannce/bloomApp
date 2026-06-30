@@ -20,13 +20,13 @@ struct ContentView: View {
                 Group {
                     switch selectedTab {
                     case 0:
-                        NavigationStack {
-                            HomeView(showCreateSheet: $showCreateSheet)
-                                .environmentObject(localization)
-                                .environmentObject(memoryStore)
-                                .environmentObject(createViewState)
-                        }
-                    case 1:
+                            NavigationStack {
+                                HomeView(showCreateSheet: $showCreateSheet)
+                                    .environmentObject(localization)
+                                    .environmentObject(memoryStore)
+                                    .environmentObject(createViewState)
+                            }
+                        case 1:
                         AnalyticsView()
                             .environmentObject(localization)
                             .environmentObject(memoryStore)

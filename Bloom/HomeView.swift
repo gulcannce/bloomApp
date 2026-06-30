@@ -112,7 +112,10 @@ struct HomeView: View {
 
                             // Hero card - latest memory
                             if let latestMemory = memoryStore.memories.sorted(by: { $0.date > $1.date }).first {
-                                VStack(spacing: 0) {
+                                NavigationLink(destination: MemoryDetailView(memory: latestMemory)
+                                    .environmentObject(memoryStore)
+                                    .environmentObject(localization)) {
+                                    VStack(spacing: 0) {
                                     ZStack(alignment: .topTrailing) {
                                         // Polaroid white frame with subtle rotation
                                         RoundedRectangle(cornerRadius: 12)
@@ -162,8 +165,9 @@ struct HomeView: View {
                                         }
                                     }
                                     .frame(height: 340)
+                                    }
+                                    .padding(.horizontal, 20)
                                 }
-                                .padding(.horizontal, 20)
 
                                 // Streak counter
                                 HStack(spacing: 6) {

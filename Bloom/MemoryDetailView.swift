@@ -176,7 +176,11 @@ struct MemoryDetailView: View {
                                         .font(.system(size: 24, weight: .light))
                                         .foregroundColor(getStickerColorForDetail(stickerName))
                                         .frame(width: 48, height: 48)
-                                        .background(Circle().fill(Color.white.opacity(0.6)))
+                                        .background(
+                                            Circle()
+                                                .fill(Color.white)
+                                                .shadow(color: Color.black.opacity(0.08), radius: 3, x: 0, y: 2)
+                                        )
                                 }
                             }
                         }
@@ -185,7 +189,7 @@ struct MemoryDetailView: View {
                     .frame(height: 64)
                 }
                 .padding(.vertical, 12)
-                .padding(.bottom, 8)
+                .padding(.bottom, 34)
             }
         }
         .onAppear {

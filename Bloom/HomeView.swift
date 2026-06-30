@@ -500,12 +500,19 @@ struct StoryInputSheet: View {
                 }
 
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("İptal") {
-                        storyText = ""
-                        isPresented = false
+                    HStack(spacing: 16) {
+                        Button("Sil") {
+                            storyText = ""
+                        }
+                        .font(.system(size: 16, weight: .light, design: .serif))
+                        .foregroundColor(Color.red.opacity(0.6))
+
+                        Button("İptal") {
+                            isPresented = false
+                        }
+                        .font(.system(size: 16, weight: .light, design: .serif))
+                        .foregroundColor(BloomTheme.textSecondary)
                     }
-                    .font(.system(size: 16, weight: .light, design: .serif))
-                    .foregroundColor(BloomTheme.textSecondary)
                 }
             }
         }

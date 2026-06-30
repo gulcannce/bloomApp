@@ -160,19 +160,6 @@ struct HomeView: View {
                                             .padding(16)
                                             .frame(maxWidth: .infinity, alignment: .leading)
                                         }
-
-                                        // Daisy sticker with subtle rotation and shadow
-                                        VStack(spacing: 0) {
-                                            HStack(spacing: 0) {
-                                                Spacer()
-                                                Text("🌼")
-                                                    .font(.system(size: 32))
-                                                    .rotationEffect(.degrees(-12))
-                                                    .offset(x: -12, y: 12)
-                                                    .shadow(color: Color.black.opacity(0.1), radius: 4, x: 1, y: 2)
-                                            }
-                                            Spacer()
-                                        }
                                     }
                                     .frame(height: 340)
                                 }

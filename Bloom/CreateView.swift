@@ -18,10 +18,24 @@ struct CreateView: View {
     @Environment(\.colorScheme) var colorScheme
 
     let botanicalStickers = [
-        ("flower", "🌸"),
+        ("daisy", "🌼"),
+        ("rose", "🌹"),
+        ("sunflower", "🌻"),
+        ("tulip", "🌷"),
+        ("hibiscus", "🌺"),
+        ("cherry", "🌸"),
+        ("bouquet", "💐"),
+        ("leaf", "🌿"),
+        ("autumn", "🍂"),
         ("heart", "🤎"),
+        ("butterfly", "🦋"),
+        ("bee", "🐝"),
+        ("star", "⭐"),
+        ("sparkle", "✨"),
         ("moon", "🌙"),
-        ("sparkle", "✨")
+        ("ribbon", "🎀"),
+        ("fox", "🦊"),
+        ("love_letter", "💌")
     ]
 
     var body: some View {

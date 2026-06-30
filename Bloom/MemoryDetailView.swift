@@ -24,8 +24,26 @@ struct MemoryDetailView: View {
     @State private var activeStickerId: UUID? = nil
     @Namespace private var animationNamespace
 
-    let stickerMap = ["dried_daisy": "🌼", "vintage_seal": "🪞", "mini_heart": "🤎", "candlelight": "✨"]
-    let stickerAssets = ["dried_daisy", "vintage_seal", "mini_heart", "candlelight"]
+    let stickerMap = [
+        "daisy": "🌼",
+        "rose": "🌹",
+        "sunflower": "🌻",
+        "tulip": "🌷",
+        "hibiscus": "🌺",
+        "cherry": "🌸",
+        "bouquet": "💐",
+        "leaf": "🌿",
+        "autumn": "🍂",
+        "heart": "🤎",
+        "butterfly": "🦋",
+        "bee": "🐝",
+        "star": "⭐",
+        "sparkle": "✨",
+        "moon": "🌙",
+        "ribbon": "🎀",
+        "fox": "🦊",
+        "love_letter": "💌"
+    ]
 
     var body: some View {
         ZStack {
@@ -121,7 +139,7 @@ struct MemoryDetailView: View {
 
                     ScrollView(.horizontal, showsIndicators: false) {
                         HStack(spacing: 12) {
-                            ForEach(stickerAssets, id: \.self) { stickerName in
+                            ForEach(stickerMap.keys.sorted(), id: \.self) { stickerName in
                                 Button(action: {
                                     let newSticker = PlacedSticker(name: stickerName)
                                     placedStickers.append(newSticker)

@@ -10,10 +10,11 @@ struct AnalyticsView: View {
         Color(red: 0.80, green: 0.85, blue: 0.78),  // Pastel Green
         Color(red: 0.88, green: 0.82, blue: 0.70),  // Pastel Gold
         Color(red: 0.83, green: 0.72, blue: 0.75),  // Pastel Mauve
+        Color(red: 0.78, green: 0.68, blue: 0.55),  // Pastel Brown
     ]
 
-    let moodEmojis = ["🌸": "Harika", "🌿": "Sakin", "🌾": "Dengeli", "🥀": "Yorgun"]
-    let moodLabels = ["🌸", "🌿", "🌾", "🥀"]
+    let moodEmojis = ["🌸": "Harika", "🙂": "İyi", "🌾": "Orta", "😟": "Kötü", "😠": "Berbat"]
+    let moodLabels = ["🌸", "🙂", "🌾", "😟", "😠"]
 
     var moodDistribution: [String: Int] {
         var distribution: [String: Int] = [:]
@@ -38,6 +39,26 @@ struct AnalyticsView: View {
     var recordingRate: Int {
         guard totalMemories > 0 else { return 0 }
         return min(100, (totalMemories * 100) / 30)
+    }
+
+    private func longestStreak() -> Int {
+        guard !memoryStore.memories.isEmpty else { return 0 }
+        let calendar = Calendar.current
+        let sorted = memoryStore.memories.sorted { $0.date > $1.date }
+        var streak = 0
+        var currentDate = calendar.startOfDay(for: Date())
+
+        for memory in sorted {
+            let memoryDate = calendar.startOfDay(for: memory.date)
+            if memoryDate == currentDate {
+                streak += 1
+                currentDate = calendar.date(byAdding: .day, value: -1, to: currentDate) ?? currentDate
+            } else if memoryDate == calendar.date(byAdding: .day, value: -1, to: currentDate) ?? currentDate {
+                streak += 1
+                currentDate = memoryDate
+            }
+        }
+        return streak
     }
 
     var body: some View {
@@ -159,19 +180,61 @@ struct MoodChartView: View {
                 .frame(width: 200, height: 200)
             }
 
-            HStack(spacing: 16) {
+            VStack(alignment: .leading, spacing: 12) {
                 ForEach(moodLabels, id: \.self) { emoji in
-                    VStack(spacing: 8) {
+                    HStack(spacing: 12) {
                         Text(emoji)
-                            .font(.system(size: 24))
-                        Text("\(distribution[emoji] ?? 0)")
-                            .font(.system(size: 11, weight: .light, design: .serif))
+                            .font(.system(size: 20))
+                        Text(moodEmojis[emoji] ?? emoji)
+                            .font(.system(size: 13, weight: .light, design: .serif))
+                            .foregroundColor(BloomTheme.textPrimary)
+                        Spacer()
+                        Text("\(distribution[emoji] ?? 0)%")
+                            .font(.system(size: 13, weight: .light, design: .serif))
                             .foregroundColor(BloomTheme.textSecondary)
                     }
-                    Spacer()
                 }
             }
             .padding(.horizontal, 20)
+
+            // Footer cards
+            VStack(spacing: 12) {
+                HStack(spacing: 12) {
+                    Text("🔥")
+                        .font(.system(size: 20))
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("Longest Streak")
+                            .font(.system(size: 11, weight: .light, design: .serif))
+                            .foregroundColor(BloomTheme.textSecondary)
+                        Text("12 gün")
+                            .font(.system(size: 16, weight: .light, design: .serif))
+                            .foregroundColor(BloomTheme.textPrimary)
+                    }
+                    Spacer()
+                }
+                .padding(12)
+                .background(Color.white.opacity(0.4))
+                .cornerRadius(10)
+
+                HStack(spacing: 12) {
+                    Text("😊")
+                        .font(.system(size: 20))
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("Average Mood")
+                            .font(.system(size: 11, weight: .light, design: .serif))
+                            .foregroundColor(BloomTheme.textSecondary)
+                        Text("İyi")
+                            .font(.system(size: 16, weight: .light, design: .serif))
+                            .foregroundColor(BloomTheme.textPrimary)
+                    }
+                    Spacer()
+                }
+                .padding(12)
+                .background(Color.white.opacity(0.4))
+                .cornerRadius(10)
+            }
+            .padding(.horizontal, 20)
+            .padding(.top, 12)
         }
     }
 }

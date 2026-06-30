@@ -31,12 +31,16 @@ struct ContentView: View {
                             .environmentObject(localization)
                             .environmentObject(memoryStore)
                     case 2:
+                        AchievementsView()
+                            .environmentObject(localization)
+                            .environmentObject(memoryStore)
+                    case 3:
                         NavigationStack {
                             CalendarView()
                                 .environmentObject(localization)
                                 .environmentObject(memoryStore)
                         }
-                    case 3:
+                    case 4:
                         ProfileView()
                             .environmentObject(localization)
                     default:
@@ -91,8 +95,9 @@ struct CustomTabBarWithPhotoPicker: View {
     let tabItems = [
         (icon: "house.fill", tag: 0, color: BloomTheme.driedRose),
         (icon: "chart.bar.fill", tag: 1, color: BloomTheme.sageGreen),
-        (icon: "calendar", tag: 2, color: BloomTheme.siennaDust),
-        (icon: "person.fill", tag: 3, color: Color(red: 0.70, green: 0.65, blue: 0.60))
+        (icon: "trophy.fill", tag: 2, color: Color(red: 0.88, green: 0.82, blue: 0.70)),
+        (icon: "calendar", tag: 3, color: BloomTheme.siennaDust),
+        (icon: "person.fill", tag: 4, color: Color(red: 0.70, green: 0.65, blue: 0.60))
     ]
 
     var body: some View {
@@ -101,25 +106,23 @@ struct CustomTabBarWithPhotoPicker: View {
                 .foregroundColor(BloomTheme.textTertiary.opacity(0.2))
 
             HStack(spacing: 0) {
-                // Left side - 1 item (Home)
-                ForEach(0..<1, id: \.self) { index in
-                    VStack(spacing: 4) {
-                        Button(action: { withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) { selectedTab = index } }) {
-                            Image(systemName: tabItems[index].icon)
-                                .font(.system(size: 20, weight: .light))
-                                .foregroundColor(tabItems[index].color.opacity(selectedTab == index ? 1.0 : 0.6))
-                        }
-
-                        if selectedTab == index {
-                            RoundedRectangle(cornerRadius: 1.5)
-                                .fill(tabItems[index].color)
-                                .frame(width: 16, height: 3)
-                        }
+                // Left side - Home
+                VStack(spacing: 4) {
+                    Button(action: { withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) { selectedTab = 0 } }) {
+                        Image(systemName: tabItems[0].icon)
+                            .font(.system(size: 20, weight: .light))
+                            .foregroundColor(tabItems[0].color.opacity(selectedTab == 0 ? 1.0 : 0.6))
                     }
-                    .frame(maxWidth: .infinity)
-                }
 
-                // Center-Left - Stats
+                    if selectedTab == 0 {
+                        RoundedRectangle(cornerRadius: 1.5)
+                            .fill(tabItems[0].color)
+                            .frame(width: 16, height: 3)
+                    }
+                }
+                .frame(maxWidth: .infinity)
+
+                // Stats
                 VStack(spacing: 4) {
                     Button(action: { withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) { selectedTab = 1 } }) {
                         Image(systemName: tabItems[1].icon)
@@ -143,7 +146,7 @@ struct CustomTabBarWithPhotoPicker: View {
                 }
                 .frame(maxWidth: .infinity)
 
-                // Center-Right - Calendar
+                // Achievements
                 VStack(spacing: 4) {
                     Button(action: { withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) { selectedTab = 2 } }) {
                         Image(systemName: tabItems[2].icon)
@@ -159,7 +162,7 @@ struct CustomTabBarWithPhotoPicker: View {
                 }
                 .frame(maxWidth: .infinity)
 
-                // Right side - Profile
+                // Calendar
                 VStack(spacing: 4) {
                     Button(action: { withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) { selectedTab = 3 } }) {
                         Image(systemName: tabItems[3].icon)
@@ -170,6 +173,22 @@ struct CustomTabBarWithPhotoPicker: View {
                     if selectedTab == 3 {
                         RoundedRectangle(cornerRadius: 1.5)
                             .fill(tabItems[3].color)
+                            .frame(width: 16, height: 3)
+                    }
+                }
+                .frame(maxWidth: .infinity)
+
+                // Right side - Profile
+                VStack(spacing: 4) {
+                    Button(action: { withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) { selectedTab = 4 } }) {
+                        Image(systemName: tabItems[4].icon)
+                            .font(.system(size: 20, weight: .light))
+                            .foregroundColor(tabItems[4].color.opacity(selectedTab == 4 ? 1.0 : 0.6))
+                    }
+
+                    if selectedTab == 4 {
+                        RoundedRectangle(cornerRadius: 1.5)
+                            .fill(tabItems[4].color)
                             .frame(width: 16, height: 3)
                     }
                 }

@@ -69,7 +69,7 @@ struct HomeView: View {
                             Text(localization.currentLanguage == .turkish ? "Henüz anı yok" : "No memories yet")
                                 .font(.system(size: 16, weight: .regular, design: .serif))
                                 .foregroundColor(BloomTheme.textPrimary)
-                            Text(localization.currentLanguage == .turkish ? "Create sekmesine git" : "Go to Create tab")
+                            Text(localization.currentLanguage == .turkish ? "Bugün Yaz sekmesine git" : "Go to Create tab")
                                 .font(.system(size: 14, weight: .light))
                                 .foregroundColor(BloomTheme.textSecondary)
                         }
@@ -79,35 +79,45 @@ struct HomeView: View {
                 } else {
                     ScrollView(showsIndicators: false) {
                         VStack(spacing: 28) {
+                            // Greeting section
+                            VStack(alignment: .leading, spacing: 8) {
+                                HStack(spacing: 8) {
+                                    Text("Merhaba,")
+                                        .font(.system(size: 36, weight: .light, design: .serif))
+                                        .foregroundColor(BloomTheme.textPrimary)
+                                    Text("🌸")
+                                        .font(.system(size: 36))
+                                }
+                                Text("Bugün kendini nasıl hissediyorsun?")
+                                    .font(.system(size: 14, weight: .light, design: .serif))
+                                    .foregroundColor(BloomTheme.textSecondary)
+                            }
+                            .padding(.horizontal, 20)
+
                             // Mood selector row
                             VStack(alignment: .leading, spacing: 10) {
-                                Text("Bugün hangi hissetteyseniz?")
-                                    .font(.system(size: 12, weight: .light, design: .serif))
-                                    .tracking(0.3)
-                                    .foregroundColor(BloomTheme.textSecondary)
-                                    .padding(.horizontal, 20)
-
                                 ScrollView(.horizontal, showsIndicators: false) {
-                                    HStack(spacing: 16) {
+                                    HStack(spacing: 12) {
                                         let moods = [
                                             ("Harika", "😊", Color(red: 0.85, green: 0.75, blue: 0.80)),
-                                            ("İyi", "😌", Color(red: 0.80, green: 0.85, blue: 0.78)),
+                                            ("İyi", "🙂", Color(red: 0.80, green: 0.85, blue: 0.78)),
                                             ("Orta", "😐", Color(red: 0.88, green: 0.82, blue: 0.70)),
-                                            ("Kötü", "😢", Color(red: 0.83, green: 0.72, blue: 0.75)),
-                                            ("Berbat", "😢", Color(red: 0.78, green: 0.68, blue: 0.55))
+                                            ("Kötü", "😟", Color(red: 0.83, green: 0.72, blue: 0.75)),
+                                            ("Berbat", "😠", Color(red: 0.78, green: 0.68, blue: 0.55))
                                         ]
                                         ForEach(moods, id: \.0) { label, emoji, color in
                                             VStack(spacing: 6) {
                                                 Text(emoji)
-                                                    .font(.system(size: 32))
-                                                    .frame(width: 44, height: 44)
-                                                    .background(Circle().fill(color))
+                                                    .font(.system(size: 28))
+                                                    .frame(width: 48, height: 48)
+                                                    .background(Circle().fill(Color.white))
+                                                    .overlay(Circle().stroke(Color.white, lineWidth: 2))
 
                                                 Text(label)
                                                     .font(.system(size: 10, weight: .light, design: .serif))
                                                     .foregroundColor(BloomTheme.textSecondary)
                                             }
-                                            .frame(width: 52)
+                                            .frame(width: 60)
                                         }
                                     }
                                     .padding(.horizontal, 20)

@@ -24,13 +24,13 @@ struct ProfileView: View {
 
                         Text("Bloom Girl")
                             .font(.system(size: 22, weight: .light, design: .serif))
-                            .foregroundColor(.black.opacity(0.8))
+                            .foregroundColor(BloomTheme.textPrimary)
 
                         Text(localization.currentLanguage == .turkish
                             ? "Hayatını yaz, anılarını yaşa."
                             : "Write your life, live your memories.")
-                            .font(.system(size: 14, weight: .light, design: .default))
-                            .foregroundColor(.black.opacity(0.5))
+                            .font(.system(size: 13, weight: .light, design: .serif))
+                            .foregroundColor(BloomTheme.textSecondary)
                             .multilineTextAlignment(.center)
                     }
                     .padding(.vertical, 32)

@@ -27,7 +27,7 @@ struct ContentView: View {
                                 .environmentObject(createViewState)
                         }
                     case 1:
-                        StatsView()
+                        AnalyticsView()
                             .environmentObject(localization)
                             .environmentObject(memoryStore)
                     case 2:

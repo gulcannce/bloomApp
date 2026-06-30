@@ -6,12 +6,11 @@ struct SidebarView: View {
     @Environment(\.colorScheme) var colorScheme
 
     let menuItems = [
-        (icon: "checkmark.square", label: "Dijital Günlük", tab: 0),
-        (icon: "photo.fill", label: "Fotoğraflar", tab: 1),
-        (icon: "sparkles", label: "Stickerlar", tab: 2),
-        (icon: "character.textbox", label: "Yazılar", tab: 3),
-        (icon: "calendar.circle", label: "Takvim Yaprakları", tab: 4),
-        (icon: "book.fill", label: "Kitap Şeklinde Anılar", tab: 5)
+        (icon: "house.fill", label: "Anasayfa", tab: 0),
+        (icon: "chart.pie.fill", label: "Analiz", tab: 1),
+        (icon: "star.fill", label: "Başarımlar", tab: 2),
+        (icon: "calendar.circle", label: "Takvim", tab: 3),
+        (icon: "person.circle.fill", label: "Profil", tab: 4)
     ]
 
     var body: some View {

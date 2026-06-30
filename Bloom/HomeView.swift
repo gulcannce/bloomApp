@@ -383,10 +383,25 @@ struct HomeView: View {
         }
     }
 
+    private func getTodayEntry() -> Memory? {
+        let calendar = Calendar.current
+        let today = calendar.startOfDay(for: Date())
+        return memoryStore.memories.first { memory in
+            calendar.isDate(memory.date, inSameDayAs: today)
+        }
+    }
+
     private func saveStory() {
         guard !storyText.isEmpty else { return }
-        let newMemory = Memory(image: nil, note: storyText, emoji: "📝")
-        memoryStore.addEntry(newMemory)
+        if let todayEntry = getTodayEntry() {
+            if let index = memoryStore.memories.firstIndex(where: { $0.id == todayEntry.id }) {
+                memoryStore.memories[index].note = storyText
+                memoryStore.saveMemories()
+            }
+        } else {
+            let newMemory = Memory(image: nil, note: storyText, emoji: "📝")
+            memoryStore.addEntry(newMemory)
+        }
         storyText = ""
         showStoryInput = false
     }
@@ -463,6 +478,7 @@ struct StoryInputSheet: View {
     @Binding var isPresented: Bool
     @Binding var storyText: String
     var memoryStore: MemoryStore
+    @State private var todayEntry: Memory? = nil
 
     var body: some View {
         NavigationStack {
@@ -487,12 +503,23 @@ struct StoryInputSheet: View {
             }
             .background(BloomTheme.agedParchment.ignoresSafeArea())
             .navigationBarTitleDisplayMode(.inline)
+            .onAppear {
+                todayEntry = getTodayEntry()
+                if let entry = todayEntry, storyText.isEmpty {
+                    storyText = entry.note
+                }
+            }
             .toolbar {
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Kaydet") {
                         guard !storyText.isEmpty else { return }
-                        let newMemory = Memory(image: nil, note: storyText, emoji: "📝")
-                        memoryStore.addEntry(newMemory)
+                        if let entry = todayEntry, let index = memoryStore.memories.firstIndex(where: { $0.id == entry.id }) {
+                            memoryStore.memories[index].note = storyText
+                            memoryStore.saveMemories()
+                        } else {
+                            let newMemory = Memory(image: nil, note: storyText, emoji: "📝")
+                            memoryStore.addEntry(newMemory)
+                        }
                         storyText = ""
                         isPresented = false
                     }
@@ -516,6 +543,14 @@ struct StoryInputSheet: View {
                     }
                 }
             }
+        }
+    }
+
+    private func getTodayEntry() -> Memory? {
+        let calendar = Calendar.current
+        let today = calendar.startOfDay(for: Date())
+        return memoryStore.memories.first { memory in
+            calendar.isDate(memory.date, inSameDayAs: today)
         }
     }
 }

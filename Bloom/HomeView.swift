@@ -72,9 +72,7 @@ struct HomeView: View {
                             HStack(spacing: 12) {
                                 ForEach(moods, id: \.label) { mood in
                                     Button(action: {
-                                        withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
-                                            selectedMood = selectedMood == mood.label ? nil : mood.label
-                                        }
+                                        selectedMood = selectedMood == mood.label ? nil : mood.label
                                         print("QA_LOG: Mood selected: \(mood.label)")
                                     }) {
                                         VStack(spacing: 6) {
@@ -99,6 +97,7 @@ struct HomeView: View {
                                                 .foregroundColor(selectedMood == mood.label ? mood.color : BloomTheme.textSecondary)
                                         }
                                         .frame(width: 64)
+                                        .animation(.spring(response: 0.3, dampingFraction: 0.6), value: selectedMood)
                                     }
                                     .buttonStyle(.plain)
                                 }
@@ -178,7 +177,7 @@ struct HomeView: View {
                                     }
                                     .background(Color.white)
                                     .cornerRadius(12)
-                                    .shadow(color: Color.black.opacity(0.10), radius: 12, x: 2, y: 4)
+                                    .shadow(color: Color.black.opacity(0.04), radius: 8, x: 0, y: 4)
 
                                     // Streak badge overlaid at bottom-right corner of Polaroid
                                     HStack(spacing: 4) {

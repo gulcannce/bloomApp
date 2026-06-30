@@ -7,7 +7,7 @@ struct CalendarView: View {
     @State private var selectedMonth = Calendar.current.component(.month, from: Date())
     @State private var selectedYear = Calendar.current.component(.year, from: Date())
 
-    let columns = Array(repeating: GridItem(.flexible(), spacing: 12), count: 3)
+    let columns = Array(repeating: GridItem(.flexible(), spacing: 8), count: 7)
     let calendar = Calendar.current
     @Environment(\.colorScheme) var colorScheme
 
@@ -97,7 +97,19 @@ struct CalendarView: View {
                         }
                         .padding(.horizontal, 20)
 
-                    LazyVGrid(columns: columns, spacing: 12) {
+                        // Day of week headers
+                        let dayLabels = ["Pat", "Sal", "Çar", "Per", "Cum", "Cmt", "Paz"]
+                        HStack(spacing: 8) {
+                            ForEach(dayLabels, id: \.self) { day in
+                                Text(day)
+                                    .font(.system(size: 10, weight: .light, design: .serif))
+                                    .foregroundColor(BloomTheme.textSecondary)
+                                    .frame(maxWidth: .infinity)
+                            }
+                        }
+                        .padding(.horizontal, 16)
+
+                    LazyVGrid(columns: columns, spacing: 8) {
                         ForEach(currentMonthDays, id: \.self) { day in
                             if let tileDate = getTileDate(day: day) {
                                 if getDailyEntry(for: tileDate) != nil {

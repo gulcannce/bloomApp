@@ -15,8 +15,6 @@ struct HomeView: View {
     @State private var stickerScale: CGFloat = 1.0
     @State private var stickerRotation: Double = 0
     @State private var showProfileSheet = false
-    @State private var showSearchSheet = false
-    @State private var searchText: String = ""
     @State private var localSelectedItem: PhotosPickerItem? = nil
     @Environment(\.colorScheme) var colorScheme
 
@@ -47,18 +45,10 @@ struct HomeView: View {
 
                     Spacer()
 
-                    HStack(spacing: 12) {
-                        Button(action: { showSearchSheet = true }) {
-                            Image(systemName: "magnifyingglass")
-                                .font(.system(size: 16, weight: .light))
-                                .foregroundColor(BloomTheme.textSecondary)
-                        }
-
-                        Button(action: { showProfileSheet = true }) {
-                            Image(systemName: "person.fill")
-                                .font(.system(size: 18, weight: .light))
-                                .foregroundColor(Color(red: 0.70, green: 0.65, blue: 0.60))
-                        }
+                    Button(action: { showProfileSheet = true }) {
+                        Image(systemName: "person.fill")
+                            .font(.system(size: 18, weight: .light))
+                            .foregroundColor(Color(red: 0.70, green: 0.65, blue: 0.60))
                     }
                     .padding(.top, 2)
                 }
@@ -66,11 +56,6 @@ struct HomeView: View {
                 .padding(.vertical, 20)
                 .sheet(isPresented: $showProfileSheet) {
                     ProfileView()
-                        .environmentObject(localization)
-                }
-                .sheet(isPresented: $showSearchSheet) {
-                    SearchSheet(searchText: $searchText, isPresented: $showSearchSheet)
-                        .environmentObject(memoryStore)
                         .environmentObject(localization)
                 }
 
@@ -567,94 +552,6 @@ struct HomeViewPreviewContainer: View {
                 ]
                 store.memories = testMemories
             }
-    }
-}
-
-struct SearchSheet: View {
-    @Binding var searchText: String
-    @Binding var isPresented: Bool
-    @EnvironmentObject var memoryStore: MemoryStore
-    @EnvironmentObject var localization: LocalizationManager
-
-    var filteredMemories: [Memory] {
-        if searchText.isEmpty {
-            return memoryStore.memories
-        }
-        return memoryStore.memories.filter { memory in
-            memory.note.localizedCaseInsensitiveContains(searchText) ||
-            memory.emoji.contains(searchText)
-        }
-    }
-
-    var body: some View {
-        ZStack {
-            BloomTheme.agedParchment.ignoresSafeArea()
-
-            VStack(spacing: 0) {
-                HStack {
-                    Button(action: { isPresented = false }) {
-                        Image(systemName: "xmark.circle.fill")
-                            .font(.system(size: 24, weight: .light))
-                            .foregroundColor(BloomTheme.driedRose)
-                    }
-
-                    HStack(spacing: 8) {
-                        Image(systemName: "magnifyingglass")
-                            .font(.system(size: 14, weight: .light))
-                            .foregroundColor(BloomTheme.textSecondary)
-
-                        TextField(
-                            localization.currentLanguage == .turkish ? "Anı ara..." : "Search memories...",
-                            text: $searchText
-                        )
-                        .font(.system(size: 14, weight: .light, design: .serif))
-                        .foregroundColor(BloomTheme.textPrimary)
-                    }
-                    .padding(12)
-                    .background(Color.white)
-                    .cornerRadius(8)
-
-                    Spacer()
-                }
-                .padding(20)
-
-                ScrollView(showsIndicators: false) {
-                    VStack(spacing: 12) {
-                        if filteredMemories.isEmpty {
-                            VStack(spacing: 12) {
-                                Image(systemName: "magnifyingglass")
-                                    .font(.system(size: 40, weight: .light))
-                                    .foregroundColor(BloomTheme.textTertiary)
-                                    .padding(.top, 40)
-                                Text(localization.currentLanguage == .turkish ? "Sonuç bulunamadı" : "No memories found")
-                                    .font(.system(size: 14, weight: .light))
-                                    .foregroundColor(BloomTheme.textSecondary)
-                                Spacer()
-                            }
-                            .frame(maxWidth: .infinity, maxHeight: .infinity)
-                        } else {
-                            ForEach(filteredMemories, id: \.id) { memory in
-                                VStack(alignment: .leading, spacing: 8) {
-                                    HStack(spacing: 8) {
-                                        Text(memory.emoji)
-                                            .font(.system(size: 18))
-                                        Text(memory.note.prefix(60) + (memory.note.count > 60 ? "..." : ""))
-                                            .font(.system(size: 12, weight: .light))
-                                            .foregroundColor(BloomTheme.textPrimary)
-                                            .lineLimit(2)
-                                        Spacer()
-                                    }
-                                }
-                                .padding(12)
-                                .background(Color.white)
-                                .cornerRadius(8)
-                            }
-                        }
-                    }
-                    .padding(.horizontal, 20)
-                }
-            }
-        }
     }
 }
 

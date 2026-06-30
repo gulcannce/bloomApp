@@ -31,14 +31,14 @@ struct ContentView: View {
                             .environmentObject(localization)
                             .environmentObject(memoryStore)
                     case 2:
-                        AchievementsView()
-                            .environmentObject(localization)
-                    case 3:
                         NavigationStack {
                             CalendarView()
                                 .environmentObject(localization)
                                 .environmentObject(memoryStore)
                         }
+                    case 3:
+                        ProfileView()
+                            .environmentObject(localization)
                     default:
                         NavigationStack {
                             HomeView(showCreateSheet: $showCreateSheet)
@@ -91,8 +91,8 @@ struct CustomTabBarWithPhotoPicker: View {
     let tabItems = [
         (icon: "house.fill", tag: 0, color: BloomTheme.driedRose),
         (icon: "chart.bar.fill", tag: 1, color: BloomTheme.sageGreen),
-        (icon: "star.fill", tag: 2, color: Color(red: 0.85, green: 0.75, blue: 0.80)),
-        (icon: "calendar", tag: 3, color: BloomTheme.siennaDust)
+        (icon: "calendar", tag: 2, color: BloomTheme.siennaDust),
+        (icon: "person.fill", tag: 3, color: Color(red: 0.70, green: 0.65, blue: 0.60))
     ]
 
     var body: some View {
@@ -143,7 +143,7 @@ struct CustomTabBarWithPhotoPicker: View {
                 }
                 .frame(maxWidth: .infinity)
 
-                // Center-Right - Achievements
+                // Center-Right - Calendar
                 VStack(spacing: 4) {
                     Button(action: { withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) { selectedTab = 2 } }) {
                         Image(systemName: tabItems[2].icon)
@@ -159,7 +159,7 @@ struct CustomTabBarWithPhotoPicker: View {
                 }
                 .frame(maxWidth: .infinity)
 
-                // Right side - Calendar
+                // Right side - Profile
                 VStack(spacing: 4) {
                     Button(action: { withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) { selectedTab = 3 } }) {
                         Image(systemName: tabItems[3].icon)

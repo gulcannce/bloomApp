@@ -19,6 +19,7 @@ struct CreateView: View {
     @Environment(\.colorScheme) var colorScheme
 
     let botanicalStickers = [
+        // Flowers & Nature
         ("daisy", "🌼"),
         ("rose", "🌹"),
         ("sunflower", "🌻"),
@@ -28,13 +29,45 @@ struct CreateView: View {
         ("bouquet", "💐"),
         ("leaf", "🌿"),
         ("autumn", "🍂"),
+        // Lifestyle & Aesthetic
+        ("coffee", "☕"),
+        ("candle", "🕯️"),
+        ("tea", "🫖"),
+        ("camera", "📷"),
+        ("laptop", "💻"),
+        ("book", "📚"),
+        ("headphones", "🎧"),
+        // Fashion & Beauty
         ("heart", "🤎"),
+        ("pink_heart", "🩷"),
+        ("bow", "🎀"),
+        ("lipstick", "💄"),
+        ("perfume", "💐"),
+        ("handbag", "👜"),
+        ("shoe", "👠"),
+        ("dress", "👗"),
+        // Travel & Adventure
+        ("airplane", "✈️"),
+        ("luggage", "🧳"),
+        ("passport", "🛂"),
+        // Animals & Pets
         ("butterfly", "🦋"),
         ("bee", "🐝"),
+        ("dog", "🐕"),
+        ("teddy", "🧸"),
+        // Food & Drinks
+        ("croissant", "🥐"),
+        ("cake", "🍰"),
+        ("cupcake", "🧁"),
+        ("cookie", "🍪"),
+        ("popcorn", "🍿"),
+        // Decor & Sparkle
         ("star", "⭐"),
         ("sparkle", "✨"),
         ("moon", "🌙"),
-        ("ribbon", "🎀"),
+        ("ribbon", "🎁"),
+        ("bell", "🔔"),
+        // Other
         ("fox", "🦊"),
         ("love_letter", "💌")
     ]

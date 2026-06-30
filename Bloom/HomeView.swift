@@ -16,6 +16,7 @@ struct HomeView: View {
     @State private var localSelectedItem: PhotosPickerItem? = nil
     @State private var selectedMood: String? = nil
     @State private var showStoryInput = false
+    // Persistent draft state: survives sheet dismissal, only clears on explicit save/delete
     @State private var storyText = ""
     @Environment(\.colorScheme) var colorScheme
 

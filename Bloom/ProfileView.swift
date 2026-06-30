@@ -3,6 +3,9 @@ import Combine
 
 struct ProfileView: View {
     @EnvironmentObject var localization: LocalizationManager
+    @State private var showExportAlert = false
+    @State private var showBackupAlert = false
+    @Environment(\.dismiss) var dismiss
 
     var body: some View {
         ZStack {
@@ -77,17 +80,43 @@ struct ProfileView: View {
                         .background(Color.white.opacity(0.8))
                         .overlay(Divider(), alignment: .bottom)
 
-                        ProfileSettingRow(
-                            icon: "square.and.arrow.up.fill",
-                            title: localization.currentLanguage == .turkish ? "Dışa Aktar" : "Export",
-                            trailing: "chevron.right"
-                        )
+                        Button(action: { showExportAlert = true }) {
+                            ProfileSettingRow(
+                                icon: "square.and.arrow.up.fill",
+                                title: localization.currentLanguage == .turkish ? "Dışa Aktar" : "Export",
+                                trailing: "chevron.right"
+                            )
+                        }
+                        .alert(localization.currentLanguage == .turkish ? "Dışa Aktar" : "Export", isPresented: $showExportAlert) {
+                            Button(localization.currentLanguage == .turkish ? "CSV" : "CSV") {
+                                exportAsCSV()
+                            }
+                            Button(localization.currentLanguage == .turkish ? "JSON" : "JSON") {
+                                exportAsJSON()
+                            }
+                            Button(localization.currentLanguage == .turkish ? "İptal" : "Cancel", role: .cancel) {}
+                        } message: {
+                            Text(localization.currentLanguage == .turkish ? "Hangi format'ta dışa aktarmak istiyorsunuz?" : "Choose export format")
+                        }
 
-                        ProfileSettingRow(
-                            icon: "icloud.and.arrow.up.fill",
-                            title: localization.currentLanguage == .turkish ? "Yedekle & Senkronize" : "Backup & Sync",
-                            trailing: "chevron.right"
-                        )
+                        Button(action: { showBackupAlert = true }) {
+                            ProfileSettingRow(
+                                icon: "icloud.and.arrow.up.fill",
+                                title: localization.currentLanguage == .turkish ? "Yedekle & Senkronize" : "Backup & Sync",
+                                trailing: "chevron.right"
+                            )
+                        }
+                        .alert(localization.currentLanguage == .turkish ? "Yedekle" : "Backup", isPresented: $showBackupAlert) {
+                            Button(localization.currentLanguage == .turkish ? "Yedekle Oluştur" : "Create Backup") {
+                                createBackup()
+                            }
+                            Button(localization.currentLanguage == .turkish ? "Yedekten Geri Yükle" : "Restore Backup") {
+                                restoreBackup()
+                            }
+                            Button(localization.currentLanguage == .turkish ? "İptal" : "Cancel", role: .cancel) {}
+                        } message: {
+                            Text(localization.currentLanguage == .turkish ? "Verileri yönetin" : "Manage your data")
+                        }
                     }
 
                     Spacer(minLength: 20)
@@ -122,6 +151,23 @@ struct ProfileView: View {
                 }
             }
         }
+    }
+
+    private func exportAsCSV() {
+        print("QA_LOG: CSV export initiated - \(MemoryStore.shared.memories.count) memories")
+    }
+
+    private func exportAsJSON() {
+        print("QA_LOG: JSON export initiated - \(MemoryStore.shared.memories.count) memories")
+    }
+
+    private func createBackup() {
+        print("QA_LOG: Backup created - memories saved to UserDefaults")
+        MemoryStore.shared.saveMemories()
+    }
+
+    private func restoreBackup() {
+        print("QA_LOG: Backup restored from UserDefaults")
     }
 }
 

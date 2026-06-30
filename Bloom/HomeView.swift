@@ -206,12 +206,12 @@ struct HomeView: View {
                             } // end if let latestMemory
                         } // end if !memories.isEmpty else block
 
-                        // "Bugün Yaz" primary CTA button — always visible
+                        // "Bugünün Öyküsü" primary CTA button — always visible
                         PhotosPicker(selection: $localSelectedItem, matching: .images) {
                             HStack(spacing: 8) {
                                 Text("✏️")
                                     .font(.system(size: 16))
-                                Text("Bugün Yaz")
+                                Text("Bugünün Öyküsü")
                                     .font(.system(size: 16, weight: .light, design: .serif))
                                     .tracking(0.3)
                             }

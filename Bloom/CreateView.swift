@@ -15,6 +15,7 @@ struct CreateView: View {
     @State private var processedImages: [Image] = []
     @State private var selectedMoodLabel: String = "Harika"
     @State private var placedStickers: [Sticker] = []
+    @State private var selectedTextColor: Color = .black
     @Environment(\.colorScheme) var colorScheme
 
     let botanicalStickers = [
@@ -149,7 +150,7 @@ struct CreateView: View {
                                     TextEditor(text: $journalText)
                                         .font(.system(size: 13, weight: .light, design: .serif))
                                         .lineSpacing(3)
-                                        .foregroundColor(BloomTheme.textPrimary)
+                                        .foregroundColor(selectedTextColor)
                                         .scrollContentBackground(.hidden)
                                         .background(BloomTheme.agedParchment.opacity(0.3))
                                         .cornerRadius(6)
@@ -260,6 +261,33 @@ struct CreateView: View {
                         .padding(.horizontal, 20)
                     }
                     .frame(height: 80)
+
+                    // Color palette selector
+                    HStack(spacing: 12) {
+                        let colors: [(Color, String)] = [
+                            (.black, "Siyah"),
+                            (Color(red: 0.60, green: 0.45, blue: 0.35), "Kahve"),
+                            (BloomTheme.driedRose, "Pembe"),
+                            (BloomTheme.sageGreen, "Yeşil")
+                        ]
+                        ForEach(0..<colors.count, id: \.self) { index in
+                            Button(action: {
+                                selectedTextColor = colors[index].0
+                            }) {
+                                Circle()
+                                    .fill(colors[index].0)
+                                    .frame(width: 28, height: 28)
+                                    .overlay(
+                                        selectedTextColor == colors[index].0 ?
+                                        Circle().stroke(Color.white, lineWidth: 2) :
+                                        nil
+                                    )
+                            }
+                        }
+                        Spacer()
+                    }
+                    .padding(.horizontal, 20)
+                    .padding(.bottom, 8)
                 }
                 .padding(.vertical, 12)
             }
@@ -330,6 +358,7 @@ struct CreateView: View {
             processedImages = []
             placedStickers = []
             selectedMoodLabel = "Harika"
+            selectedTextColor = .black
             createViewState.processedImage = nil
 
             print("QA_LOG: Explicitly toggling showCreateSheet = false to trigger parent re-render")

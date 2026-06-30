@@ -117,21 +117,34 @@ struct HomeView: View {
                             if let latestMemory = memoryStore.memories.sorted(by: { $0.date > $1.date }).first {
                                 VStack(spacing: 0) {
                                     ZStack(alignment: .topTrailing) {
-                                        // Polaroid white frame
+                                        // Polaroid white frame with subtle rotation
                                         RoundedRectangle(cornerRadius: 12)
                                             .fill(Color.white)
-                                            .shadow(color: Color.black.opacity(0.08), radius: 8, x: 0, y: 2)
+                                            .shadow(color: Color.black.opacity(0.1), radius: 12, x: 2, y: 4)
 
                                         VStack(spacing: 0) {
-                                            // Photo area
-                                            if let image = latestMemory.image {
-                                                image.resizable()
-                                                    .scaledToFill()
-                                                    .frame(height: 240)
-                                                    .clipped()
-                                            } else {
-                                                LinearGradient(gradient: Gradient(colors: [Color(red: 0.96, green: 0.94, blue: 0.91), Color(red: 0.90, green: 0.88, blue: 0.85)]), startPoint: .topLeading, endPoint: .bottomTrailing)
-                                                    .frame(height: 240)
+                                            // Photo area with subtle frame
+                                            ZStack(alignment: .center) {
+                                                if let image = latestMemory.image {
+                                                    image.resizable()
+                                                        .scaledToFill()
+                                                        .frame(height: 240)
+                                                        .clipped()
+                                                } else {
+                                                    LinearGradient(gradient: Gradient(colors: [Color(red: 0.96, green: 0.94, blue: 0.91), Color(red: 0.90, green: 0.88, blue: 0.85)]), startPoint: .topLeading, endPoint: .bottomTrailing)
+                                                        .frame(height: 240)
+                                                }
+
+                                                // Polaroid tape effect at top
+                                                VStack {
+                                                    RoundedRectangle(cornerRadius: 2)
+                                                        .fill(Color.white.opacity(0.85))
+                                                        .frame(height: 18)
+                                                        .shadow(color: Color.black.opacity(0.08), radius: 2, x: 0, y: 1)
+                                                        .padding(.horizontal, 20)
+
+                                                    Spacer()
+                                                }
                                             }
 
                                             // Note section
@@ -150,16 +163,21 @@ struct HomeView: View {
                                             .padding(16)
                                             .frame(maxWidth: .infinity, alignment: .leading)
                                         }
+
+                                        // Daisy sticker with subtle rotation and shadow
+                                        VStack(spacing: 0) {
+                                            HStack(spacing: 0) {
+                                                Spacer()
+                                                Text("🌼")
+                                                    .font(.system(size: 32))
+                                                    .rotationEffect(.degrees(-12))
+                                                    .offset(x: -12, y: 12)
+                                                    .shadow(color: Color.black.opacity(0.1), radius: 4, x: 1, y: 2)
+                                            }
+                                            Spacer()
+                                        }
                                     }
                                     .frame(height: 340)
-
-                                    // Daisy sticker in top-right corner
-                                    .overlay(
-                                        Text("🌼")
-                                            .font(.system(size: 28))
-                                            .offset(x: -8, y: 8),
-                                        alignment: .topTrailing
-                                    )
                                 }
                                 .padding(.horizontal, 20)
 

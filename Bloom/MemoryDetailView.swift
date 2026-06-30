@@ -156,14 +156,15 @@ struct MemoryDetailView: View {
 
                 VStack(spacing: 12) {
                     Text("Günün Çıkartmaları")
-                        .font(.system(size: 11, weight: .light, design: .serif))
+                        .font(.system(size: 12, weight: .light, design: .serif))
                         .foregroundColor(BloomTheme.textSecondary)
-                        .tracking(0.4)
+                        .tracking(0.5)
                         .padding(.horizontal, 20)
+                        .padding(.top, 12)
                         .frame(maxWidth: .infinity, alignment: .leading)
 
                     ScrollView(.horizontal, showsIndicators: false) {
-                        HStack(spacing: 12) {
+                        HStack(spacing: 16) {
                             ForEach(stickerMap.keys.sorted(), id: \.self) { stickerName in
                                 Button(action: {
                                     let newSticker = PlacedSticker(name: stickerName)
@@ -171,21 +172,20 @@ struct MemoryDetailView: View {
                                     activeStickerId = newSticker.id
                                     print("QA_LOG: MemoryDetailView - Added sticker: \(stickerName)")
                                 }) {
-                                    Text(stickerMap[stickerName] ?? stickerName)
-                                        .font(.system(size: 32))
-                                        .frame(width: 52, height: 52)
-                                        .background(Color.white.opacity(0.4))
-                                        .cornerRadius(8)
+                                    getStickerIconForDetail(stickerName)
+                                        .font(.system(size: 24, weight: .light))
+                                        .foregroundColor(getStickerColorForDetail(stickerName))
+                                        .frame(width: 48, height: 48)
+                                        .background(Circle().fill(Color.white.opacity(0.6)))
                                 }
                             }
                         }
                         .padding(.horizontal, 20)
                     }
-                    .frame(height: 68)
+                    .frame(height: 64)
                 }
-                .padding(.vertical, 16)
-                .background(Color.white.opacity(0.2))
-                .ignoresSafeArea(edges: .bottom)
+                .padding(.vertical, 12)
+                .padding(.bottom, 8)
             }
         }
         .onAppear {
@@ -253,6 +253,84 @@ struct MemoryDetailView: View {
         } else {
             formatter.dateFormat = "MMMM dd, yyyy"
             return formatter.string(from: date)
+        }
+    }
+
+    private func getStickerIconForDetail(_ name: String) -> Image {
+        switch name {
+        case "bow", "ribbon":
+            return Image(systemName: "ribbon")
+        case "flower", "cherry", "daisy", "rose":
+            return Image(systemName: "camera.macro")
+        case "sparkle", "candle":
+            return Image(systemName: "sparkles")
+        case "coffee", "tea":
+            return Image(systemName: "cup.and.saucer")
+        case "heart", "pink_heart":
+            return Image(systemName: "heart")
+        case "book", "bouquet", "tulip", "hibiscus", "sunflower":
+            return Image(systemName: "book")
+        case "headphones":
+            return Image(systemName: "headphones")
+        case "camera":
+            return Image(systemName: "camera")
+        case "laptop":
+            return Image(systemName: "laptop")
+        case "handbag", "luggage":
+            return Image(systemName: "handbag")
+        case "shoe":
+            return Image(systemName: "shoe")
+        case "dress":
+            return Image(systemName: "tshirt")
+        case "airplane":
+            return Image(systemName: "airplane")
+        case "passport":
+            return Image(systemName: "passport")
+        case "butterfly":
+            return Image(systemName: "butterfly")
+        case "bee":
+            return Image(systemName: "hare")
+        case "dog", "teddy":
+            return Image(systemName: "dog")
+        case "croissant":
+            return Image(systemName: "fork.knife")
+        case "cake", "cupcake":
+            return Image(systemName: "birthday.cake")
+        case "cookie":
+            return Image(systemName: "cookies")
+        case "popcorn":
+            return Image(systemName: "popcorn")
+        case "star":
+            return Image(systemName: "star")
+        case "moon":
+            return Image(systemName: "moon")
+        case "bell":
+            return Image(systemName: "bell")
+        case "fox":
+            return Image(systemName: "dog.circle")
+        case "love_letter":
+            return Image(systemName: "envelope")
+        case "leaf", "autumn":
+            return Image(systemName: "leaf")
+        default:
+            return Image(systemName: "sparkles")
+        }
+    }
+
+    private func getStickerColorForDetail(_ name: String) -> Color {
+        switch name {
+        case "bow", "ribbon", "pink_heart", "rose", "hibiscus", "lipstick":
+            return Color(red: 0.83, green: 0.64, blue: 0.64)
+        case "sparkle", "candle", "star", "sun", "cake", "cupcake":
+            return Color(red: 0.83, green: 0.69, blue: 0.22)
+        case "coffee", "tea", "croissant", "popcorn", "dog":
+            return Color(red: 0.74, green: 0.66, blue: 0.54)
+        case "flower", "daisy", "cherry", "tulip", "bouquet", "book":
+            return Color(red: 0.89, green: 0.75, blue: 0.82)
+        case "leaf", "autumn":
+            return Color(red: 0.66, green: 0.70, blue: 0.63)
+        default:
+            return Color(red: 0.80, green: 0.81, blue: 0.81)
         }
     }
 }

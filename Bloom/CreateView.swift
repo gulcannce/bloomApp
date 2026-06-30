@@ -16,6 +16,7 @@ struct CreateView: View {
     @State private var placedStickers: [Sticker] = []
     @State private var selectedTextColor: Color = .black
     @Environment(\.colorScheme) var colorScheme
+    @State private var showPhotoPicker = false
 
     let botanicalStickers = [
         // Flowers & Nature
@@ -119,13 +120,15 @@ struct CreateView: View {
                                     if let image = processedImages.first {
                                         image.resizable().scaledToFill()
                                     } else {
-                                        VStack(spacing: 12) {
-                                            Image(systemName: "photo.artframe")
-                                                .font(.system(size: 48, weight: .light))
-                                                .foregroundColor(BloomTheme.textTertiary)
-                                            Text("Fotoğraf Ekle")
-                                                .font(.system(size: 14, weight: .light))
-                                                .foregroundColor(BloomTheme.textSecondary)
+                                        PhotosPicker(selection: $selectedItems, matching: .images) {
+                                            VStack(spacing: 12) {
+                                                Image(systemName: "photo.artframe")
+                                                    .font(.system(size: 48, weight: .light))
+                                                    .foregroundColor(BloomTheme.textTertiary)
+                                                Text("Fotoğraf Ekle")
+                                                    .font(.system(size: 14, weight: .light))
+                                                    .foregroundColor(BloomTheme.textSecondary)
+                                            }
                                         }
                                     }
 
@@ -334,6 +337,22 @@ struct CreateView: View {
                 processedImages = [selectedImage]
             }
         }
+        .onChange(of: selectedItems) {
+            Task {
+                var images: [Image] = []
+                for item in selectedItems {
+                    if let data = try? await item.loadTransferable(type: Data.self),
+                       let uiImage = UIImage(data: data) {
+                        images.append(Image(uiImage: uiImage))
+                    }
+                }
+                DispatchQueue.main.async {
+                    processedImages = images
+                    selectedItems = []
+                    print("QA_LOG: CreateView - Photo picker loaded \(images.count) images, storyText persists as: '\(storyText)'")
+                }
+            }
+        }
     }
 
     private func formattedCurrentDate() -> String {
@@ -365,7 +384,8 @@ struct CreateView: View {
 
     private func saveMemory() {
         let finalText = storyText.trimmingCharacters(in: .whitespaces)
-        let safeNote = finalText.isEmpty ? "Günün hali" : finalText
+        guard !finalText.isEmpty else { return }
+        let safeNote = finalText
 
         let now = Date()
         let firstImage = processedImages.first

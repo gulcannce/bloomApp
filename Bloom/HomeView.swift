@@ -78,50 +78,123 @@ struct HomeView: View {
                 } else {
                     ScrollView(showsIndicators: false) {
                         VStack(spacing: 24) {
-                            ScrollView(.horizontal, showsIndicators: false) {
-                                HStack(spacing: 16) {
-                                    let moods = [
-                                        ("Harika", Color(red: 0.85, green: 0.75, blue: 0.80)),
-                                        ("İyi", Color(red: 0.80, green: 0.85, blue: 0.78)),
-                                        ("Orta", Color(red: 0.88, green: 0.82, blue: 0.70)),
-                                        ("Kötü", Color(red: 0.83, green: 0.72, blue: 0.75)),
-                                        ("Berbat", Color(red: 0.78, green: 0.68, blue: 0.55))
-                                    ]
-                                    ForEach(moods, id: \.0) { label, color in
-                                        VStack(spacing: 6) {
-                                            MoodDoodleFace(mood: label, size: 40)
-                                                .frame(width: 40, height: 40)
-                                                .background(Circle().fill(color))
+                            // Mood selector row
+                            VStack(alignment: .leading, spacing: 8) {
+                                Text("Bugün hangi hissetteyseniz?")
+                                    .font(.system(size: 13, weight: .light, design: .serif))
+                                    .foregroundColor(BloomTheme.textSecondary)
+                                    .padding(.horizontal, 20)
 
-                                            Text(label)
-                                                .font(.system(size: 10, weight: .light, design: .serif))
-                                                .foregroundColor(BloomTheme.textSecondary)
+                                ScrollView(.horizontal, showsIndicators: false) {
+                                    HStack(spacing: 16) {
+                                        let moods = [
+                                            ("Harika", "😊", Color(red: 0.85, green: 0.75, blue: 0.80)),
+                                            ("İyi", "😌", Color(red: 0.80, green: 0.85, blue: 0.78)),
+                                            ("Orta", "😐", Color(red: 0.88, green: 0.82, blue: 0.70)),
+                                            ("Kötü", "😢", Color(red: 0.83, green: 0.72, blue: 0.75)),
+                                            ("Berbat", "😢", Color(red: 0.78, green: 0.68, blue: 0.55))
+                                        ]
+                                        ForEach(moods, id: \.0) { label, emoji, color in
+                                            VStack(spacing: 6) {
+                                                Text(emoji)
+                                                    .font(.system(size: 32))
+                                                    .frame(width: 44, height: 44)
+                                                    .background(Circle().fill(color))
+
+                                                Text(label)
+                                                    .font(.system(size: 10, weight: .light, design: .serif))
+                                                    .foregroundColor(BloomTheme.textSecondary)
+                                            }
+                                            .frame(width: 52)
                                         }
-                                        .frame(width: 52)
                                     }
+                                    .padding(.horizontal, 20)
+                                }
+                                .frame(height: 90)
+                            }
+
+                            // Hero card - latest memory
+                            if let latestMemory = memoryStore.memories.sorted(by: { $0.date > $1.date }).first {
+                                VStack(spacing: 0) {
+                                    ZStack(alignment: .topTrailing) {
+                                        // Polaroid white frame
+                                        RoundedRectangle(cornerRadius: 12)
+                                            .fill(Color.white)
+                                            .shadow(color: Color.black.opacity(0.08), radius: 8, x: 0, y: 2)
+
+                                        VStack(spacing: 0) {
+                                            // Photo area
+                                            if let image = latestMemory.image {
+                                                image.resizable()
+                                                    .scaledToFill()
+                                                    .frame(height: 240)
+                                                    .clipped()
+                                            } else {
+                                                LinearGradient(gradient: Gradient(colors: [Color(red: 0.96, green: 0.94, blue: 0.91), Color(red: 0.90, green: 0.88, blue: 0.85)]), startPoint: .topLeading, endPoint: .bottomTrailing)
+                                                    .frame(height: 240)
+                                            }
+
+                                            // Note section
+                                            VStack(alignment: .leading, spacing: 12) {
+                                                Text(latestMemory.note.prefix(80) + (latestMemory.note.count > 80 ? "..." : ""))
+                                                    .font(.system(size: 13, weight: .light, design: .serif))
+                                                    .italic()
+                                                    .lineSpacing(2)
+                                                    .foregroundColor(BloomTheme.textPrimary)
+                                                    .lineLimit(2)
+
+                                                Text(formattedDate(latestMemory.date))
+                                                    .font(.system(size: 11, weight: .light, design: .serif))
+                                                    .foregroundColor(BloomTheme.textSecondary)
+                                            }
+                                            .padding(16)
+                                            .frame(maxWidth: .infinity, alignment: .leading)
+                                        }
+                                    }
+                                    .frame(height: 340)
+
+                                    // Daisy sticker in top-right corner
+                                    .overlay(
+                                        Text("🌼")
+                                            .font(.system(size: 28))
+                                            .offset(x: -8, y: 8),
+                                        alignment: .topTrailing
+                                    )
                                 }
                                 .padding(.horizontal, 20)
-                            }
-                            .frame(height: 80)
 
+                                // Streak counter
+                                HStack(spacing: 8) {
+                                    Image(systemName: "flame.fill")
+                                        .font(.system(size: 14, weight: .semibold))
+                                        .foregroundColor(BloomTheme.driedRose)
+
+                                    Text("\(longestStreak()) gün streak")
+                                        .font(.system(size: 13, weight: .light, design: .serif))
+                                        .foregroundColor(BloomTheme.driedRose)
+                                }
+                                .padding(.horizontal, 20)
+                                .padding(.top, 16)
+                            }
+
+                            // "Bugün Yaz" button
+                            PhotosPicker(selection: $localSelectedItem, matching: .images) {
+                                HStack(spacing: 8) {
+                                    Image(systemName: "pencil")
+                                        .font(.system(size: 16, weight: .light))
+                                    Text("Bugün Yaz")
+                                        .font(.system(size: 16, weight: .light, design: .serif))
+                                }
+                                .foregroundColor(.white)
+                                .frame(maxWidth: .infinity)
+                                .padding(14)
+                                .background(BloomTheme.driedRose)
+                                .cornerRadius(10)
+                            }
+                            .padding(.horizontal, 20)
+                            .padding(.top, 8)
                         }
                         .padding(.vertical, 24)
-
-                        PhotosPicker(selection: $localSelectedItem, matching: .images) {
-                            HStack(spacing: 8) {
-                                Image(systemName: "pencil")
-                                    .font(.system(size: 16, weight: .light))
-                                Text("Bugünün Öyküsü")
-                                    .font(.system(size: 16, weight: .light, design: .serif))
-                            }
-                            .foregroundColor(.white)
-                            .frame(maxWidth: .infinity)
-                            .padding(14)
-                            .background(BloomTheme.driedRose)
-                            .cornerRadius(10)
-                        }
-                        .padding(.horizontal, 20)
-                        .padding(.bottom, 24)
                     }
                     .padding(.bottom, 90)
                 }

@@ -134,65 +134,95 @@ struct CreateView: View {
                                 .cornerRadius(8)
                                 .padding(12)
 
-                                VStack(alignment: .leading, spacing: 6) {
-                                    HStack {
-                                        Text("Bugün'ün Öyküsü")
-                                            .font(.system(size: 11, weight: .light, design: .serif))
-                                            .foregroundColor(BloomTheme.textSecondary)
-                                        Spacer()
-                                        Text("\(journalText.count)/500")
-                                            .font(.system(size: 10, weight: .light))
-                                            .foregroundColor(journalText.count > 500 ? BloomTheme.driedRose : BloomTheme.textTertiary)
-                                    }
-                                    .padding(.horizontal, 8)
-                                    .padding(.top, 8)
-
-                                    TextEditor(text: $journalText)
-                                        .font(.system(size: 13, weight: .light, design: .serif))
-                                        .lineSpacing(3)
-                                        .foregroundColor(selectedTextColor)
-                                        .scrollContentBackground(.hidden)
-                                        .background(BloomTheme.agedParchment.opacity(0.3))
-                                        .cornerRadius(6)
-                                        .frame(minHeight: 100)
+                                HStack(spacing: 12) {
+                                    // Text Editor Section
+                                    VStack(alignment: .leading, spacing: 6) {
+                                        HStack {
+                                            Text("Bugün'ün Öyküsü")
+                                                .font(.system(size: 11, weight: .light, design: .serif))
+                                                .foregroundColor(BloomTheme.textSecondary)
+                                            Spacer()
+                                            Text("\(journalText.count)/500")
+                                                .font(.system(size: 10, weight: .light))
+                                                .foregroundColor(journalText.count > 500 ? BloomTheme.driedRose : BloomTheme.textTertiary)
+                                        }
                                         .padding(.horizontal, 8)
-                                        .padding(.bottom, 12)
+                                        .padding(.top, 8)
 
-                                    // Formatting toolbar
-                                    HStack(spacing: 12) {
-                                        Button(action: {}) {
-                                            Image(systemName: "textformat")
-                                                .font(.system(size: 14, weight: .light))
-                                                .foregroundColor(BloomTheme.textSecondary)
+                                        TextEditor(text: $journalText)
+                                            .font(.system(size: 13, weight: .light, design: .serif))
+                                            .lineSpacing(3)
+                                            .foregroundColor(selectedTextColor)
+                                            .scrollContentBackground(.hidden)
+                                            .background(BloomTheme.agedParchment.opacity(0.3))
+                                            .cornerRadius(6)
+                                            .frame(minHeight: 100)
+                                            .padding(.horizontal, 8)
+                                            .padding(.bottom, 12)
+
+                                        // Formatting toolbar
+                                        HStack(spacing: 12) {
+                                            Button(action: {}) {
+                                                Image(systemName: "textformat")
+                                                    .font(.system(size: 14, weight: .light))
+                                                    .foregroundColor(BloomTheme.textSecondary)
+                                            }
+                                            Button(action: {}) {
+                                                Image(systemName: "smiley")
+                                                    .font(.system(size: 14, weight: .light))
+                                                    .foregroundColor(BloomTheme.textSecondary)
+                                            }
+                                            Button(action: {}) {
+                                                Image(systemName: "photo")
+                                                    .font(.system(size: 14, weight: .light))
+                                                    .foregroundColor(BloomTheme.textSecondary)
+                                            }
+                                            Button(action: {}) {
+                                                Image(systemName: "pencil")
+                                                    .font(.system(size: 14, weight: .light))
+                                                    .foregroundColor(BloomTheme.textSecondary)
+                                            }
+                                            Button(action: {}) {
+                                                Image(systemName: "sparkles")
+                                                    .font(.system(size: 14, weight: .light))
+                                                    .foregroundColor(BloomTheme.textSecondary)
+                                            }
+                                            Spacer()
                                         }
-                                        Button(action: {}) {
-                                            Image(systemName: "smiley")
-                                                .font(.system(size: 14, weight: .light))
-                                                .foregroundColor(BloomTheme.textSecondary)
-                                        }
-                                        Button(action: {}) {
-                                            Image(systemName: "photo")
-                                                .font(.system(size: 14, weight: .light))
-                                                .foregroundColor(BloomTheme.textSecondary)
-                                        }
-                                        Button(action: {}) {
-                                            Image(systemName: "pencil")
-                                                .font(.system(size: 14, weight: .light))
-                                                .foregroundColor(BloomTheme.textSecondary)
-                                        }
-                                        Button(action: {}) {
-                                            Image(systemName: "sparkles")
-                                                .font(.system(size: 14, weight: .light))
-                                                .foregroundColor(BloomTheme.textSecondary)
-                                        }
-                                        Spacer()
+                                        .padding(.horizontal, 8)
+                                        .padding(.bottom, 8)
                                     }
                                     .padding(.horizontal, 8)
-                                    .padding(.bottom, 8)
+                                    .padding(.vertical, 8)
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+
+                                    // Stickers Section
+                                    VStack(spacing: 8) {
+                                        Text("Çıkartmalar")
+                                            .font(.system(size: 10, weight: .light, design: .serif))
+                                            .foregroundColor(BloomTheme.textSecondary)
+                                            .tracking(0.3)
+
+                                        ScrollView {
+                                            VStack(spacing: 8) {
+                                                ForEach(botanicalStickers, id: \.0) { name, emoji in
+                                                    Button(action: {
+                                                        let newSticker = Sticker(name: name)
+                                                        placedStickers.append(newSticker)
+                                                    }) {
+                                                        Text(emoji)
+                                                            .font(.system(size: 28))
+                                                            .frame(width: 48, height: 48)
+                                                            .background(Color.white.opacity(0.6))
+                                                            .cornerRadius(8)
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                    .frame(width: 70)
+                                    .padding(.vertical, 8)
                                 }
-                                .padding(.horizontal, 12)
-                                .padding(.bottom, 12)
-                                .frame(maxWidth: .infinity, alignment: .leading)
                             }
                         }
                         .frame(maxWidth: 320)
@@ -236,32 +266,6 @@ struct CreateView: View {
                 }
 
                 VStack(spacing: 12) {
-                    Text("Çıkartmalar")
-                        .font(.system(size: 11, weight: .light, design: .serif))
-                        .foregroundColor(BloomTheme.textSecondary)
-                        .tracking(0.4)
-                        .padding(.horizontal, 20)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-
-                    ScrollView(.horizontal, showsIndicators: false) {
-                        HStack(spacing: 10) {
-                            ForEach(botanicalStickers, id: \.0) { name, emoji in
-                                Button(action: {
-                                    let newSticker = Sticker(name: name)
-                                    placedStickers.append(newSticker)
-                                }) {
-                                    Text(emoji)
-                                        .font(.system(size: 32))
-                                        .frame(width: 56, height: 56)
-                                        .background(Color.white.opacity(0.6))
-                                        .cornerRadius(8)
-                                }
-                            }
-                        }
-                        .padding(.horizontal, 20)
-                    }
-                    .frame(height: 80)
-
                     // Color palette selector
                     HStack(spacing: 12) {
                         let colors: [(Color, String)] = [

@@ -17,11 +17,10 @@ struct CreateView: View {
     @State private var placedStickers: [Sticker] = []
 
     let botanicalStickers = [
-        ("pressed_daisy", "🌼"),
-        ("dried_rose_petal", "🥀"),
-        ("vintage_tape", "📌"),
-        ("dried_fern", "🌿"),
-        ("wax_seal", "✨")
+        ("flower", "🌸"),
+        ("heart", "🤎"),
+        ("moon", "🌙"),
+        ("sparkle", "✨")
     ]
 
     var body: some View {
@@ -54,6 +53,12 @@ struct CreateView: View {
 
                 ScrollView(showsIndicators: false) {
                     VStack(spacing: 24) {
+                        // Date display
+                        Text(formattedCurrentDate())
+                            .font(.system(size: 13, weight: .light, design: .serif))
+                            .foregroundColor(BloomTheme.textSecondary)
+                            .frame(maxWidth: .infinity, alignment: .center)
+
                         ZStack(alignment: .topTrailing) {
                             RoundedRectangle(cornerRadius: 12)
                                 .fill(Color.white)
@@ -127,7 +132,7 @@ struct CreateView: View {
                                     .padding(.top, 8)
 
                                     TextEditor(text: $journalText)
-                                        .font(.system(size: 13, weight: .light))
+                                        .font(.system(size: 13, weight: .light, design: .serif))
                                         .lineSpacing(3)
                                         .foregroundColor(BloomTheme.textPrimary)
                                         .scrollContentBackground(.hidden)
@@ -135,7 +140,39 @@ struct CreateView: View {
                                         .cornerRadius(6)
                                         .frame(minHeight: 100)
                                         .padding(.horizontal, 8)
-                                        .padding(.bottom, 8)
+                                        .padding(.bottom, 12)
+
+                                    // Formatting toolbar
+                                    HStack(spacing: 12) {
+                                        Button(action: {}) {
+                                            Image(systemName: "textformat")
+                                                .font(.system(size: 14, weight: .light))
+                                                .foregroundColor(BloomTheme.textSecondary)
+                                        }
+                                        Button(action: {}) {
+                                            Image(systemName: "smiley")
+                                                .font(.system(size: 14, weight: .light))
+                                                .foregroundColor(BloomTheme.textSecondary)
+                                        }
+                                        Button(action: {}) {
+                                            Image(systemName: "photo")
+                                                .font(.system(size: 14, weight: .light))
+                                                .foregroundColor(BloomTheme.textSecondary)
+                                        }
+                                        Button(action: {}) {
+                                            Image(systemName: "pencil")
+                                                .font(.system(size: 14, weight: .light))
+                                                .foregroundColor(BloomTheme.textSecondary)
+                                        }
+                                        Button(action: {}) {
+                                            Image(systemName: "sparkles")
+                                                .font(.system(size: 14, weight: .light))
+                                                .foregroundColor(BloomTheme.textSecondary)
+                                        }
+                                        Spacer()
+                                    }
+                                    .padding(.horizontal, 8)
+                                    .padding(.bottom, 8)
                                 }
                                 .padding(.horizontal, 12)
                                 .padding(.bottom, 12)
@@ -183,9 +220,10 @@ struct CreateView: View {
                 }
 
                 VStack(spacing: 12) {
-                    Text("Sticker Tray")
-                        .font(.system(size: 12, weight: .light, design: .serif))
+                    Text("Çıkartmalar")
+                        .font(.system(size: 11, weight: .light, design: .serif))
                         .foregroundColor(BloomTheme.textSecondary)
+                        .tracking(0.4)
                         .padding(.horizontal, 20)
                         .frame(maxWidth: .infinity, alignment: .leading)
 
@@ -215,6 +253,18 @@ struct CreateView: View {
             if processedImage == nil, let selectedImage = createViewState.processedImage {
                 processedImage = selectedImage
             }
+        }
+    }
+
+    private func formattedCurrentDate() -> String {
+        let formatter = DateFormatter()
+        if localization.currentLanguage == .turkish {
+            formatter.dateFormat = "dd MMMM yyyy"
+            formatter.locale = Locale(identifier: "tr_TR")
+            return formatter.string(from: Date()).capitalized
+        } else {
+            formatter.dateFormat = "MMMM dd, yyyy"
+            return formatter.string(from: Date())
         }
     }
 

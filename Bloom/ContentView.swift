@@ -13,6 +13,7 @@ struct ContentView: View {
     @State private var showCreateSheet = false
     @State private var selectedItem: PhotosPickerItem? = nil
     @StateObject private var createViewState = CreateViewState()
+    @State private var didInjectMockData = false
 
     var body: some View {
         ZStack {
@@ -84,6 +85,13 @@ struct ContentView: View {
                 .environmentObject(localization)
                 .environmentObject(memoryStore)
                 .environmentObject(createViewState)
+        }
+        .onAppear {
+            if !didInjectMockData && memoryStore.memories.isEmpty {
+                MemoryStore.injectMockData()
+                didInjectMockData = true
+                print("QA_LOG: Injected mock data for QA testing")
+            }
         }
     }
 }

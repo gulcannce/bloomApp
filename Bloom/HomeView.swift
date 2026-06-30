@@ -15,6 +15,8 @@ struct HomeView: View {
     @State private var showProfileSheet = false
     @State private var localSelectedItem: PhotosPickerItem? = nil
     @State private var selectedMood: String? = nil
+    @State private var showStoryInput = false
+    @State private var storyText = ""
     @Environment(\.colorScheme) var colorScheme
 
     private let moods: [(label: String, emoji: String, color: Color)] = [
@@ -153,12 +155,13 @@ struct HomeView: View {
 
                                         // Caption section
                                         VStack(alignment: .leading, spacing: 8) {
-                                            Text("Küçük şeyler, büyük mutluluklar.")
+                                            Text(latestMemory.note.isEmpty ? "Küçük şeyler, büyük mutluluklar." : latestMemory.note)
                                                 .font(.system(size: 14, weight: .light, design: .serif))
                                                 .italic()
                                                 .tracking(0.6)
                                                 .lineSpacing(2)
                                                 .foregroundColor(Color(red: 0.35, green: 0.30, blue: 0.25))
+                                                .lineLimit(3)
 
                                             Text(formattedDate(latestMemory.date))
                                                 .font(.system(size: 11, weight: .light, design: .serif))
@@ -202,7 +205,7 @@ struct HomeView: View {
                         } // end if !memories.isEmpty else block
 
                         // "Bugünün Öyküsü" primary CTA button — always visible
-                        PhotosPicker(selection: $localSelectedItem, matching: .images) {
+                        Button(action: { showStoryInput = true }) {
                             HStack(spacing: 8) {
                                 Text("✏️")
                                     .font(.system(size: 16))
@@ -374,6 +377,17 @@ struct HomeView: View {
                 }
             }
         }
+        .sheet(isPresented: $showStoryInput) {
+            StoryInputSheet(isPresented: $showStoryInput, storyText: $storyText, memoryStore: memoryStore)
+        }
+    }
+
+    private func saveStory() {
+        guard !storyText.isEmpty else { return }
+        let newMemory = Memory(image: nil, note: storyText, emoji: "📝")
+        memoryStore.addEntry(newMemory)
+        storyText = ""
+        showStoryInput = false
     }
 
     private func formattedDate(_ date: Date) -> String {
@@ -441,6 +455,60 @@ struct HomeView: View {
                     )
                 )
             )
+    }
+}
+
+struct StoryInputSheet: View {
+    @Binding var isPresented: Bool
+    @Binding var storyText: String
+    var memoryStore: MemoryStore
+
+    var body: some View {
+        NavigationStack {
+            VStack(spacing: 20) {
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("Bugünün Öyküsü")
+                        .font(.system(size: 20, weight: .light, design: .serif))
+                        .foregroundColor(BloomTheme.textPrimary)
+
+                    TextEditor(text: $storyText)
+                        .font(.system(size: 16, weight: .light, design: .default))
+                        .foregroundColor(BloomTheme.textPrimary)
+                        .frame(minHeight: 200)
+                        .padding(12)
+                        .background(Color.white)
+                        .cornerRadius(12)
+                        .overlay(RoundedRectangle(cornerRadius: 12).stroke(BloomTheme.textSecondary.opacity(0.2), lineWidth: 1))
+                }
+                .padding(20)
+
+                Spacer()
+            }
+            .background(BloomTheme.agedParchment.ignoresSafeArea())
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Kaydet") {
+                        guard !storyText.isEmpty else { return }
+                        let newMemory = Memory(image: nil, note: storyText, emoji: "📝")
+                        memoryStore.addEntry(newMemory)
+                        storyText = ""
+                        isPresented = false
+                    }
+                    .font(.system(size: 16, weight: .light, design: .serif))
+                    .foregroundColor(BloomTheme.driedRose)
+                }
+
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("İptal") {
+                        storyText = ""
+                        isPresented = false
+                    }
+                    .font(.system(size: 16, weight: .light, design: .serif))
+                    .foregroundColor(BloomTheme.textSecondary)
+                }
+            }
+        }
     }
 }
 

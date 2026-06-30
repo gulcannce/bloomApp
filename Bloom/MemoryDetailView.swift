@@ -29,7 +29,7 @@ struct MemoryDetailView: View {
 
     var body: some View {
         ZStack {
-            BloomTheme.agedParchment.ignoresSafeArea()
+            Color("IvoryParchment").ignoresSafeArea()
 
             VStack(spacing: 0) {
                 HStack(alignment: .center, spacing: 12) {
@@ -51,7 +51,7 @@ struct MemoryDetailView: View {
                 }
                 .padding(.horizontal, 20)
                 .padding(.vertical, 16)
-                .background(BloomTheme.agedParchment)
+                .background(Color("IvoryParchment"))
 
                 ScrollView(showsIndicators: false) {
                     VStack(spacing: 24) {
@@ -91,7 +91,7 @@ struct MemoryDetailView: View {
                                 .frame(minHeight: 120)
                                 .lineSpacing(6)
                                 .padding(16)
-                                .background(BloomTheme.agedParchment.opacity(0.5))
+                                .background(Color("IvoryParchment").opacity(0.5))
                                 .cornerRadius(0)
                                 .padding(.horizontal, 20)
                         }

@@ -530,7 +530,12 @@ struct StoryInputSheet: View {
                 ToolbarItem(placement: .cancellationAction) {
                     HStack(spacing: 16) {
                         Button("Sil") {
+                            if let entry = todayEntry, let index = memoryStore.memories.firstIndex(where: { $0.id == entry.id }) {
+                                memoryStore.memories.remove(at: index)
+                                memoryStore.saveMemories()
+                            }
                             storyText = ""
+                            isPresented = false
                         }
                         .font(.system(size: 16, weight: .light, design: .serif))
                         .foregroundColor(Color.red.opacity(0.6))

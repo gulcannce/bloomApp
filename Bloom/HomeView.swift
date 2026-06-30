@@ -18,11 +18,11 @@ struct HomeView: View {
     @Environment(\.colorScheme) var colorScheme
 
     private let moods: [(label: String, emoji: String, color: Color)] = [
-        ("Harika", "face.smiling.fill", Color(red: 0.92, green: 0.58, blue: 0.58)),
+        ("Harika", "smiley.fill", Color(red: 0.92, green: 0.58, blue: 0.58)),
         ("İyi",    "face.smiling.fill", Color(red: 0.90, green: 0.72, blue: 0.45)),
-        ("Orta",   "face.smiling.fill", Color(red: 0.72, green: 0.72, blue: 0.65)),
+        ("Orta",   "face.neutral.fill", Color(red: 0.72, green: 0.72, blue: 0.65)),
         ("Kötü",   "face.frowning.fill", Color(red: 0.85, green: 0.55, blue: 0.45)),
-        ("Berbat", "face.frowning.fill", Color(red: 0.70, green: 0.50, blue: 0.55))
+        ("Berbat", "heart.broken.fill", Color(red: 0.70, green: 0.50, blue: 0.55))
     ]
 
     let columns = [

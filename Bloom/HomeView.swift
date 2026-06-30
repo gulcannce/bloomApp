@@ -78,22 +78,7 @@ struct HomeView: View {
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                 } else {
                     ScrollView(showsIndicators: false) {
-                        VStack(spacing: 28) {
-                            // Greeting section
-                            VStack(alignment: .leading, spacing: 8) {
-                                HStack(spacing: 8) {
-                                    Text("Merhaba,")
-                                        .font(.system(size: 36, weight: .light, design: .serif))
-                                        .foregroundColor(BloomTheme.textPrimary)
-                                    Text("🌸")
-                                        .font(.system(size: 36))
-                                }
-                                Text("Bugün kendini nasıl hissediyorsun?")
-                                    .font(.system(size: 14, weight: .light, design: .serif))
-                                    .foregroundColor(BloomTheme.textSecondary)
-                            }
-                            .padding(.horizontal, 20)
-
+                        VStack(spacing: 20) {
                             // Mood selector row
                             VStack(alignment: .leading, spacing: 10) {
                                 ScrollView(.horizontal, showsIndicators: false) {

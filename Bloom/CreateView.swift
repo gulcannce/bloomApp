@@ -243,11 +243,17 @@ struct CreateView: View {
                                                         let newSticker = Sticker(name: name)
                                                         placedStickers.append(newSticker)
                                                     }) {
-                                                        Text(emoji)
-                                                            .font(.system(size: 28))
-                                                            .frame(width: 48, height: 48)
-                                                            .background(Color.white.opacity(0.6))
-                                                            .cornerRadius(8)
+                                                        if let customView = getCustomStickerView(name) {
+                                                            customView
+                                                                .background(Color.white.opacity(0.4))
+                                                                .cornerRadius(8)
+                                                        } else {
+                                                            Text(emoji)
+                                                                .font(.system(size: 28))
+                                                                .frame(width: 48, height: 48)
+                                                                .background(Color.white.opacity(0.6))
+                                                                .cornerRadius(8)
+                                                        }
                                                     }
                                                 }
                                             }

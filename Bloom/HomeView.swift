@@ -18,6 +18,7 @@ struct HomeView: View {
     @State private var showSearchSheet = false
     @State private var searchText: String = ""
     @State private var localSelectedItem: PhotosPickerItem? = nil
+    @Environment(\.colorScheme) var colorScheme
 
     let columns = [
         GridItem(.flexible(), spacing: 12),
@@ -26,7 +27,7 @@ struct HomeView: View {
 
     var body: some View {
         ZStack {
-            BloomTheme.background
+            BloomTheme.adaptiveBackground(colorScheme)
                 .ignoresSafeArea()
 
             VStack(spacing: 0) {

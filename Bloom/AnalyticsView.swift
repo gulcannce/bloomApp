@@ -3,6 +3,7 @@ import SwiftUI
 struct AnalyticsView: View {
     @ObservedObject var memoryStore = MemoryStore.shared
     @EnvironmentObject var localization: LocalizationManager
+    @Environment(\.colorScheme) var colorScheme
 
     let pastelColors = [
         Color(red: 0.85, green: 0.75, blue: 0.80),  // Pastel Rose
@@ -41,7 +42,7 @@ struct AnalyticsView: View {
 
     var body: some View {
         ZStack {
-            BloomTheme.agedParchment.ignoresSafeArea()
+            BloomTheme.adaptiveBackground(colorScheme).ignoresSafeArea()
 
             VStack(spacing: 0) {
                 VStack(alignment: .leading, spacing: 8) {

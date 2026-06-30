@@ -15,6 +15,7 @@ struct CreateView: View {
     @State private var processedImage: Image?
     @State private var selectedMoodLabel: String = "Harika"
     @State private var placedStickers: [Sticker] = []
+    @Environment(\.colorScheme) var colorScheme
 
     let botanicalStickers = [
         ("flower", "🌸"),
@@ -25,7 +26,7 @@ struct CreateView: View {
 
     var body: some View {
         ZStack {
-            BloomTheme.background.ignoresSafeArea()
+            BloomTheme.adaptiveBackground(colorScheme).ignoresSafeArea()
 
             VStack(spacing: 0) {
                 HStack {

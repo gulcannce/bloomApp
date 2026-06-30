@@ -9,6 +9,7 @@ struct CalendarView: View {
 
     let columns = Array(repeating: GridItem(.flexible(), spacing: 12), count: 3)
     let calendar = Calendar.current
+    @Environment(\.colorScheme) var colorScheme
 
     var currentMonthDays: [Int] {
         var dateComponents = DateComponents()
@@ -56,7 +57,7 @@ struct CalendarView: View {
 
     var body: some View {
         ZStack {
-            BloomTheme.background.ignoresSafeArea()
+            BloomTheme.adaptiveBackground(colorScheme).ignoresSafeArea()
 
             VStack(spacing: 0) {
                 // Header

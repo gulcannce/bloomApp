@@ -11,7 +11,7 @@ struct CalendarView: View {
     let calendar = Calendar.current
     @Environment(\.colorScheme) var colorScheme
 
-    var currentMonthDays: [Int] {
+    var currentMonthDays: [Int?] {
         var dateComponents = DateComponents()
         dateComponents.year = selectedYear
         dateComponents.month = selectedMonth
@@ -19,13 +19,31 @@ struct CalendarView: View {
 
         guard let firstDay = calendar.date(from: dateComponents) else { return [] }
         let range = calendar.range(of: .day, in: .month, for: firstDay)!
-        return Array(1...range.count)
+        let daysInMonth = range.count
+
+        // Get weekday of first day (1 = Sunday, 2 = Monday, ..., 7 = Saturday)
+        let firstWeekday = calendar.component(.weekday, from: firstDay)
+        // Convert to Monday-based (Monday = 0, Sunday = 6)
+        let mondayBasedWeekday = (firstWeekday + 5) % 7
+
+        // Create array with nil for days before month starts
+        var days: [Int?] = Array(repeating: nil, count: mondayBasedWeekday)
+        days.append(contentsOf: (1...daysInMonth).map { $0 })
+
+        // Pad to complete weeks
+        while days.count % 7 != 0 {
+            days.append(nil)
+        }
+
+        return days
     }
 
     var memoryMap: [Int: Memory] {
         var map: [Int: Memory] = [:]
         for memory in memoryStore.memories {
-            for day in currentMonthDays {
+            for dayOptional in currentMonthDays {
+                guard let day = dayOptional else { continue }
+
                 var dateComponents = DateComponents()
                 dateComponents.year = selectedYear
                 dateComponents.month = selectedMonth
@@ -110,13 +128,22 @@ struct CalendarView: View {
                         .padding(.horizontal, 16)
 
                     LazyVGrid(columns: columns, spacing: 8) {
-                        ForEach(currentMonthDays, id: \.self) { day in
-                            if let tileDate = getTileDate(day: day) {
-                                if getDailyEntry(for: tileDate) != nil {
-                                    NavigationLink(destination: DailyMemoriesView(selectedDate: tileDate)
-                                        .environmentObject(memoryStore)
-                                        .environmentObject(localization)
-                                    ) {
+                        ForEach(0..<currentMonthDays.count, id: \.self) { index in
+                            if let day = currentMonthDays[index] {
+                                if let tileDate = getTileDate(day: day) {
+                                    if getDailyEntry(for: tileDate) != nil {
+                                        NavigationLink(destination: DailyMemoriesView(selectedDate: tileDate)
+                                            .environmentObject(memoryStore)
+                                            .environmentObject(localization)
+                                        ) {
+                                            CalendarTile(
+                                                day: day,
+                                                tileDate: tileDate,
+                                                memoryStore: memoryStore,
+                                                sageGreen: BloomTheme.sageGreen
+                                            )
+                                        }
+                                    } else {
                                         CalendarTile(
                                             day: day,
                                             tileDate: tileDate,
@@ -124,14 +151,10 @@ struct CalendarView: View {
                                             sageGreen: BloomTheme.sageGreen
                                         )
                                     }
-                                } else {
-                                    CalendarTile(
-                                        day: day,
-                                        tileDate: tileDate,
-                                        memoryStore: memoryStore,
-                                        sageGreen: BloomTheme.sageGreen
-                                    )
                                 }
+                            } else {
+                                Color.clear
+                                    .frame(height: 100)
                             }
                         }
                     }

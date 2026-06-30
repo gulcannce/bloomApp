@@ -11,8 +11,8 @@ struct CreateView: View {
     @Binding var selectedTab: Int
 
     @State private var journalText: String = ""
-    @State private var selectedItem: PhotosPickerItem?
-    @State private var processedImage: Image?
+    @State private var selectedItems: [PhotosPickerItem] = []
+    @State private var processedImages: [Image] = []
     @State private var selectedMoodLabel: String = "Harika"
     @State private var placedStickers: [Sticker] = []
     @Environment(\.colorScheme) var colorScheme
@@ -69,7 +69,7 @@ struct CreateView: View {
                                 ZStack(alignment: .center) {
                                     LinearGradient(gradient: Gradient(colors: [BloomTheme.agedParchment, BloomTheme.agedParchment.opacity(0.9)]), startPoint: .topLeading, endPoint: .bottomTrailing)
 
-                                    if let image = processedImage {
+                                    if let image = processedImages.first {
                                         image.resizable().scaledToFill()
                                     } else {
                                         VStack(spacing: 12) {
@@ -251,8 +251,8 @@ struct CreateView: View {
             }
         }
         .onAppear {
-            if processedImage == nil, let selectedImage = createViewState.processedImage {
-                processedImage = selectedImage
+            if processedImages.isEmpty, let selectedImage = createViewState.processedImage {
+                processedImages = [selectedImage]
             }
         }
     }
@@ -289,15 +289,17 @@ struct CreateView: View {
         let safeNote = finalText.isEmpty ? "Günün hali" : finalText
 
         let now = Date()
-        print("QA_LOG: SaveMemory - Text captured: '\(safeNote)' | Mood: '\(selectedMoodLabel)' | Image present: \(processedImage != nil) | Stickers: \(placedStickers.count) | Date: \(now)")
+        let firstImage = processedImages.first
+        print("QA_LOG: SaveMemory - Text: '\(safeNote)' | Mood: '\(selectedMoodLabel)' | Images: \(processedImages.count) | Stickers: \(placedStickers.count) | Date: \(now)")
 
-        let newEntry = Memory(
-            image: processedImage,
+        var newEntry = Memory(
+            image: firstImage,
             note: safeNote,
             emoji: labelToEmoji(selectedMoodLabel),
             date: now,
             stickers: placedStickers
         )
+        newEntry.images = processedImages
 
         MemoryStore.shared.addEntry(newEntry)
 
@@ -311,7 +313,7 @@ struct CreateView: View {
         DispatchQueue.main.async {
             print("QA_LOG: Resetting temporary picker states for next session")
             journalText = ""
-            processedImage = nil
+            processedImages = []
             placedStickers = []
             selectedMoodLabel = "Harika"
             createViewState.processedImage = nil

@@ -63,7 +63,18 @@ struct MemoryDetailView: View {
                                 .fill(Color.white)
                                 .shadow(color: Color.black.opacity(0.08), radius: 8, x: 0, y: 2)
 
-                            if let image = memory.image {
+                            // Multiple images support with TabView
+                            if !memory.images.isEmpty {
+                                TabView {
+                                    ForEach(0..<memory.images.count, id: \.self) { index in
+                                        memory.images[index].resizable()
+                                            .scaledToFill()
+                                            .clipped()
+                                            .cornerRadius(12)
+                                    }
+                                }
+                                .tabViewStyle(.page(indexDisplayMode: .automatic))
+                            } else if let image = memory.image {
                                 image.resizable()
                                     .scaledToFill()
                                     .clipped()

@@ -73,6 +73,10 @@ class MemoryStore: ObservableObject {
     private let memoriesKey = "bloom_memories"
 
     init() {
+        // Force purge of stale cached data on initialization to guarantee clean state
+        UserDefaults.standard.removeObject(forKey: "bloom_memories")
+        memories = []
+        print("QA_LOG: MemoryStore.init() - Force purged all cached data for clean state")
         loadMemories()
     }
 
@@ -103,30 +107,7 @@ class MemoryStore: ObservableObject {
     }
 
     static func injectMockData() {
-        let mockData: [(note: String, emoji: String, daysAgo: Int)] = [
-            ("Bu sabah çok güzel bir kahvaltı yaptım. Evde yaptığım omlet çok lezzetliydi ve hava da harika. Pencereden dışarıyı seyrettim.", "🌸", 9),
-            ("Bugün harika bir gün. Parkta yürüyüş yaptım ve doğayı gözlemledim.", "✨", 8),
-            ("Evet, bugün biraz tedirgin hissettim fakat sonunda her şey yolunda gitti. Rahatladım.", "☁️", 7),
-            ("Yeni bir proje başladım. Çok heyecan duyuyorum. Bu proje bana çok ilham veriyor ve gelişmemi sağlayacak.", "🌱", 6),
-            ("Arkadaşlarımla buluştuk ve çok eğlendik. Muhabbet çok güzeldi.", "🤍", 5),
-            ("Bugün çok verimli bir gün oldu. Bitirmek istediğim işleri bitirdim.", "🌸", 4),
-            ("Sabah antrenmanı yaptım. Vücudum çok güçlü hissetti.", "✨", 3),
-            ("Kitap okuduk. Çok hoş bir kitapdı.", "🌱", 2),
-            ("Bugün düşündüm. Hayatımı gözden geçirdim.", "☁️", 1),
-            ("Bugün güzel bir gün. Evde rahat ettim.", "🤍", 0)
-        ]
-
-        let calendar = Calendar.current
-        let today = calendar.startOfDay(for: Date())
-        let testImage = createTestImage()
-
-        for (note, emoji, daysAgo) in mockData {
-            let memoryDate = calendar.date(byAdding: .day, value: -daysAgo, to: today) ?? today
-            let memory = Memory(image: testImage, note: note, emoji: emoji, date: memoryDate)
-            shared.memories.insert(memory, at: 0)
-        }
-
-        shared.saveMemories()
+        // Mock data injection disabled - start with completely clean empty state
     }
 
     private static func createTestImage() -> Image {

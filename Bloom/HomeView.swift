@@ -80,23 +80,18 @@ struct HomeView: View {
                                         selectedMood = selectedMood == mood.label ? nil : mood.label
                                         print("QA_LOG: Mood selected: \(mood.label)")
                                     }) {
-                                        VStack(spacing: 6) {
-                                            Image(systemName: mood.emoji)
-                                                .font(.system(size: 32, weight: .medium))
-                                                .foregroundColor(mood.color)
-                                                .frame(width: 52, height: 52)
-                                                .background(
-                                                    Circle()
-                                                        .fill(Color.white)
-                                                        .shadow(color: Color.black.opacity(0.06), radius: 3, x: 0, y: 2)
-                                                )
+                                        VStack(spacing: 8) {
+                                            Circle()
+                                                .fill(mood.color)
+                                                .shadow(color: Color.black.opacity(0.08), radius: 3, x: 0, y: 2)
+                                                .frame(width: 40, height: 40)
                                                 .overlay(
                                                     Circle().stroke(
-                                                        selectedMood == mood.label ? mood.color : Color.clear,
+                                                        selectedMood == mood.label ? mood.color.opacity(0.5) : Color.clear,
                                                         lineWidth: 2
                                                     )
                                                 )
-                                                .scaleEffect(selectedMood == mood.label ? 1.08 : 1.0)
+                                                .scaleEffect(selectedMood == mood.label ? 1.12 : 1.0)
 
                                             Text(mood.label)
                                                 .font(.system(size: 10, weight: .light, design: .serif))

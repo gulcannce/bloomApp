@@ -12,11 +12,21 @@ struct AchievementsView: View {
 
             ScrollView {
                 VStack(spacing: 24) {
-                    Text(localization.currentLanguage == .turkish ? "Başarımlar" : "Achievements")
-                        .font(.system(size: 28, weight: .light, design: .serif))
-                        .tracking(1.0)
-                        .foregroundColor(.black.opacity(0.8))
-                        .padding(.top, 20)
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text(localization.currentLanguage == .turkish ? "Başarımlar" : "Achievements")
+                            .font(.system(size: 32, weight: .thin, design: .serif))
+                            .tracking(1.2)
+                            .foregroundColor(BloomTheme.textPrimary)
+
+                        Text(localization.currentLanguage == .turkish ? "Senin yolculuğunu kutla" : "Celebrate your journey")
+                            .font(.system(size: 13, weight: .light, design: .serif))
+                            .italic()
+                            .tracking(0.3)
+                            .foregroundColor(BloomTheme.textSecondary.opacity(0.8))
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.horizontal, 20)
+                    .padding(.top, 20)
 
                     LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 16) {
                         AchievementBadge(
@@ -114,46 +124,76 @@ struct AchievementBadge: View {
 
     var body: some View {
         VStack(spacing: 12) {
-            Text(emoji)
-                .font(.system(size: 48))
-                .opacity(isUnlocked ? 1.0 : 0.3)
+            ZStack {
+                // Background glow for unlocked badges
+                if isUnlocked {
+                    Circle()
+                        .fill(BloomTheme.driedRose.opacity(0.1))
+                        .frame(width: 70, height: 70)
+                }
+
+                Text(emoji)
+                    .font(.system(size: 48))
+                    .opacity(isUnlocked ? 1.0 : 0.3)
+                    .scaleEffect(isUnlocked ? 1.1 : 0.9)
+            }
 
             VStack(spacing: 4) {
                 Text(title)
-                    .font(.system(size: 14, weight: .semibold, design: .serif))
-                    .foregroundColor(.black.opacity(isUnlocked ? 0.8 : 0.4))
+                    .font(.system(size: 13, weight: .semibold, design: .serif))
+                    .foregroundColor(BloomTheme.textPrimary.opacity(isUnlocked ? 1.0 : 0.4))
 
                 Text(condition)
-                    .font(.system(size: 11, weight: .light))
-                    .foregroundColor(.black.opacity(isUnlocked ? 0.6 : 0.3))
+                    .font(.system(size: 10, weight: .light, design: .serif))
+                    .foregroundColor(BloomTheme.textSecondary.opacity(isUnlocked ? 0.8 : 0.3))
                     .lineLimit(2)
                     .multilineTextAlignment(.center)
             }
 
-            if !isUnlocked {
-                Image(systemName: "lock.fill")
-                    .font(.system(size: 12, weight: .light))
-                    .foregroundColor(.black.opacity(0.3))
-            } else {
-                Image(systemName: "checkmark.circle.fill")
-                    .font(.system(size: 12, weight: .light))
-                    .foregroundColor(.black.opacity(0.6))
+            HStack(spacing: 6) {
+                if !isUnlocked {
+                    Image(systemName: "lock.fill")
+                        .font(.system(size: 11, weight: .light))
+                        .foregroundColor(BloomTheme.textTertiary)
+                } else {
+                    Image(systemName: "star.fill")
+                        .font(.system(size: 11, weight: .light))
+                        .foregroundColor(BloomTheme.driedRose)
+                }
             }
         }
         .frame(maxWidth: .infinity)
         .padding(16)
         .background(
             RoundedRectangle(cornerRadius: 12)
-                .fill(Color.white.opacity(isUnlocked ? 0.9 : 0.5))
+                .fill(
+                    isUnlocked ?
+                    LinearGradient(
+                        gradient: Gradient(colors: [Color.white, Color.white.opacity(0.95)]),
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    ) :
+                    LinearGradient(
+                        gradient: Gradient(colors: [Color.white.opacity(0.6), Color.white.opacity(0.4)]),
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                )
                 .overlay(
                     RoundedRectangle(cornerRadius: 12)
                         .stroke(
-                            Color.black.opacity(isUnlocked ? 0.1 : 0.05),
-                            lineWidth: 1
+                            isUnlocked ? BloomTheme.driedRose.opacity(0.2) : Color.black.opacity(0.05),
+                            lineWidth: 1.5
                         )
+                )
+                .shadow(
+                    color: isUnlocked ? BloomTheme.driedRose.opacity(0.15) : Color.black.opacity(0.05),
+                    radius: isUnlocked ? 8 : 4,
+                    x: 0,
+                    y: isUnlocked ? 3 : 1
                 )
         )
         .scaleEffect(isUnlocked ? 1.0 : 0.95)
-        .animation(.spring(response: 0.4, dampingFraction: 0.7), value: isUnlocked)
+        .animation(.spring(response: 0.5, dampingFraction: 0.6), value: isUnlocked)
     }
 }

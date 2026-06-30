@@ -41,7 +41,7 @@ struct HomeView: View {
             VStack(spacing: 0) {
                 HStack(alignment: .top, spacing: 16) {
                     VStack(alignment: .leading, spacing: 4) {
-                        Text("Merhaba, 🌸")
+                        Text("Bloom")
                             .font(.system(size: 28, weight: .light, design: .serif))
                             .tracking(0.5)
                             .foregroundColor(BloomTheme.textPrimary)

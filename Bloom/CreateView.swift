@@ -243,17 +243,12 @@ struct CreateView: View {
                                                         let newSticker = Sticker(name: name)
                                                         placedStickers.append(newSticker)
                                                     }) {
-                                                        if let customView = getCustomStickerView(name) {
-                                                            customView
-                                                                .background(Color.white.opacity(0.4))
-                                                                .cornerRadius(8)
-                                                        } else {
-                                                            Text(emoji)
-                                                                .font(.system(size: 28))
-                                                                .frame(width: 48, height: 48)
-                                                                .background(Color.white.opacity(0.6))
-                                                                .cornerRadius(8)
-                                                        }
+                                                        getStickerIcon(for: name)
+                                                            .font(.system(size: 18, weight: .ultraLight))
+                                                            .foregroundColor(getStickerColor(for: name))
+                                                            .frame(width: 44, height: 44)
+                                                            .background(Color.white.opacity(0.5))
+                                                            .cornerRadius(6)
                                                     }
                                                 }
                                             }
@@ -409,6 +404,80 @@ struct CreateView: View {
             print("QA_LOG: Navigating to Calendar tab (selectedTab = 3)")
             selectedTab = 3
             print("QA_LOG: Parent ContentView binding updated - HomeView and CalendarView will refresh")
+        }
+    }
+
+    private func getStickerIcon(for name: String) -> Image {
+        switch name {
+        case "bow", "ribbon":
+            return Image(systemName: "ribbon")
+        case "flower", "cherry", "daisy", "rose":
+            return Image(systemName: "camera.macro")
+        case "sparkle", "candle":
+            return Image(systemName: "sparkles")
+        case "coffee", "tea":
+            return Image(systemName: "cup.and.saucer")
+        case "heart", "pink_heart":
+            return Image(systemName: "heart")
+        case "book", "bouquet", "tulip", "hibiscus", "sunflower":
+            return Image(systemName: "book")
+        case "headphones":
+            return Image(systemName: "headphones")
+        case "camera":
+            return Image(systemName: "camera")
+        case "laptop":
+            return Image(systemName: "laptop")
+        case "handbag", "luggage":
+            return Image(systemName: "handbag")
+        case "shoe":
+            return Image(systemName: "shoe")
+        case "dress":
+            return Image(systemName: "tshirt")
+        case "airplane":
+            return Image(systemName: "airplane")
+        case "passport":
+            return Image(systemName: "passport")
+        case "butterfly":
+            return Image(systemName: "butterfly")
+        case "bee":
+            return Image(systemName: "hare")
+        case "dog", "teddy":
+            return Image(systemName: "dog")
+        case "croissant":
+            return Image(systemName: "fork.knife")
+        case "cake", "cupcake":
+            return Image(systemName: "birthday.cake")
+        case "cookie":
+            return Image(systemName: "cookies")
+        case "popcorn":
+            return Image(systemName: "popcorn")
+        case "star":
+            return Image(systemName: "star")
+        case "moon":
+            return Image(systemName: "moon")
+        case "bell":
+            return Image(systemName: "bell")
+        case "fox":
+            return Image(systemName: "dog.circle")
+        case "love_letter":
+            return Image(systemName: "envelope")
+        default:
+            return Image(systemName: "sparkles")
+        }
+    }
+
+    private func getStickerColor(for name: String) -> Color {
+        switch name {
+        case "bow", "ribbon", "pink_heart":
+            return Color(red: 0.85, green: 0.65, blue: 0.75)
+        case "sparkle", "candle", "star":
+            return Color(red: 1.0, green: 0.88, blue: 0.65)
+        case "coffee", "tea", "croissant", "popcorn":
+            return Color(red: 0.75, green: 0.65, blue: 0.55)
+        case "flower", "rose", "daisy", "cherry", "tulip", "bouquet":
+            return Color(red: 0.90, green: 0.75, blue: 0.85)
+        default:
+            return Color(red: 0.75, green: 0.80, blue: 0.80)
         }
     }
 }

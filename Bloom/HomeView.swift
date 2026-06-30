@@ -52,11 +52,16 @@ struct HomeView: View {
                     Spacer()
 
                     Button(action: { showProfileSheet = true }) {
-                        Image(systemName: "person.fill")
-                            .font(.system(size: 18, weight: .light))
-                            .foregroundColor(Color(red: 0.70, green: 0.65, blue: 0.60))
+                        Image(systemName: "person.crop.circle")
+                            .font(.system(size: 24, weight: .light))
+                            .foregroundColor(BloomTheme.driedRose)
+                            .frame(width: 36, height: 36)
+                            .background(
+                                Circle()
+                                    .fill(Color.white)
+                                    .shadow(color: Color.black.opacity(0.06), radius: 4, x: 0, y: 2)
+                            )
                     }
-                    .padding(.top, 2)
                 }
                 .padding(.horizontal, 20)
                 .padding(.vertical, 20)

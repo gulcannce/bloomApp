@@ -41,9 +41,6 @@ struct ContentView: View {
                                 .environmentObject(localization)
                                 .environmentObject(memoryStore)
                         }
-                    case 4:
-                        ProfileView()
-                            .environmentObject(localization)
                     default:
                         NavigationStack {
                             HomeView(showCreateSheet: $showCreateSheet)
@@ -104,8 +101,7 @@ struct CustomTabBarWithPhotoPicker: View {
         (icon: "house.fill", tag: 0, color: BloomTheme.driedRose),
         (icon: "chart.bar.fill", tag: 1, color: BloomTheme.sageGreen),
         (icon: "trophy.fill", tag: 2, color: Color(red: 0.88, green: 0.82, blue: 0.70)),
-        (icon: "calendar", tag: 3, color: BloomTheme.siennaDust),
-        (icon: "person.fill", tag: 4, color: Color(red: 0.70, green: 0.65, blue: 0.60))
+        (icon: "calendar", tag: 3, color: BloomTheme.siennaDust)
     ]
 
     var body: some View {
@@ -181,22 +177,6 @@ struct CustomTabBarWithPhotoPicker: View {
                     if selectedTab == 3 {
                         RoundedRectangle(cornerRadius: 1.5)
                             .fill(tabItems[3].color)
-                            .frame(width: 16, height: 3)
-                    }
-                }
-                .frame(maxWidth: .infinity)
-
-                // Right side - Profile
-                VStack(spacing: 4) {
-                    Button(action: { withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) { selectedTab = 4 } }) {
-                        Image(systemName: tabItems[4].icon)
-                            .font(.system(size: 20, weight: .light))
-                            .foregroundColor(tabItems[4].color.opacity(selectedTab == 4 ? 1.0 : 0.6))
-                    }
-
-                    if selectedTab == 4 {
-                        RoundedRectangle(cornerRadius: 1.5)
-                            .fill(tabItems[4].color)
                             .frame(width: 16, height: 3)
                     }
                 }

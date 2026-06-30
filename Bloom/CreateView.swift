@@ -287,22 +287,14 @@ struct CreateView: View {
         let finalText = journalText.trimmingCharacters(in: .whitespaces)
         let safeNote = finalText.isEmpty ? "Günün hali" : finalText
 
-        var calendar = Calendar.current
-        calendar.timeZone = TimeZone.current
-
-        var todayComponents = calendar.dateComponents([.year, .month, .day], from: Date())
-        todayComponents.year = 2026
-        todayComponents.month = 6
-        todayComponents.day = 29
-        let lockedDate = calendar.date(from: todayComponents) ?? Date()
-
-        print("QA_LOG: SaveMemory - Text captured: '\(safeNote)' | Mood: '\(selectedMoodLabel)' | Image present: \(processedImage != nil) | Stickers: \(placedStickers.count) | Locked date: \(lockedDate)")
+        let now = Date()
+        print("QA_LOG: SaveMemory - Text captured: '\(safeNote)' | Mood: '\(selectedMoodLabel)' | Image present: \(processedImage != nil) | Stickers: \(placedStickers.count) | Date: \(now)")
 
         let newEntry = Memory(
             image: processedImage,
             note: safeNote,
             emoji: labelToEmoji(selectedMoodLabel),
-            date: lockedDate,
+            date: now,
             stickers: placedStickers
         )
 

@@ -179,7 +179,7 @@ struct MemoryDetailView: View {
                                         .background(
                                             Circle()
                                                 .fill(Color.white)
-                                                .shadow(color: Color.black.opacity(0.08), radius: 3, x: 0, y: 2)
+                                                .shadow(color: Color.black.opacity(0.05), radius: 2, x: 0, y: 1)
                                         )
                                 }
                             }
@@ -325,6 +325,8 @@ struct MemoryDetailView: View {
         switch name {
         case "bow", "ribbon", "pink_heart", "rose", "hibiscus", "lipstick":
             return Color(red: 0.83, green: 0.64, blue: 0.64)
+        case "heart":
+            return Color(red: 0.70, green: 0.55, blue: 0.45)
         case "sparkle", "candle", "star", "sun", "cake", "cupcake":
             return Color(red: 0.83, green: 0.69, blue: 0.22)
         case "coffee", "tea", "croissant", "popcorn", "dog":

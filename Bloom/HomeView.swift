@@ -30,17 +30,16 @@ struct HomeView: View {
 
             VStack(spacing: 0) {
                 HStack(alignment: .top, spacing: 16) {
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text(localization.string("bloom_title"))
-                            .font(.system(size: 32, weight: .thin, design: .serif))
-                            .tracking(1.2)
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("Merhaba, 🌸")
+                            .font(.system(size: 28, weight: .light, design: .serif))
+                            .tracking(0.5)
                             .foregroundColor(BloomTheme.textPrimary)
 
-                        Text("Senin anın, senin hikayen.")
-                            .font(.system(size: 13, weight: .light, design: .serif))
-                            .italic()
-                            .tracking(0.3)
-                            .foregroundColor(BloomTheme.textSecondary.opacity(0.8))
+                        Text("Bugün kendini nasıl hissediyorsun?")
+                            .font(.system(size: 12, weight: .light, design: .serif))
+                            .tracking(0.2)
+                            .foregroundColor(BloomTheme.textSecondary.opacity(0.7))
                     }
 
                     Spacer()
@@ -110,98 +109,97 @@ struct HomeView: View {
                                 .frame(height: 90)
                             }
 
-                            // Hero card - latest memory
+                            // Hero Polaroid card
                             if let latestMemory = memoryStore.memories.sorted(by: { $0.date > $1.date }).first {
-                                NavigationLink(destination: MemoryDetailView(memory: latestMemory)
-                                    .environmentObject(memoryStore)
-                                    .environmentObject(localization)) {
+                                ZStack(alignment: .bottomTrailing) {
+                                    // Polaroid white frame
                                     VStack(spacing: 0) {
-                                    ZStack(alignment: .topTrailing) {
-                                        // Polaroid white frame with subtle rotation
-                                        RoundedRectangle(cornerRadius: 12)
-                                            .fill(Color.white)
-                                            .shadow(color: Color.black.opacity(0.1), radius: 12, x: 2, y: 4)
-
-                                        VStack(spacing: 0) {
-                                            // Photo area with subtle frame
-                                            ZStack(alignment: .center) {
-                                                if let image = latestMemory.image {
-                                                    image.resizable()
-                                                        .scaledToFill()
-                                                        .frame(height: 240)
-                                                        .clipped()
-                                                } else {
-                                                    LinearGradient(gradient: Gradient(colors: [Color(red: 0.96, green: 0.94, blue: 0.91), Color(red: 0.90, green: 0.88, blue: 0.85)]), startPoint: .topLeading, endPoint: .bottomTrailing)
-                                                        .frame(height: 240)
-                                                }
-
-                                                // Polaroid tape effect at top
-                                                VStack {
-                                                    RoundedRectangle(cornerRadius: 2)
-                                                        .fill(Color.white.opacity(0.85))
-                                                        .frame(height: 18)
-                                                        .shadow(color: Color.black.opacity(0.08), radius: 2, x: 0, y: 1)
-                                                        .padding(.horizontal, 20)
-
-                                                    Spacer()
-                                                }
+                                        // Photo area
+                                        ZStack(alignment: .top) {
+                                            if let image = latestMemory.image {
+                                                image.resizable()
+                                                    .scaledToFill()
+                                                    .frame(height: 240)
+                                                    .clipped()
+                                            } else {
+                                                LinearGradient(
+                                                    gradient: Gradient(colors: [
+                                                        Color(red: 0.96, green: 0.94, blue: 0.91),
+                                                        Color(red: 0.90, green: 0.88, blue: 0.85)
+                                                    ]),
+                                                    startPoint: .topLeading,
+                                                    endPoint: .bottomTrailing
+                                                )
+                                                .frame(height: 240)
                                             }
 
-                                            // Note section
-                                            VStack(alignment: .leading, spacing: 12) {
-                                                Text(latestMemory.note.prefix(80) + (latestMemory.note.count > 80 ? "..." : ""))
-                                                    .font(.system(size: 13, weight: .light, design: .serif))
-                                                    .italic()
-                                                    .lineSpacing(2)
-                                                    .foregroundColor(BloomTheme.textPrimary)
-                                                    .lineLimit(2)
-
-                                                Text(formattedDate(latestMemory.date))
-                                                    .font(.system(size: 11, weight: .light, design: .serif))
-                                                    .foregroundColor(BloomTheme.textSecondary)
-                                            }
-                                            .padding(16)
-                                            .frame(maxWidth: .infinity, alignment: .leading)
+                                            // Polaroid tape strip at top
+                                            RoundedRectangle(cornerRadius: 2)
+                                                .fill(Color.white.opacity(0.85))
+                                                .frame(height: 18)
+                                                .shadow(color: Color.black.opacity(0.08), radius: 2, x: 0, y: 1)
+                                                .padding(.horizontal, 24)
                                         }
-                                    }
-                                    .frame(height: 340)
-                                    }
-                                    .padding(.horizontal, 20)
-                                }
 
-                                // Streak counter
-                                HStack(spacing: 6) {
-                                    Image(systemName: "flame.fill")
-                                        .font(.system(size: 13, weight: .semibold))
-                                        .foregroundColor(BloomTheme.driedRose)
+                                        // Caption section
+                                        VStack(alignment: .leading, spacing: 8) {
+                                            Text("Küçük şeyler, büyük mutluluklar.")
+                                                .font(.system(size: 14, weight: .light, design: .serif))
+                                                .italic()
+                                                .lineSpacing(3)
+                                                .foregroundColor(BloomTheme.textPrimary)
 
-                                    Text("\(longestStreak()) gün streak")
-                                        .font(.system(size: 12, weight: .light, design: .serif))
-                                        .tracking(0.2)
-                                        .foregroundColor(BloomTheme.driedRose)
+                                            Text(formattedDate(latestMemory.date))
+                                                .font(.system(size: 11, weight: .light, design: .serif))
+                                                .foregroundColor(BloomTheme.textSecondary)
+                                        }
+                                        .padding(.horizontal, 16)
+                                        .padding(.vertical, 16)
+                                        .frame(maxWidth: .infinity, alignment: .leading)
+                                    }
+                                    .background(Color.white)
+                                    .cornerRadius(12)
+                                    .shadow(color: Color.black.opacity(0.10), radius: 12, x: 2, y: 4)
+
+                                    // Streak badge overlaid at bottom-right corner of Polaroid
+                                    HStack(spacing: 4) {
+                                        Text("🔥")
+                                            .font(.system(size: 12))
+                                        Text("\(longestStreak()) gün streak")
+                                            .font(.system(size: 11, weight: .medium, design: .serif))
+                                            .foregroundColor(BloomTheme.driedRose)
+                                    }
+                                    .padding(.horizontal, 10)
+                                    .padding(.vertical, 5)
+                                    .background(
+                                        Capsule()
+                                            .fill(Color(red: 0.98, green: 0.95, blue: 0.93))
+                                            .shadow(color: Color.black.opacity(0.06), radius: 4, x: 0, y: 2)
+                                    )
+                                    .padding(.trailing, 16)
+                                    .padding(.bottom, 12)
                                 }
                                 .padding(.horizontal, 20)
-                                .padding(.top, 12)
                             }
 
-                            // "Bugünün Öyküsü" button
+                            // "Bugün Yaz" primary CTA button
                             PhotosPicker(selection: $localSelectedItem, matching: .images) {
                                 HStack(spacing: 8) {
-                                    Image(systemName: "pencil")
-                                        .font(.system(size: 16, weight: .light))
-                                    Text("Bugünün Öyküsü")
+                                    Text("✏️")
+                                        .font(.system(size: 16))
+                                    Text("Bugün Yaz")
                                         .font(.system(size: 16, weight: .light, design: .serif))
+                                        .tracking(0.3)
                                 }
                                 .foregroundColor(.white)
                                 .frame(maxWidth: .infinity)
-                                .padding(14)
+                                .padding(16)
                                 .background(BloomTheme.driedRose)
-                                .cornerRadius(10)
-                                .shadow(color: BloomTheme.driedRose.opacity(0.3), radius: 8, x: 0, y: 4)
-                                .scaleEffect(1.0)
+                                .cornerRadius(12)
+                                .shadow(color: BloomTheme.driedRose.opacity(0.35), radius: 10, x: 0, y: 5)
                             }
                             .padding(.horizontal, 20)
-                            .padding(.top, 8)
+                            .padding(.top, 12)
                         }
                         .padding(.vertical, 24)
                     }

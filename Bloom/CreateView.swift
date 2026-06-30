@@ -16,6 +16,8 @@ struct CreateView: View {
     @State private var placedStickers: [Sticker] = []
     @State private var selectedTextColor: Color = .black
     @Environment(\.colorScheme) var colorScheme
+    @State private var isDrawingMode = false
+    @State private var selectedStickerForPlacement: String? = nil
 
     let botanicalStickers = [
         ("daisy", "🌼"), ("rose", "🌹"), ("sunflower", "🌻"), ("tulip", "🌷"),
@@ -66,39 +68,59 @@ struct CreateView: View {
 
                 ScrollView(showsIndicators: false) {
                     VStack(spacing: 16) {
-                        // POLAROID CARD WITH PHOTO PICKER
+                        // POLAROID CARD WITH PHOTO PICKER & DRAWING
                         ZStack {
                             RoundedRectangle(cornerRadius: 12)
                                 .fill(Color.white)
                                 .shadow(color: Color.black.opacity(0.08), radius: 8, x: 0, y: 4)
 
                             VStack(spacing: 0) {
-                                // Photo area - Clickable for photo picker
-                                PhotosPicker(selection: $selectedItems, matching: .images) {
-                                    ZStack(alignment: .center) {
-                                        if let image = processedImages.first {
-                                            image.resizable().scaledToFill()
-                                        } else {
-                                            LinearGradient(
-                                                gradient: Gradient(colors: [
-                                                    BloomTheme.agedParchment,
-                                                    BloomTheme.agedParchment.opacity(0.9)
-                                                ]),
-                                                startPoint: .topLeading,
-                                                endPoint: .bottomTrailing
-                                            )
+                                // Photo area - Direct photo picker trigger
+                                ZStack(alignment: .center) {
+                                    if let image = processedImages.first {
+                                        image.resizable().scaledToFill()
+                                    } else {
+                                        LinearGradient(
+                                            gradient: Gradient(colors: [
+                                                BloomTheme.agedParchment,
+                                                BloomTheme.agedParchment.opacity(0.9)
+                                            ]),
+                                            startPoint: .topLeading,
+                                            endPoint: .bottomTrailing
+                                        )
 
-                                            VStack(spacing: 8) {
-                                                Image(systemName: "photo.artframe")
-                                                    .font(.system(size: 40, weight: .light))
-                                                    .foregroundColor(BloomTheme.textTertiary)
-                                                Text("Fotoğraf Ekle")
-                                                    .font(.system(size: 13, weight: .light, design: .serif))
-                                                    .foregroundColor(BloomTheme.textSecondary)
+                                        VStack(spacing: 8) {
+                                            Image(systemName: "photo.artframe")
+                                                .font(.system(size: 40, weight: .light))
+                                                .foregroundColor(BloomTheme.textTertiary)
+                                            Text("Fotoğraf Ekle")
+                                                .font(.system(size: 13, weight: .light, design: .serif))
+                                                .foregroundColor(BloomTheme.textSecondary)
+                                        }
+                                    }
+
+                                    // Drawing overlay indicator when in drawing mode
+                                    if isDrawingMode && processedImages.first != nil {
+                                        VStack {
+                                            HStack {
+                                                Text("✏️ Drawing Mode")
+                                                    .font(.system(size: 11, weight: .light, design: .serif))
+                                                    .foregroundColor(.white)
+                                                    .padding(6)
+                                                    .background(BloomTheme.driedRose)
+                                                    .cornerRadius(4)
+                                                Spacer()
                                             }
+                                            .padding(8)
+                                            Spacer()
                                         }
                                     }
                                 }
+                                .overlay(
+                                    PhotosPicker(selection: $selectedItems, matching: .images) {
+                                        Color.clear
+                                    }
+                                )
                                 .frame(height: 240)
 
                                 // Text editor area
@@ -168,16 +190,22 @@ struct CreateView: View {
                                     .overlay(RoundedRectangle(cornerRadius: 6).stroke(BloomTheme.textSecondary.opacity(0.2), lineWidth: 1))
                             }
 
-                            // Pen/drawing tool
-                            Button(action: {}) {
+                            // Pen/drawing tool - Toggle drawing mode
+                            Button(action: {
+                                if processedImages.first != nil {
+                                    isDrawingMode.toggle()
+                                    print("QA_LOG: Drawing mode toggled: \(isDrawingMode), text persists: '\(storyText)'")
+                                }
+                            }) {
                                 Image(systemName: "pencil.tip")
                                     .font(.system(size: 14, weight: .light))
-                                    .foregroundColor(BloomTheme.driedRose)
+                                    .foregroundColor(isDrawingMode ? .white : BloomTheme.driedRose)
                                     .frame(width: 36, height: 36)
-                                    .background(Color.white)
+                                    .background(isDrawingMode ? BloomTheme.driedRose : Color.white)
                                     .cornerRadius(6)
                                     .overlay(RoundedRectangle(cornerRadius: 6).stroke(BloomTheme.textSecondary.opacity(0.2), lineWidth: 1))
                             }
+                            .disabled(processedImages.isEmpty)
 
                             // Palette/color picker
                             Button(action: {}) {
@@ -194,25 +222,40 @@ struct CreateView: View {
                         }
                         .padding(.horizontal, 16)
 
-                        // SCRAPBOOK STICKER STRIP
+                        // SCRAPBOOK STICKER & EMOJI DECORATION ROW
                         VStack(alignment: .leading, spacing: 8) {
-                            Text("Botanical Stickers")
-                                .font(.system(size: 11, weight: .light, design: .serif))
-                                .foregroundColor(BloomTheme.textSecondary)
-                                .padding(.horizontal, 16)
+                            HStack {
+                                Text("Botanical & Aesthetic Stickers")
+                                    .font(.system(size: 11, weight: .light, design: .serif))
+                                    .foregroundColor(BloomTheme.textSecondary)
+                                Spacer()
+                                if let selected = selectedStickerForPlacement {
+                                    Text("Selected: \(botanicalStickers.first(where: { $0.0 == selected })?.1 ?? "")")
+                                        .font(.system(size: 10, weight: .light, design: .serif))
+                                        .foregroundColor(BloomTheme.driedRose)
+                                }
+                            }
+                            .padding(.horizontal, 16)
 
                             ScrollView(.horizontal, showsIndicators: false) {
                                 HStack(spacing: 8) {
                                     ForEach(botanicalStickers, id: \.0) { sticker in
                                         Button(action: {
+                                            selectedStickerForPlacement = sticker.0
                                             placedStickers.append(Sticker(name: sticker.0))
+                                            print("QA_LOG: Sticker placed '\(sticker.0)', text remains: '\(storyText)'")
                                         }) {
                                             Text(sticker.1)
                                                 .font(.system(size: 24))
                                                 .frame(width: 44, height: 44)
-                                                .background(Color.white)
+                                                .background(selectedStickerForPlacement == sticker.0 ? BloomTheme.agedParchment : Color.white)
                                                 .cornerRadius(8)
-                                                .overlay(RoundedRectangle(cornerRadius: 8).stroke(BloomTheme.textSecondary.opacity(0.15), lineWidth: 1))
+                                                .overlay(
+                                                    RoundedRectangle(cornerRadius: 8).stroke(
+                                                        selectedStickerForPlacement == sticker.0 ? BloomTheme.driedRose : BloomTheme.textSecondary.opacity(0.15),
+                                                        lineWidth: selectedStickerForPlacement == sticker.0 ? 2 : 1
+                                                    )
+                                                )
                                         }
                                     }
                                 }

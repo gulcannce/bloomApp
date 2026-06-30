@@ -175,31 +175,6 @@ struct HomeView: View {
                                     .background(Color.white)
                                     .cornerRadius(12)
                                     .shadow(color: Color.black.opacity(0.04), radius: 8, x: 0, y: 4)
-
-                                    // Botanical daisy accent overlay on Polaroid
-                                    Image(systemName: "leaf.circle")
-                                        .font(.system(size: 28, weight: .thin))
-                                        .foregroundColor(Color(red: 0.75, green: 0.80, blue: 0.70).opacity(0.5))
-                                        .padding(.trailing, 8)
-                                        .padding(.bottom, 28)
-
-                                    // Streak badge overlaid at bottom-right corner of Polaroid
-                                    HStack(spacing: 4) {
-                                        Text("🔥")
-                                            .font(.system(size: 12))
-                                        Text("12 gün streak")
-                                            .font(.system(size: 11, weight: .medium, design: .serif))
-                                            .foregroundColor(BloomTheme.driedRose)
-                                    }
-                                    .padding(.horizontal, 10)
-                                    .padding(.vertical, 5)
-                                    .background(
-                                        Capsule()
-                                            .fill(Color(red: 0.98, green: 0.95, blue: 0.93))
-                                            .shadow(color: Color.black.opacity(0.06), radius: 4, x: 0, y: 2)
-                                    )
-                                    .padding(.trailing, 16)
-                                    .padding(.bottom, 12)
                                 }
                                 .padding(.horizontal, 20)
                             } // end if let latestMemory
@@ -410,28 +385,6 @@ struct HomeView: View {
         let formatter = DateFormatter()
         formatter.dateFormat = localization.currentLanguage == .turkish ? "dd.MM.yyyy" : "MM/dd/yyyy"
         return formatter.string(from: date)
-    }
-
-    private func longestStreak() -> Int {
-        guard !memoryStore.memories.isEmpty else { return 0 }
-        let calendar = Calendar.current
-        let dates = Set(memoryStore.memories.map { calendar.startOfDay(for: $0.date) })
-        let sortedDates = dates.sorted(by: >)
-
-        var streak = 1
-        var maxStreak = 1
-        for i in 0..<(sortedDates.count - 1) {
-            let current = sortedDates[i]
-            let next = sortedDates[i + 1]
-            let daysDifference = calendar.dateComponents([.day], from: next, to: current).day ?? 0
-            if daysDifference == 1 {
-                streak += 1
-                maxStreak = max(maxStreak, streak)
-            } else {
-                streak = 1
-            }
-        }
-        return maxStreak
     }
 
     @ViewBuilder

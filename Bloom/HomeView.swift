@@ -77,11 +77,12 @@ struct HomeView: View {
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                 } else {
                     ScrollView(showsIndicators: false) {
-                        VStack(spacing: 24) {
+                        VStack(spacing: 28) {
                             // Mood selector row
-                            VStack(alignment: .leading, spacing: 8) {
+                            VStack(alignment: .leading, spacing: 10) {
                                 Text("Bugün hangi hissetteyseniz?")
-                                    .font(.system(size: 13, weight: .light, design: .serif))
+                                    .font(.system(size: 12, weight: .light, design: .serif))
+                                    .tracking(0.3)
                                     .foregroundColor(BloomTheme.textSecondary)
                                     .padding(.horizontal, 20)
 
@@ -182,17 +183,18 @@ struct HomeView: View {
                                 .padding(.horizontal, 20)
 
                                 // Streak counter
-                                HStack(spacing: 8) {
+                                HStack(spacing: 6) {
                                     Image(systemName: "flame.fill")
-                                        .font(.system(size: 14, weight: .semibold))
+                                        .font(.system(size: 13, weight: .semibold))
                                         .foregroundColor(BloomTheme.driedRose)
 
                                     Text("\(longestStreak()) gün streak")
-                                        .font(.system(size: 13, weight: .light, design: .serif))
+                                        .font(.system(size: 12, weight: .light, design: .serif))
+                                        .tracking(0.2)
                                         .foregroundColor(BloomTheme.driedRose)
                                 }
                                 .padding(.horizontal, 20)
-                                .padding(.top, 16)
+                                .padding(.top, 12)
                             }
 
                             // "Bugün Yaz" button

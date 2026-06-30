@@ -89,10 +89,10 @@ struct CustomTabBarWithPhotoPicker: View {
     @Binding var selectedItem: PhotosPickerItem?
 
     let tabItems = [
-        (icon: "house.fill", tag: 0, color: Color(red: 0.72, green: 0.55, blue: 0.50)),
+        (icon: "house.fill", tag: 0, color: BloomTheme.driedRose),
         (icon: "chart.bar.fill", tag: 1, color: BloomTheme.sageGreen),
-        (icon: "star.fill", tag: 2, color: Color(red: 0.82, green: 0.75, blue: 0.55)),
-        (icon: "calendar", tag: 3, color: Color(red: 0.68, green: 0.60, blue: 0.50))
+        (icon: "star.fill", tag: 2, color: Color(red: 0.85, green: 0.75, blue: 0.80)),
+        (icon: "calendar", tag: 3, color: BloomTheme.siennaDust)
     ]
 
     var body: some View {

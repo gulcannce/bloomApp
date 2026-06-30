@@ -65,9 +65,9 @@ struct ContentView: View {
             }
             .ignoresSafeArea(edges: .bottom)
         }
-        .onChange(of: selectedItem) { newItem in
+        .onChange(of: selectedItem) {
             Task {
-                if let newItem = newItem {
+                if let newItem = selectedItem {
                     if let data = try? await newItem.loadTransferable(type: Data.self) {
                         if let uiImage = UIImage(data: data) {
                             DispatchQueue.main.async {

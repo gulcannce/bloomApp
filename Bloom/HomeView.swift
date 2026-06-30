@@ -359,9 +359,9 @@ struct HomeView: View {
                 }
             }
         }
-        .onChange(of: localSelectedItem) { newItem in
+        .onChange(of: localSelectedItem) {
             Task {
-                if let newItem = newItem {
+                if let newItem = localSelectedItem {
                     if let data = try? await newItem.loadTransferable(type: Data.self) {
                         if let uiImage = UIImage(data: data) {
                             DispatchQueue.main.async {

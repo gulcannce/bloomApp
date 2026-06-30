@@ -124,7 +124,6 @@ struct DailyMemoriesView: View {
 }
 
 #Preview {
-    let testMemory = Memory(image: nil, note: "Test memory", emoji: "🌸", date: Date(), stickers: [])
     NavigationStack {
         DailyMemoriesView(selectedDate: Date())
             .environmentObject(MemoryStore.shared)

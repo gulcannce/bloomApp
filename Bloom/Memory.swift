@@ -21,7 +21,7 @@ struct Sticker: Identifiable, Codable {
 
 struct Memory: Identifiable {
     let id: UUID
-    let image: Image?
+    var image: Image?
     var note: String
     let date: Date
     let emoji: String

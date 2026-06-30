@@ -2,17 +2,11 @@ import SwiftUI
 import PhotosUI
 import Combine
 
-class CreateViewState: ObservableObject {
-    @Published var processedImage: Image? = nil
-}
-
 struct ContentView: View {
     @State private var selectedTab: Int = 0
     @StateObject private var localization = LocalizationManager()
     @StateObject private var memoryStore = MemoryStore.shared
-    @State private var showCreateSheet = false
     @State private var selectedItem: PhotosPickerItem? = nil
-    @StateObject private var createViewState = CreateViewState()
     @State private var didInjectMockData = false
     @State private var storyText = ""
 
@@ -23,10 +17,9 @@ struct ContentView: View {
                     switch selectedTab {
                     case 0:
                             NavigationStack {
-                                HomeView(showCreateSheet: $showCreateSheet, storyText: $storyText)
+                                HomeView(storyText: $storyText)
                                     .environmentObject(localization)
                                     .environmentObject(memoryStore)
-                                    .environmentObject(createViewState)
                             }
                         case 1:
                         AnalyticsView()
@@ -44,10 +37,9 @@ struct ContentView: View {
                         }
                     default:
                         NavigationStack {
-                            HomeView(showCreateSheet: $showCreateSheet, storyText: $storyText)
+                            HomeView(storyText: $storyText)
                                 .environmentObject(localization)
                                 .environmentObject(memoryStore)
-                                .environmentObject(createViewState)
                         }
                     }
                 }
@@ -59,7 +51,8 @@ struct ContentView: View {
                 Spacer()
                 CustomTabBarWithPhotoPicker(
                     selectedTab: $selectedTab,
-                    selectedItem: $selectedItem
+                    selectedItem: $selectedItem,
+                    memoryStore: memoryStore
                 )
             }
             .ignoresSafeArea(edges: .bottom)
@@ -70,19 +63,12 @@ struct ContentView: View {
                     if let data = try? await newItem.loadTransferable(type: Data.self) {
                         if let uiImage = UIImage(data: data) {
                             DispatchQueue.main.async {
-                                createViewState.processedImage = Image(uiImage: uiImage)
-                                showCreateSheet = true
+                                injectPhotoToTodaysMemory(UIImage: uiImage)
                             }
                         }
                     }
                 }
             }
-        }
-        .sheet(isPresented: $showCreateSheet) {
-            CreateView(showCreateSheet: $showCreateSheet, selectedTab: $selectedTab, storyText: $storyText)
-                .environmentObject(localization)
-                .environmentObject(memoryStore)
-                .environmentObject(createViewState)
         }
         .onAppear {
             if !didInjectMockData && memoryStore.memories.isEmpty {
@@ -92,11 +78,37 @@ struct ContentView: View {
             }
         }
     }
+
+    private func injectPhotoToTodaysMemory(UIImage: UIImage) {
+        let calendar = Calendar.current
+        let today = calendar.startOfDay(for: Date())
+
+        if let index = memoryStore.memories.firstIndex(where: { memory in
+            calendar.isDate(memory.date, inSameDayAs: today)
+        }) {
+            // Update existing entry with photo
+            memoryStore.memories[index].image = Image(uiImage: UIImage)
+            memoryStore.memories[index].images = [Image(uiImage: UIImage)]
+            memoryStore.saveMemories()
+            print("QA_LOG: Photo injected into today's existing memory")
+        } else {
+            // Create new entry with photo and default text
+            let newMemory = Memory(
+                image: Image(uiImage: UIImage),
+                note: "",
+                emoji: "📷",
+                date: Date()
+            )
+            memoryStore.addEntry(newMemory)
+            print("QA_LOG: Photo created new memory entry for today")
+        }
+    }
 }
 
 struct CustomTabBarWithPhotoPicker: View {
     @Binding var selectedTab: Int
     @Binding var selectedItem: PhotosPickerItem?
+    let memoryStore: MemoryStore
 
     let tabItems = [
         (icon: "house.fill", tag: 0, color: BloomTheme.driedRose),
@@ -200,5 +212,4 @@ struct CustomTabBarWithPhotoPicker: View {
 
 #Preview {
     ContentView()
-        .environmentObject(CreateViewState())
 }

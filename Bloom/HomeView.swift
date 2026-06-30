@@ -4,8 +4,6 @@ import PhotosUI
 struct HomeView: View {
     @EnvironmentObject var localization: LocalizationManager
     @EnvironmentObject var memoryStore: MemoryStore
-    @EnvironmentObject var createViewState: CreateViewState
-    @Binding var showCreateSheet: Bool
     @Binding var storyText: String
     @State private var expandedMemoryId: UUID? = nil
     @Namespace private var animationNamespace
@@ -14,7 +12,6 @@ struct HomeView: View {
     @State private var stickerScale: CGFloat = 1.0
     @State private var stickerRotation: Double = 0
     @State private var showProfileSheet = false
-    @State private var localSelectedItem: PhotosPickerItem? = nil
     @State private var selectedMood: String? = nil
     @State private var showStoryInput = false
     @Environment(\.colorScheme) var colorScheme
@@ -337,22 +334,6 @@ struct HomeView: View {
                 }
             }
         }
-        .onChange(of: localSelectedItem) {
-            Task {
-                if let newItem = localSelectedItem {
-                    if let data = try? await newItem.loadTransferable(type: Data.self) {
-                        if let uiImage = UIImage(data: data) {
-                            DispatchQueue.main.async {
-                                print("QA_LOG: HomeView photo picker - Image loaded and set to createViewState")
-                                createViewState.processedImage = Image(uiImage: uiImage)
-                                print("QA_LOG: HomeView photo picker - Opening CreateView sheet with image")
-                                showCreateSheet = true
-                            }
-                        }
-                    }
-                }
-            }
-        }
         .sheet(isPresented: $showStoryInput) {
             StoryInputSheet(isPresented: $showStoryInput, storyText: $storyText, memoryStore: memoryStore)
         }
@@ -603,11 +584,10 @@ struct PinterestMemoryCard: View {
 
 struct HomeViewPreviewContainer: View {
     @StateObject var store = MemoryStore.shared
-    @State private var showCreateSheet = false
     @State private var storyText = ""
 
     var body: some View {
-        HomeView(showCreateSheet: $showCreateSheet, storyText: $storyText)
+        HomeView(storyText: $storyText)
             .environmentObject(store)
             .environmentObject(LocalizationManager())
     }

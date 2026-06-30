@@ -18,11 +18,11 @@ struct HomeView: View {
     @Environment(\.colorScheme) var colorScheme
 
     private let moods: [(label: String, emoji: String, color: Color)] = [
-        ("Harika", "😊", Color(red: 0.85, green: 0.75, blue: 0.80)),
-        ("İyi",    "🙂", Color(red: 0.80, green: 0.85, blue: 0.78)),
-        ("Orta",   "😐", Color(red: 0.88, green: 0.82, blue: 0.70)),
-        ("Kötü",   "😟", Color(red: 0.83, green: 0.72, blue: 0.75)),
-        ("Berbat", "😠", Color(red: 0.78, green: 0.68, blue: 0.55))
+        ("Harika", "sun.max", Color(red: 0.85, green: 0.75, blue: 0.70)),
+        ("İyi",    "face.smiling", Color(red: 0.75, green: 0.80, blue: 0.70)),
+        ("Orta",   "cloud", Color(red: 0.80, green: 0.78, blue: 0.70)),
+        ("Kötü",   "cloud.rain", Color(red: 0.78, green: 0.72, blue: 0.70)),
+        ("Berbat", "bolt.heart", Color(red: 0.75, green: 0.65, blue: 0.60))
     ]
 
     let columns = [
@@ -81,12 +81,13 @@ struct HomeView: View {
                                         print("QA_LOG: Mood selected: \(mood.label)")
                                     }) {
                                         VStack(spacing: 6) {
-                                            Text(mood.emoji)
-                                                .font(.system(size: 28))
+                                            Image(systemName: mood.emoji)
+                                                .font(.system(size: 22, weight: .thin))
+                                                .foregroundColor(selectedMood == mood.label ? mood.color : mood.color.opacity(0.6))
                                                 .frame(width: 52, height: 52)
                                                 .background(
                                                     Circle()
-                                                        .fill(selectedMood == mood.label ? mood.color.opacity(0.35) : Color.white)
+                                                        .fill(selectedMood == mood.label ? mood.color.opacity(0.15) : Color.white)
                                                         .shadow(color: Color.black.opacity(0.06), radius: 4, x: 0, y: 2)
                                                 )
                                                 .overlay(
@@ -160,9 +161,9 @@ struct HomeView: View {
                                             Text("Küçük şeyler, büyük mutluluklar.")
                                                 .font(.system(size: 14, weight: .light, design: .serif))
                                                 .italic()
-                                                .tracking(0.5)
-                                                .lineSpacing(3)
-                                                .foregroundColor(BloomTheme.textPrimary)
+                                                .tracking(0.6)
+                                                .lineSpacing(2)
+                                                .foregroundColor(Color(red: 0.35, green: 0.30, blue: 0.25))
 
                                             Text(formattedDate(latestMemory.date))
                                                 .font(.system(size: 11, weight: .light, design: .serif))
@@ -175,6 +176,13 @@ struct HomeView: View {
                                     .background(Color.white)
                                     .cornerRadius(12)
                                     .shadow(color: Color.black.opacity(0.04), radius: 8, x: 0, y: 4)
+
+                                    // Botanical daisy accent overlay on Polaroid
+                                    Image(systemName: "leaf.circle")
+                                        .font(.system(size: 28, weight: .thin))
+                                        .foregroundColor(Color(red: 0.75, green: 0.80, blue: 0.70).opacity(0.5))
+                                        .padding(.trailing, 8)
+                                        .padding(.bottom, 28)
 
                                     // Streak badge overlaid at bottom-right corner of Polaroid
                                     HStack(spacing: 4) {

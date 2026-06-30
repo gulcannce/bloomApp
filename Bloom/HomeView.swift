@@ -18,11 +18,11 @@ struct HomeView: View {
     @Environment(\.colorScheme) var colorScheme
 
     private let moods: [(label: String, emoji: String, color: Color)] = [
-        ("Harika", "face.smiling.radiant.fill", Color(red: 0.95, green: 0.80, blue: 0.60)),
-        ("İyi",    "face.smiling.fill", Color(red: 0.95, green: 0.90, blue: 0.55)),
-        ("Orta",   "face.neutral.fill", Color(red: 0.88, green: 0.82, blue: 0.72)),
-        ("Kötü",   "face.frowning.fill", Color(red: 0.92, green: 0.72, blue: 0.60)),
-        ("Berbat", "face.dashed.fill", Color(red: 0.82, green: 0.70, blue: 0.75))
+        ("Harika", "face.smiling.fill", Color(red: 0.92, green: 0.58, blue: 0.58)),
+        ("İyi",    "face.smiling.fill", Color(red: 0.90, green: 0.72, blue: 0.45)),
+        ("Orta",   "face.smiling.fill", Color(red: 0.72, green: 0.72, blue: 0.65)),
+        ("Kötü",   "face.frowning.fill", Color(red: 0.85, green: 0.55, blue: 0.45)),
+        ("Berbat", "face.frowning.fill", Color(red: 0.70, green: 0.50, blue: 0.55))
     ]
 
     let columns = [
@@ -82,13 +82,13 @@ struct HomeView: View {
                                     }) {
                                         VStack(spacing: 6) {
                                             Image(systemName: mood.emoji)
-                                                .font(.system(size: 28))
+                                                .font(.system(size: 32, weight: .medium))
                                                 .foregroundColor(mood.color)
                                                 .frame(width: 52, height: 52)
                                                 .background(
                                                     Circle()
                                                         .fill(Color.white)
-                                                        .shadow(color: Color.black.opacity(0.06), radius: 4, x: 0, y: 2)
+                                                        .shadow(color: Color.black.opacity(0.06), radius: 3, x: 0, y: 2)
                                                 )
                                                 .overlay(
                                                     Circle().stroke(

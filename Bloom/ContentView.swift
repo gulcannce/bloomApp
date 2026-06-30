@@ -16,61 +16,54 @@ struct ContentView: View {
 
     var body: some View {
         ZStack {
-            HStack(spacing: 0) {
-                // Sidebar
-                SidebarView(selectedTab: $selectedTab)
-                    .environmentObject(localization)
-
-                // Main content
-                VStack(spacing: 0) {
-                    Group {
-                        switch selectedTab {
-                        case 0:
-                            NavigationStack {
-                                HomeView(showCreateSheet: $showCreateSheet)
-                                    .environmentObject(localization)
-                                    .environmentObject(memoryStore)
-                                    .environmentObject(createViewState)
-                            }
-                        case 1:
-                            AnalyticsView()
+            VStack(spacing: 0) {
+                Group {
+                    switch selectedTab {
+                    case 0:
+                        NavigationStack {
+                            HomeView(showCreateSheet: $showCreateSheet)
                                 .environmentObject(localization)
                                 .environmentObject(memoryStore)
-                        case 2:
-                            AchievementsView()
+                                .environmentObject(createViewState)
+                        }
+                    case 1:
+                        AnalyticsView()
+                            .environmentObject(localization)
+                            .environmentObject(memoryStore)
+                    case 2:
+                        AchievementsView()
+                            .environmentObject(localization)
+                            .environmentObject(memoryStore)
+                    case 3:
+                        NavigationStack {
+                            CalendarView()
                                 .environmentObject(localization)
                                 .environmentObject(memoryStore)
-                        case 3:
-                            NavigationStack {
-                                CalendarView()
-                                    .environmentObject(localization)
-                                    .environmentObject(memoryStore)
-                            }
-                        case 4:
-                            ProfileView()
+                        }
+                    case 4:
+                        ProfileView()
+                            .environmentObject(localization)
+                    default:
+                        NavigationStack {
+                            HomeView(showCreateSheet: $showCreateSheet)
                                 .environmentObject(localization)
-                        default:
-                            NavigationStack {
-                                HomeView(showCreateSheet: $showCreateSheet)
-                                    .environmentObject(localization)
-                                    .environmentObject(memoryStore)
-                                    .environmentObject(createViewState)
-                            }
+                                .environmentObject(memoryStore)
+                                .environmentObject(createViewState)
                         }
                     }
-
-                    Spacer()
                 }
 
-                VStack(spacing: 0) {
-                    Spacer()
-                    CustomTabBarWithPhotoPicker(
-                        selectedTab: $selectedTab,
-                        selectedItem: $selectedItem
-                    )
-                }
-                .ignoresSafeArea(edges: .bottom)
+                Spacer()
             }
+
+            VStack(spacing: 0) {
+                Spacer()
+                CustomTabBarWithPhotoPicker(
+                    selectedTab: $selectedTab,
+                    selectedItem: $selectedItem
+                )
+            }
+            .ignoresSafeArea(edges: .bottom)
         }
         .onChange(of: selectedItem) { newItem in
             Task {

@@ -310,8 +310,10 @@ struct CreateView: View {
 
         print("QA_LOG: Entry persisted - Store now contains \(MemoryStore.shared.memories.count) entries")
 
+        // Haptic feedback
         let successHaptic = UINotificationFeedbackGenerator()
         successHaptic.notificationOccurred(.success)
+        print("QA_LOG: Success haptic triggered")
 
         DispatchQueue.main.async {
             print("QA_LOG: Resetting temporary picker states for next session")

@@ -104,7 +104,7 @@ struct CustomTabBarWithPhotoPicker: View {
                 // Left side - 1 item (Home)
                 ForEach(0..<1, id: \.self) { index in
                     VStack(spacing: 4) {
-                        Button(action: { selectedTab = index }) {
+                        Button(action: { withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) { selectedTab = index } }) {
                             Image(systemName: tabItems[index].icon)
                                 .font(.system(size: 20, weight: .light))
                                 .foregroundColor(tabItems[index].color.opacity(selectedTab == index ? 1.0 : 0.6))
@@ -121,7 +121,7 @@ struct CustomTabBarWithPhotoPicker: View {
 
                 // Center-Left - Stats
                 VStack(spacing: 4) {
-                    Button(action: { selectedTab = 1 }) {
+                    Button(action: { withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) { selectedTab = 1 } }) {
                         Image(systemName: tabItems[1].icon)
                             .font(.system(size: 20, weight: .light))
                             .foregroundColor(tabItems[1].color.opacity(selectedTab == 1 ? 1.0 : 0.6))
@@ -145,7 +145,7 @@ struct CustomTabBarWithPhotoPicker: View {
 
                 // Center-Right - Achievements
                 VStack(spacing: 4) {
-                    Button(action: { selectedTab = 2 }) {
+                    Button(action: { withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) { selectedTab = 2 } }) {
                         Image(systemName: tabItems[2].icon)
                             .font(.system(size: 20, weight: .light))
                             .foregroundColor(tabItems[2].color.opacity(selectedTab == 2 ? 1.0 : 0.6))
@@ -161,7 +161,7 @@ struct CustomTabBarWithPhotoPicker: View {
 
                 // Right side - Calendar
                 VStack(spacing: 4) {
-                    Button(action: { selectedTab = 3 }) {
+                    Button(action: { withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) { selectedTab = 3 } }) {
                         Image(systemName: tabItems[3].icon)
                             .font(.system(size: 20, weight: .light))
                             .foregroundColor(tabItems[3].color.opacity(selectedTab == 3 ? 1.0 : 0.6))

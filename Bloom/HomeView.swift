@@ -208,6 +208,8 @@ struct HomeView: View {
                                 .padding(14)
                                 .background(BloomTheme.driedRose)
                                 .cornerRadius(10)
+                                .shadow(color: BloomTheme.driedRose.opacity(0.3), radius: 8, x: 0, y: 4)
+                                .scaleEffect(1.0)
                             }
                             .padding(.horizontal, 20)
                             .padding(.top, 8)

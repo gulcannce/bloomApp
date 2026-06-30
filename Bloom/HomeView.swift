@@ -18,11 +18,11 @@ struct HomeView: View {
     @Environment(\.colorScheme) var colorScheme
 
     private let moods: [(label: String, emoji: String, color: Color)] = [
-        ("Harika", "sun.max", Color(red: 0.85, green: 0.75, blue: 0.70)),
-        ("İyi",    "face.smiling", Color(red: 0.75, green: 0.80, blue: 0.70)),
-        ("Orta",   "cloud", Color(red: 0.80, green: 0.78, blue: 0.70)),
-        ("Kötü",   "cloud.rain", Color(red: 0.78, green: 0.72, blue: 0.70)),
-        ("Berbat", "bolt.heart", Color(red: 0.75, green: 0.65, blue: 0.60))
+        ("Harika", "face.smiling.radiant.fill", Color(red: 0.95, green: 0.80, blue: 0.60)),
+        ("İyi",    "face.smiling.fill", Color(red: 0.95, green: 0.90, blue: 0.55)),
+        ("Orta",   "face.neutral.fill", Color(red: 0.88, green: 0.82, blue: 0.72)),
+        ("Kötü",   "face.frowning.fill", Color(red: 0.92, green: 0.72, blue: 0.60)),
+        ("Berbat", "face.dashed.fill", Color(red: 0.82, green: 0.70, blue: 0.75))
     ]
 
     let columns = [
@@ -82,12 +82,12 @@ struct HomeView: View {
                                     }) {
                                         VStack(spacing: 6) {
                                             Image(systemName: mood.emoji)
-                                                .font(.system(size: 22, weight: .thin))
-                                                .foregroundColor(selectedMood == mood.label ? mood.color : mood.color.opacity(0.6))
+                                                .font(.system(size: 28))
+                                                .foregroundColor(mood.color)
                                                 .frame(width: 52, height: 52)
                                                 .background(
                                                     Circle()
-                                                        .fill(selectedMood == mood.label ? mood.color.opacity(0.15) : Color.white)
+                                                        .fill(Color.white)
                                                         .shadow(color: Color.black.opacity(0.06), radius: 4, x: 0, y: 2)
                                                 )
                                                 .overlay(

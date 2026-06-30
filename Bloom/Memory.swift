@@ -118,13 +118,39 @@ class MemoryStore: ObservableObject {
 
         let calendar = Calendar.current
         let today = calendar.startOfDay(for: Date())
+        let testImage = createTestImage()
 
         for (note, emoji, daysAgo) in mockData {
             let memoryDate = calendar.date(byAdding: .day, value: -daysAgo, to: today) ?? today
-            let memory = Memory(image: nil, note: note, emoji: emoji, date: memoryDate)
+            let memory = Memory(image: testImage, note: note, emoji: emoji, date: memoryDate)
             shared.memories.insert(memory, at: 0)
         }
 
         shared.saveMemories()
+    }
+
+    private static func createTestImage() -> Image {
+        let size = CGSize(width: 300, height: 240)
+        let rect = CGRect(origin: .zero, size: size)
+
+        let renderer = UIGraphicsImageRenderer(size: size)
+        let uiImage = renderer.image { context in
+            let colors = [
+                UIColor(red: 0.85, green: 0.75, blue: 0.60, alpha: 1.0).cgColor,
+                UIColor(red: 0.75, green: 0.65, blue: 0.50, alpha: 1.0).cgColor
+            ]
+
+            let colorSpace = CGColorSpaceCreateDeviceRGB()
+            let gradient = CGGradient(colorsSpace: colorSpace, colors: colors as CFArray, locations: [0, 1])!
+
+            context.cgContext.drawLinearGradient(
+                gradient,
+                start: rect.origin,
+                end: CGPoint(x: rect.maxX, y: rect.maxY),
+                options: []
+            )
+        }
+
+        return Image(uiImage: uiImage)
     }
 }

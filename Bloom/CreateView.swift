@@ -1,6 +1,7 @@
 import SwiftUI
 import PhotosUI
 import UIKit
+import PencilKit
 
 struct CreateView: View {
     @EnvironmentObject var localization: LocalizationManager
@@ -18,6 +19,7 @@ struct CreateView: View {
     @Environment(\.colorScheme) var colorScheme
     @State private var isDrawingMode = false
     @State private var selectedStickerForPlacement: String? = nil
+    @StateObject private var canvasViewModel = PencilKitCanvasViewModel()
 
     let botanicalStickers = [
         ("daisy", "🌼"), ("rose", "🌹"), ("sunflower", "🌻"), ("tulip", "🌷"),
@@ -75,8 +77,9 @@ struct CreateView: View {
                                 .shadow(color: Color.black.opacity(0.08), radius: 8, x: 0, y: 4)
 
                             VStack(spacing: 0) {
-                                // Photo area - Direct photo picker trigger
+                                // Photo area with drawing canvas overlay
                                 ZStack(alignment: .center) {
+                                    // Base photo or placeholder
                                     if let image = processedImages.first {
                                         image.resizable().scaledToFill()
                                     } else {
@@ -99,8 +102,15 @@ struct CreateView: View {
                                         }
                                     }
 
-                                    // Drawing overlay indicator when in drawing mode
+                                    // Drawing canvas overlay (active when drawing mode is on)
                                     if isDrawingMode && processedImages.first != nil {
+                                        PencilKitCanvasView(
+                                            canvasView: $canvasViewModel.canvasView,
+                                            isDrawingEnabled: isDrawingMode
+                                        )
+                                        .cornerRadius(8)
+
+                                        // Drawing mode indicator
                                         VStack {
                                             HStack {
                                                 Text("✏️ Drawing Mode")
@@ -309,8 +319,18 @@ struct CreateView: View {
         guard !finalText.isEmpty else { return }
 
         let now = Date()
-        let firstImage = processedImages.first
-        print("QA_LOG: SaveMemory - Text: '\(finalText)' | Images: \(processedImages.count) | Stickers: \(placedStickers.count)")
+        var imagesToSave = processedImages
+        var hasDrawing = false
+
+        // Capture drawing if in drawing mode
+        if isDrawingMode, let drawingImage = canvasViewModel.getDrawingImage() {
+            imagesToSave.append(Image(uiImage: drawingImage))
+            hasDrawing = true
+            print("QA_LOG: Drawing captured and saved with memory")
+        }
+
+        let firstImage = imagesToSave.first
+        print("QA_LOG: SaveMemory - Text: '\(finalText)' | Images: \(imagesToSave.count) | Stickers: \(placedStickers.count) | Drawing: \(hasDrawing)")
 
         var newEntry = Memory(
             image: firstImage,
@@ -319,19 +339,21 @@ struct CreateView: View {
             date: now,
             stickers: placedStickers
         )
-        newEntry.images = processedImages
+        newEntry.images = imagesToSave
 
         MemoryStore.shared.addEntry(newEntry)
         print("QA_LOG: Entry saved - Store contains \(MemoryStore.shared.memories.count) entries")
 
         DispatchQueue.main.async {
-            print("QA_LOG: Clearing draft state and closing sheet")
+            print("QA_LOG: Clearing draft state, canvas, and closing sheet")
             storyText = ""
             processedImages = []
             placedStickers = []
             selectedMoodLabel = "Harika"
             selectedTextColor = .black
             createViewState.processedImage = nil
+            isDrawingMode = false
+            canvasViewModel.clearCanvas()
 
             showCreateSheet = false
             selectedTab = 3

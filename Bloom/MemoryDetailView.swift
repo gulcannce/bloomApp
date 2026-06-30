@@ -100,7 +100,14 @@ struct MemoryDetailView: View {
                     .padding(.vertical, 24)
                 }
 
-                VStack(spacing: 0) {
+                VStack(spacing: 12) {
+                    Text("Günün Çıkartmaları")
+                        .font(.system(size: 11, weight: .light, design: .serif))
+                        .foregroundColor(BloomTheme.textSecondary)
+                        .tracking(0.4)
+                        .padding(.horizontal, 20)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+
                     ScrollView(.horizontal, showsIndicators: false) {
                         HStack(spacing: 12) {
                             ForEach(stickerAssets, id: \.self) { stickerName in
@@ -120,9 +127,10 @@ struct MemoryDetailView: View {
                         }
                         .padding(.horizontal, 20)
                     }
-                    .frame(height: 80)
-                    .background(Color.white.opacity(0.2))
+                    .frame(height: 68)
                 }
+                .padding(.vertical, 16)
+                .background(Color.white.opacity(0.2))
                 .ignoresSafeArea(edges: .bottom)
             }
         }

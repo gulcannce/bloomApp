@@ -58,28 +58,43 @@ struct CalendarView: View {
         ZStack {
             BloomTheme.background.ignoresSafeArea()
 
-            ScrollView {
-                VStack(spacing: 24) {
-                    HStack(spacing: 12) {
-                        Button(action: { previousMonth() }) {
-                            Image(systemName: "chevron.left")
-                                .font(.system(size: 16, weight: .light))
-                                .foregroundColor(BloomTheme.driedRose)
-                        }
+            VStack(spacing: 0) {
+                // Header
+                VStack(alignment: .leading, spacing: 8) {
+                    Text(localization.currentLanguage == .turkish ? "Takvim" : "Calendar")
+                        .font(.system(size: 32, weight: .thin, design: .serif))
+                        .tracking(1.2)
+                        .foregroundColor(BloomTheme.textPrimary)
 
-                        Text(monthYearString)
-                            .font(.system(size: 20, weight: .light, design: .serif))
-                            .foregroundColor(BloomTheme.textPrimary)
-                            .frame(maxWidth: .infinity)
+                    Text(monthYearString)
+                        .font(.system(size: 13, weight: .light, design: .serif))
+                        .italic()
+                        .tracking(0.3)
+                        .foregroundColor(BloomTheme.textSecondary.opacity(0.8))
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.horizontal, 20)
+                .padding(.vertical, 20)
 
-                        Button(action: { nextMonth() }) {
-                            Image(systemName: "chevron.right")
-                                .font(.system(size: 16, weight: .light))
-                                .foregroundColor(BloomTheme.driedRose)
+                ScrollView {
+                    VStack(spacing: 24) {
+                        // Month navigation
+                        HStack(spacing: 12) {
+                            Button(action: { previousMonth() }) {
+                                Image(systemName: "chevron.left")
+                                    .font(.system(size: 16, weight: .light))
+                                    .foregroundColor(BloomTheme.driedRose)
+                            }
+
+                            Spacer()
+
+                            Button(action: { nextMonth() }) {
+                                Image(systemName: "chevron.right")
+                                    .font(.system(size: 16, weight: .light))
+                                    .foregroundColor(BloomTheme.driedRose)
+                            }
                         }
-                    }
-                    .padding(.horizontal, 20)
-                    .padding(.top, 20)
+                        .padding(.horizontal, 20)
 
                     LazyVGrid(columns: columns, spacing: 12) {
                         ForEach(currentMonthDays, id: \.self) { day in
@@ -112,6 +127,7 @@ struct CalendarView: View {
                     Spacer(minLength: 40)
                 }
                 .padding(.bottom, 80)
+                }
             }
         }
     }

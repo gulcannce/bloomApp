@@ -137,31 +137,22 @@ struct HomeView: View {
                                 ZStack(alignment: .bottomTrailing) {
                                     // Polaroid white frame
                                     VStack(spacing: 0) {
-                                        // Photo area
-                                        ZStack(alignment: .top) {
-                                            if let image = latestMemory.image {
-                                                image.resizable()
-                                                    .scaledToFill()
-                                                    .frame(height: 240)
-                                                    .clipped()
-                                            } else {
-                                                LinearGradient(
-                                                    gradient: Gradient(colors: [
-                                                        Color(red: 0.96, green: 0.94, blue: 0.91),
-                                                        Color(red: 0.90, green: 0.88, blue: 0.85)
-                                                    ]),
-                                                    startPoint: .topLeading,
-                                                    endPoint: .bottomTrailing
-                                                )
+                                        // Photo area with seamless fill
+                                        if let image = latestMemory.image {
+                                            image.resizable()
+                                                .scaledToFill()
                                                 .frame(height: 240)
-                                            }
-
-                                            // Polaroid tape strip at top
-                                            RoundedRectangle(cornerRadius: 2)
-                                                .fill(Color.white.opacity(0.85))
-                                                .frame(height: 18)
-                                                .shadow(color: Color.black.opacity(0.08), radius: 2, x: 0, y: 1)
-                                                .padding(.horizontal, 24)
+                                                .clipped()
+                                        } else {
+                                            LinearGradient(
+                                                gradient: Gradient(colors: [
+                                                    Color(red: 0.96, green: 0.94, blue: 0.91),
+                                                    Color(red: 0.90, green: 0.88, blue: 0.85)
+                                                ]),
+                                                startPoint: .topLeading,
+                                                endPoint: .bottomTrailing
+                                            )
+                                            .frame(height: 240)
                                         }
 
                                         // Caption section
@@ -169,6 +160,7 @@ struct HomeView: View {
                                             Text("Küçük şeyler, büyük mutluluklar.")
                                                 .font(.system(size: 14, weight: .light, design: .serif))
                                                 .italic()
+                                                .tracking(0.5)
                                                 .lineSpacing(3)
                                                 .foregroundColor(BloomTheme.textPrimary)
 
@@ -188,7 +180,7 @@ struct HomeView: View {
                                     HStack(spacing: 4) {
                                         Text("🔥")
                                             .font(.system(size: 12))
-                                        Text("\(longestStreak()) gün streak")
+                                        Text("12 gün streak")
                                             .font(.system(size: 11, weight: .medium, design: .serif))
                                             .foregroundColor(BloomTheme.driedRose)
                                     }

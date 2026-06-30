@@ -78,23 +78,24 @@ struct MemoryDetailView: View {
                         .frame(height: 280)
                         .padding(.horizontal, 20)
 
-                        VStack(alignment: .leading, spacing: 12) {
-                            Text("Notlar")
-                                .font(.system(size: 12, weight: .light, design: .serif))
+                        VStack(alignment: .leading, spacing: 16) {
+                            Text("Senin Anın")
+                                .font(.system(size: 13, weight: .light, design: .serif))
                                 .foregroundColor(BloomTheme.textSecondary)
+                                .tracking(0.5)
                                 .padding(.horizontal, 20)
 
                             TextEditor(text: $editingNote)
-                                .font(.system(size: 13, weight: .light))
+                                .font(.system(size: 14, weight: .light, design: .serif))
                                 .foregroundColor(BloomTheme.textPrimary)
-                                .frame(minHeight: 90)
-                                .padding(12)
-                                .background(Color.white.opacity(0.6))
-                                .cornerRadius(8)
-                                .overlay(RoundedRectangle(cornerRadius: 8).stroke(BloomTheme.textTertiary.opacity(0.1), lineWidth: 0.5))
+                                .frame(minHeight: 120)
+                                .lineSpacing(6)
+                                .padding(16)
+                                .background(BloomTheme.agedParchment.opacity(0.5))
+                                .cornerRadius(0)
                                 .padding(.horizontal, 20)
                         }
-                        .padding(.bottom, 20)
+                        .padding(.bottom, 24)
                     }
                     .padding(.vertical, 24)
                 }

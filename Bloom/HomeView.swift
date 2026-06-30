@@ -193,12 +193,12 @@ struct HomeView: View {
                                 .padding(.top, 12)
                             }
 
-                            // "Bugün Yaz" button
+                            // "Bugünün Öyküsü" button
                             PhotosPicker(selection: $localSelectedItem, matching: .images) {
                                 HStack(spacing: 8) {
                                     Image(systemName: "pencil")
                                         .font(.system(size: 16, weight: .light))
-                                    Text("Bugün Yaz")
+                                    Text("Bugünün Öyküsü")
                                         .font(.system(size: 16, weight: .light, design: .serif))
                                 }
                                 .foregroundColor(.white)

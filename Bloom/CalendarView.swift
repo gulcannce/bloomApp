@@ -6,8 +6,8 @@ struct CalendarView: View {
     @ObservedObject var memoryStore = MemoryStore.shared
     @State private var selectedMonth = Calendar.current.component(.month, from: Date())
     @State private var selectedYear = Calendar.current.component(.year, from: Date())
+    @State private var selectedDay: Int? = nil
 
-    let columns = Array(repeating: GridItem(.flexible(), spacing: 8), count: 7)
     let calendar = Calendar.current
     @Environment(\.colorScheme) var colorScheme
 
@@ -21,16 +21,12 @@ struct CalendarView: View {
         let range = calendar.range(of: .day, in: .month, for: firstDay)!
         let daysInMonth = range.count
 
-        // Get weekday of first day (1 = Sunday, 2 = Monday, ..., 7 = Saturday)
         let firstWeekday = calendar.component(.weekday, from: firstDay)
-        // Convert to Monday-based (Monday = 0, Sunday = 6)
         let mondayBasedWeekday = (firstWeekday + 5) % 7
 
-        // Create array with nil for days before month starts
         var days: [Int?] = Array(repeating: nil, count: mondayBasedWeekday)
         days.append(contentsOf: (1...daysInMonth).map { $0 })
 
-        // Pad to complete weeks
         while days.count % 7 != 0 {
             days.append(nil)
         }
@@ -41,20 +37,12 @@ struct CalendarView: View {
     var memoryMap: [Int: Memory] {
         var map: [Int: Memory] = [:]
         for memory in memoryStore.memories {
-            for dayOptional in currentMonthDays {
-                guard let day = dayOptional else { continue }
+            let memoryMonth = calendar.component(.month, from: memory.date)
+            let memoryYear = calendar.component(.year, from: memory.date)
+            let memoryDay = calendar.component(.day, from: memory.date)
 
-                var dateComponents = DateComponents()
-                dateComponents.year = selectedYear
-                dateComponents.month = selectedMonth
-                dateComponents.day = day
-
-                guard let tileDate = calendar.date(from: dateComponents) else { continue }
-
-                if calendar.isDate(memory.date, inSameDayAs: tileDate) {
-                    print("QA_LOG: CalendarView.memoryMap - Mapped memory on day \(day): '\(memory.note.prefix(30))'")
-                    map[day] = memory
-                }
+            if memoryMonth == selectedMonth && memoryYear == selectedYear {
+                map[memoryDay] = memory
             }
         }
         return map
@@ -70,99 +58,171 @@ struct CalendarView: View {
         let formatter = DateFormatter()
         formatter.dateFormat = localization.currentLanguage == .turkish ? "MMMM yyyy" : "MMMM yyyy"
         formatter.locale = localization.currentLanguage == .turkish ? Locale(identifier: "tr_TR") : Locale(identifier: "en_US")
-        return formatter.string(from: date)
+        return formatter.string(from: date).capitalized
+    }
+
+    var monthMemories: [Memory] {
+        memoryStore.memories.filter { memory in
+            calendar.component(.month, from: memory.date) == selectedMonth &&
+            calendar.component(.year, from: memory.date) == selectedYear
+        }.sorted { $0.date > $1.date }
     }
 
     var body: some View {
         ZStack {
-            BloomTheme.adaptiveBackground(colorScheme).ignoresSafeArea()
+            BloomTheme.agedParchment.ignoresSafeArea()
 
             VStack(spacing: 0) {
-                // Header
-                VStack(alignment: .leading, spacing: 8) {
-                    Text(localization.currentLanguage == .turkish ? "Takvim" : "Calendar")
-                        .font(.system(size: 32, weight: .thin, design: .serif))
-                        .tracking(1.2)
-                        .foregroundColor(BloomTheme.textPrimary)
+                // PREMIUM MONTH-YEAR HEADER WITH NAVIGATION
+                VStack(spacing: 12) {
+                    HStack(spacing: 16) {
+                        Button(action: previousMonth) {
+                            Image(systemName: "chevron.left")
+                                .font(.system(size: 16, weight: .light))
+                                .foregroundColor(BloomTheme.driedRose)
+                        }
+                        .frame(width: 32, height: 32)
 
-                    Text(monthYearString)
-                        .font(.system(size: 13, weight: .light, design: .serif))
-                        .italic()
-                        .tracking(0.3)
-                        .foregroundColor(BloomTheme.textSecondary.opacity(0.8))
+                        Spacer()
+
+                        VStack(spacing: 2) {
+                            Text(monthYearString)
+                                .font(.system(size: 20, weight: .light, design: .serif))
+                                .foregroundColor(BloomTheme.textPrimary)
+                                .tracking(0.5)
+                        }
+
+                        Spacer()
+
+                        Button(action: nextMonth) {
+                            Image(systemName: "chevron.right")
+                                .font(.system(size: 16, weight: .light))
+                                .foregroundColor(BloomTheme.driedRose)
+                        }
+                        .frame(width: 32, height: 32)
+                    }
+                    .padding(.horizontal, 16)
                 }
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(.horizontal, 20)
-                .padding(.vertical, 20)
+                .padding(.vertical, 16)
 
                 ScrollView {
                     VStack(spacing: 24) {
-                        // Month navigation
-                        HStack(spacing: 12) {
-                            Button(action: { previousMonth() }) {
-                                Image(systemName: "chevron.left")
-                                    .font(.system(size: 16, weight: .light))
-                                    .foregroundColor(BloomTheme.driedRose)
+                        // MINIMAL MONTHLY GRID
+                        VStack(spacing: 12) {
+                            // Day labels row (Mon-Sun)
+                            HStack(spacing: 0) {
+                                ForEach(["M", "T", "W", "T", "F", "S", "S"], id: \.self) { day in
+                                    Text(day)
+                                        .font(.system(size: 10, weight: .light, design: .serif))
+                                        .foregroundColor(BloomTheme.textSecondary)
+                                        .frame(maxWidth: .infinity)
+                                }
                             }
+                            .padding(.horizontal, 16)
 
-                            Spacer()
+                            // Day grid
+                            VStack(spacing: 8) {
+                                ForEach(0..<(currentMonthDays.count / 7), id: \.self) { weekIndex in
+                                    HStack(spacing: 8) {
+                                        ForEach(0..<7, id: \.self) { dayIndex in
+                                            let dayOptional = currentMonthDays[weekIndex * 7 + dayIndex]
 
-                            Button(action: { nextMonth() }) {
-                                Image(systemName: "chevron.right")
-                                    .font(.system(size: 16, weight: .light))
-                                    .foregroundColor(BloomTheme.driedRose)
+                                            if let day = dayOptional {
+                                                ZStack {
+                                                    // Highlight circle for days with entries
+                                                    if memoryMap[day] != nil {
+                                                        Circle()
+                                                            .fill(BloomTheme.driedRose.opacity(0.2))
+                                                    }
+
+                                                    Text("\(day)")
+                                                        .font(.system(size: 13, weight: .light, design: .serif))
+                                                        .foregroundColor(memoryMap[day] != nil ? BloomTheme.driedRose : BloomTheme.textPrimary)
+                                                }
+                                                .frame(height: 32)
+                                                .onTapGesture {
+                                                    selectedDay = day
+                                                }
+                                            } else {
+                                                Color.clear.frame(height: 32)
+                                            }
+                                        }
+                                    }
+                                }
                             }
+                            .padding(.horizontal, 16)
                         }
-                        .padding(.horizontal, 20)
 
-                        // Day of week headers
-                        let dayLabels = ["Pat", "Sal", "Çar", "Per", "Cum", "Cmt", "Paz"]
-                        HStack(spacing: 8) {
-                            ForEach(dayLabels, id: \.self) { day in
-                                Text(day)
-                                    .font(.system(size: 10, weight: .light, design: .serif))
-                                    .foregroundColor(BloomTheme.textSecondary)
-                                    .frame(maxWidth: .infinity)
+                        // BOTTOM POLAROID MEMORIES GRID
+                        VStack(spacing: 12) {
+                            if monthMemories.isEmpty {
+                                VStack(spacing: 16) {
+                                    Image(systemName: "plus.circle")
+                                        .font(.system(size: 48, weight: .light))
+                                        .foregroundColor(BloomTheme.textTertiary)
+
+                                    Text(localization.currentLanguage == .turkish ? "Bu ay için anı yok" : "No memories this month")
+                                        .font(.system(size: 13, weight: .light, design: .serif))
+                                        .foregroundColor(BloomTheme.textSecondary)
+                                }
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 40)
+                            } else {
+                                // Grid of Polaroid memory cards
+                                VStack(spacing: 12) {
+                                    ForEach(monthMemories, id: \.id) { memory in
+                                        HStack(spacing: 12) {
+                                            // Mini Polaroid card
+                                            VStack(spacing: 0) {
+                                                if let image = memory.image {
+                                                    image.resizable()
+                                                        .scaledToFill()
+                                                        .frame(height: 100)
+                                                        .clipped()
+                                                } else {
+                                                    LinearGradient(
+                                                        gradient: Gradient(colors: [
+                                                            BloomTheme.agedParchment,
+                                                            BloomTheme.agedParchment.opacity(0.9)
+                                                        ]),
+                                                        startPoint: .topLeading,
+                                                        endPoint: .bottomTrailing
+                                                    )
+                                                    .frame(height: 100)
+                                                }
+
+                                                // Day label
+                                                VStack(spacing: 4) {
+                                                    let dayComponent = calendar.component(.day, from: memory.date)
+                                                    let monthName = getMonthName(selectedMonth)
+                                                    Text("\(dayComponent) \(monthName)")
+                                                        .font(.system(size: 10, weight: .light, design: .serif))
+                                                        .foregroundColor(BloomTheme.textPrimary)
+                                                        .italic()
+
+                                                    if !memory.note.isEmpty {
+                                                        Text(memory.note.prefix(40) + (memory.note.count > 40 ? "..." : ""))
+                                                            .font(.system(size: 9, weight: .light))
+                                                            .foregroundColor(BloomTheme.textSecondary)
+                                                            .lineLimit(1)
+                                                    }
+                                                }
+                                                .padding(8)
+                                                .frame(maxWidth: .infinity, alignment: .leading)
+                                            }
+                                            .background(Color.white)
+                                            .cornerRadius(8)
+                                            .shadow(color: Color.black.opacity(0.04), radius: 4, x: 0, y: 2)
+
+                                            Spacer()
+                                        }
+                                    }
+                                }
                             }
                         }
                         .padding(.horizontal, 16)
-
-                    LazyVGrid(columns: columns, spacing: 8) {
-                        ForEach(0..<currentMonthDays.count, id: \.self) { index in
-                            if let day = currentMonthDays[index] {
-                                if let tileDate = getTileDate(day: day) {
-                                    if getDailyEntry(for: tileDate) != nil {
-                                        NavigationLink(destination: DailyMemoriesView(selectedDate: tileDate)
-                                            .environmentObject(memoryStore)
-                                            .environmentObject(localization)
-                                        ) {
-                                            CalendarTile(
-                                                day: day,
-                                                tileDate: tileDate,
-                                                memoryStore: memoryStore,
-                                                sageGreen: BloomTheme.sageGreen
-                                            )
-                                        }
-                                    } else {
-                                        CalendarTile(
-                                            day: day,
-                                            tileDate: tileDate,
-                                            memoryStore: memoryStore,
-                                            sageGreen: BloomTheme.sageGreen
-                                        )
-                                    }
-                                }
-                            } else {
-                                Color.clear
-                                    .frame(height: 100)
-                            }
-                        }
+                        .padding(.bottom, 20)
                     }
-                    .padding(.horizontal, 16)
-
-                    Spacer(minLength: 40)
-                }
-                .padding(.bottom, 80)
                 }
             }
         }
@@ -186,121 +246,19 @@ struct CalendarView: View {
         }
     }
 
-    private func getTileDate(day: Int) -> Date? {
-        var dateComponents = DateComponents()
-        dateComponents.year = selectedYear
-        dateComponents.month = selectedMonth
-        dateComponents.day = day
-        return calendar.date(from: dateComponents)
-    }
-
-    private func getDailyEntry(for tileDate: Date) -> Memory? {
-        memoryStore.memories.first { memory in
-            calendar.isDate(memory.date, inSameDayAs: tileDate)
-        }
-    }
-}
-
-struct CalendarTile: View {
-    let day: Int
-    let tileDate: Date
-    @ObservedObject var memoryStore: MemoryStore
-    let sageGreen: Color
-    let calendar = Calendar.current
-
-    var dailyEntry: Memory? {
-        memoryStore.memories.first { memory in
-            calendar.isDate(memory.date, inSameDayAs: tileDate)
-        }
-    }
-
-    var body: some View {
-        VStack(spacing: 0) {
-            ZStack(alignment: .center) {
-                LinearGradient(
-                    gradient: Gradient(colors: [Color(red: 0.96, green: 0.94, blue: 0.91), Color(red: 0.96, green: 0.94, blue: 0.91).opacity(0.9)]),
-                    startPoint: .topLeading,
-                    endPoint: .bottomTrailing
-                )
-
-                if let entry = dailyEntry {
-                    if let firstImage = entry.images.first {
-                        firstImage.resizable()
-                            .aspectRatio(contentMode: .fill)
-                            .onAppear {
-                                print("QA_LOG: CalendarTile - Rendering first image from \(entry.images.count) images for day \(day)")
-                            }
-                    } else if let image = entry.image {
-                        image.resizable()
-                            .aspectRatio(contentMode: .fill)
-                            .onAppear {
-                                print("QA_LOG: CalendarTile - Rendering fallback image for day \(day)")
-                            }
-                    } else {
-                        VStack {
-                            Image(systemName: "leaf")
-                                .font(.system(size: 20, weight: .light))
-                                .foregroundColor(sageGreen.opacity(0.4))
-                        }
-                    }
-                } else {
-                    VStack {
-                        Image(systemName: "leaf")
-                            .font(.system(size: 20, weight: .light))
-                            .foregroundColor(sageGreen.opacity(0.4))
-                    }
-                }
-            }
-            .frame(height: 80)
-            .cornerRadius(8)
-            .clipped()
-
-            VStack(alignment: .leading, spacing: 4) {
-                HStack(spacing: 6) {
-                    Text("\(day)")
-                        .font(.system(size: 14, weight: .light, design: .serif))
-                        .foregroundColor(Color.black.opacity(0.8))
-
-                    if let entry = dailyEntry {
-                        let symbolName = moodEmojiToSymbol(entry.emoji)
-                        Image(systemName: symbolName)
-                            .font(.system(size: 11, weight: .ultraLight))
-                            .foregroundColor(sageGreen.opacity(0.7))
-                    }
-
-                    Spacer()
-                }
-
-                if let entry = dailyEntry {
-                    Text(entry.note.prefix(40) + (entry.note.count > 40 ? "..." : ""))
-                        .font(.system(size: 9, weight: .light))
-                        .foregroundColor(Color.black.opacity(0.6))
-                        .lineLimit(1)
-                }
-            }
-            .padding(8)
-            .frame(maxWidth: .infinity, alignment: .leading)
-        }
-        .background(Color.white)
-        .cornerRadius(10)
-        .shadow(color: Color.black.opacity(0.06), radius: 6, x: 0, y: 2)
-        .contentShape(Rectangle())
-    }
-}
-
-func moodEmojiToSymbol(_ emoji: String) -> String {
-    switch emoji {
-    case "🌸": return "leaf.rose"
-    case "🌿": return "leaf"
-    case "🌾": return "sun.haze"
-    case "🍂": return "drop"
-    case "🥀": return "wind"
-    default: return "leaf"
+    private func getMonthName(_ month: Int) -> String {
+        let formatter = DateFormatter()
+        formatter.locale = localization.currentLanguage == .turkish ? Locale(identifier: "tr_TR") : Locale(identifier: "en_US")
+        guard let date = calendar.date(from: DateComponents(month: month, day: 1)) else { return "" }
+        formatter.dateFormat = "MMMM"
+        return formatter.string(from: date)
     }
 }
 
 #Preview {
-    CalendarView()
-        .environmentObject(LocalizationManager())
-        .environmentObject(MemoryStore.shared)
+    NavigationStack {
+        CalendarView()
+            .environmentObject(LocalizationManager())
+            .environmentObject(MemoryStore.shared)
+    }
 }
